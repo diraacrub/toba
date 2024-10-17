@@ -6,7 +6,7 @@ INSERT INTO apex_proyecto (proyecto, descripcion, descripcion_corta, estilo, con
 	'catedras', --proyecto
 	'CATEDRAS', --descripcion
 	'Catedras', --descripcion_corta
-	'plastik', --estilo
+	'v2_azul', --estilo
 	'1', --con_frames
 	NULL, --frames_clase
 	NULL, --frames_archivo
@@ -40,7 +40,7 @@ INSERT INTO apex_proyecto (proyecto, descripcion, descripcion_corta, estilo, con
 	'13', --pm_usuario
 	NULL, --usuario_subclase
 	NULL, --usuario_subclase_archivo
-	NULL, --encriptar_qs
+	'0', --encriptar_qs
 	'1', --registrar_solicitud
 	NULL, --registrar_cronometro
 	'2', --item_inicio_sesion
@@ -56,7 +56,7 @@ INSERT INTO apex_proyecto (proyecto, descripcion, descripcion_corta, estilo, con
 	NULL, --version_detalle
 	NULL, --version_link
 	NULL, --tiempo_espera_ms
-	NULL, --navegacion_ajax
+	'0', --navegacion_ajax
 	NULL, --codigo_ga_tracker
 	TRUE, --extension_toba
 	FALSE  --extension_proyecto
