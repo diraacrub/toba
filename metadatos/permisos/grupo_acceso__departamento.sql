@@ -38,18 +38,30 @@ INSERT INTO apex_usuario_grupo_acc_item (proyecto, usuario_grupo_acc, item_id, i
 	'catedras', --proyecto
 	'departamento', --usuario_grupo_acc
 	NULL, --item_id
-	'3468'  --item
-);
-INSERT INTO apex_usuario_grupo_acc_item (proyecto, usuario_grupo_acc, item_id, item) VALUES (
-	'catedras', --proyecto
-	'departamento', --usuario_grupo_acc
-	NULL, --item_id
-	'3469'  --item
-);
-INSERT INTO apex_usuario_grupo_acc_item (proyecto, usuario_grupo_acc, item_id, item) VALUES (
-	'catedras', --proyecto
-	'departamento', --usuario_grupo_acc
-	NULL, --item_id
 	'3471'  --item
+);
+INSERT INTO apex_usuario_grupo_acc_item (proyecto, usuario_grupo_acc, item_id, item) VALUES (
+	'catedras', --proyecto
+	'departamento', --usuario_grupo_acc
+	NULL, --item_id
+	'3472'  --item
+);
+INSERT INTO apex_usuario_grupo_acc_item (proyecto, usuario_grupo_acc, item_id, item) VALUES (
+	'catedras', --proyecto
+	'departamento', --usuario_grupo_acc
+	NULL, --item_id
+	'3475'  --item
+);
+INSERT INTO apex_usuario_grupo_acc_item (proyecto, usuario_grupo_acc, item_id, item) VALUES (
+	'catedras', --proyecto
+	'departamento', --usuario_grupo_acc
+	NULL, --item_id
+	'3476'  --item
+);
+INSERT INTO apex_usuario_grupo_acc_item (proyecto, usuario_grupo_acc, item_id, item) VALUES (
+	'catedras', --proyecto
+	'departamento', --usuario_grupo_acc
+	NULL, --item_id
+	'3478'  --item
 );
 --- FIN Grupo de desarrollo 0

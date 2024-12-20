@@ -2,9 +2,10 @@
 class ci_programas extends catedras_ci
 
 {
-	//esto es de operaciones docentes
+	//esto es de operaciones departamentos
 	
-	private $id_programa_seleccionado;
+	
+private $id_programa_seleccionado;
 
 private $nombre_materia_selec;
 private $cod_guarani_selec;
@@ -46,7 +47,7 @@ private $id_programa_selec;
 
 	
 	function vista_impresion(toba_impresion $salida)
-{ 
+{
 	// Recuperar los datos del programa seleccionado desde la memoria
 	$this->id_programa_seleccionado = toba::memoria()->get_dato_operacion('id_programa_seleccionado');
 	$this->ano_academico_selec = toba::memoria()->get_dato_operacion('ano_academico_selec');
@@ -166,7 +167,6 @@ private $id_programa_selec;
 	
 	function conf__formulario_con_todo(toba_ei_formulario $form)
 {
-
 	// Verificar si los datos están cargados
 	if ($this->dep('datos')->esta_cargada()) {
 		// Obtener los datos del programa
@@ -211,69 +211,55 @@ $this->horas_teoricopracticas_selec = $datos_programa['horas_teoricopracticas'];
 $this->cronograma_tentativo_selec = $datos_programa['cronograma_tentativo'];
 $this->estado_selec = $datos_programa['estado'];
 $this->comentarios_selec = $datos_programa['comentarios'];
+//$this->comentario_selec = $datos_programa['comentario'];
 $this->cod_carrera_selec = $datos_programa['cod_carrera'];
 $this->id_programa_selec = $datos_programa['id_programa'];
 // Almacenar en memoria
-toba::memoria()->set_dato_operacion('ano_academico_selec', $this->ano_academico_selec); 
-toba::memoria()->set_dato_operacion('nombre_materia_selec', $this->nombre_materia_selec); 
-toba::memoria()->set_dato_operacion('cod_guarani_selec', $this->cod_guarani_selec); 
-toba::memoria()->set_dato_operacion('nombre_carrera_selec', $this->nombre_carrera_selec); 
-toba::memoria()->set_dato_operacion('depto_selec', $this->depto_selec); 
-toba::memoria()->set_dato_operacion('area_selec', $this->area_selec); 
-toba::memoria()->set_dato_operacion('orientacion_selec', $this->orientacion_selec); 
-toba::memoria()->set_dato_operacion('optativa_selec', $this->optativa_selec); 
-toba::memoria()->set_dato_operacion('trayecto_selec', $this->trayecto_selec); 
-toba::memoria()->set_dato_operacion('periodo_dictado_selec', $this->periodo_dictado_selec); 
-toba::memoria()->set_dato_operacion('ano_plan_selec', $this->ano_plan_selec); 
-toba::memoria()->set_dato_operacion('horas_totales_selec', $this->horas_totales_selec); 
-toba::memoria()->set_dato_operacion('horas_semanales_selec', $this->horas_semanales_selec); 
-toba::memoria()->set_dato_operacion('correlativas_para_cursar_selec', $this->correlativas_para_cursar_selec); 
-toba::memoria()->set_dato_operacion('correlativas_para_aprobar_selec', $this->correlativas_para_aprobar_selec); 
-toba::memoria()->set_dato_operacion('contenidos_minimos_selec', $this->contenidos_minimos_selec); 
-toba::memoria()->set_dato_operacion('competencias_selec', $this->competencias_selec); 
-toba::memoria()->set_dato_operacion('plan_ordenanzas_selec', $this->plan_ordenanzas_selec); 
-toba::memoria()->set_dato_operacion('apellido_resp_selec', $this->apellido_resp_selec); 
-toba::memoria()->set_dato_operacion('nombre_resp_selec', $this->nombre_resp_selec); 
-toba::memoria()->set_dato_operacion('cargo_resp_selec', $this->cargo_resp_selec); 
-toba::memoria()->set_dato_operacion('equipo_catedra_selec', $this->equipo_catedra_selec); 
-toba::memoria()->set_dato_operacion('fundamentacion_selec', $this->fundamentacion_selec); 
-toba::memoria()->set_dato_operacion('objetivos_selec', $this->objetivos_selec); 
-toba::memoria()->set_dato_operacion('programa_analitico_selec', $this->programa_analitico_selec); 
-toba::memoria()->set_dato_operacion('bibliografia_selec', $this->bibliografia_selec); 
-toba::memoria()->set_dato_operacion('propuesta_metodologica_selec', $this->propuesta_metodologica_selec); 
-toba::memoria()->set_dato_operacion('evaluacion_acreditacion_selec', $this->evaluacion_acreditacion_selec); 
-toba::memoria()->set_dato_operacion('distribucion_horaria_selec', $this->distribucion_horaria_selec); 
-toba::memoria()->set_dato_operacion('horas_teoricas_selec', $this->horas_teoricas_selec); 
-toba::memoria()->set_dato_operacion('horas_practicas_selec', $this->horas_practicas_selec); 
-toba::memoria()->set_dato_operacion('horas_teoricopracticas_selec', $this->horas_teoricopracticas_selec); 
-toba::memoria()->set_dato_operacion('cronograma_tentativo_selec', $this->cronograma_tentativo_selec); 
-toba::memoria()->set_dato_operacion('estado_selec', $this->estado_selec); 
-toba::memoria()->set_dato_operacion('comentarios_selec', $this->comentarios_selec); 
-toba::memoria()->set_dato_operacion('comentario_selec', $this->comentario_selec); 
-toba::memoria()->set_dato_operacion('cod_carrera_selec', $this->cod_carrera_selec); 
-toba::memoria()->set_dato_operacion('id_programa_selec', $this->id_programa_selec); 
+toba::memoria()->set_dato_operacion('ano_academico_selec', $this->ano_academico_selec);
+toba::memoria()->set_dato_operacion('nombre_materia_selec', $this->nombre_materia_selec);
+toba::memoria()->set_dato_operacion('cod_guarani_selec', $this->cod_guarani_selec);
+toba::memoria()->set_dato_operacion('nombre_carrera_selec', $this->nombre_carrera_selec);
+toba::memoria()->set_dato_operacion('depto_selec', $this->depto_selec);
+toba::memoria()->set_dato_operacion('area_selec', $this->area_selec);
+toba::memoria()->set_dato_operacion('orientacion_selec', $this->orientacion_selec);
+toba::memoria()->set_dato_operacion('optativa_selec', $this->optativa_selec);
+toba::memoria()->set_dato_operacion('trayecto_selec', $this->trayecto_selec);
+toba::memoria()->set_dato_operacion('periodo_dictado_selec', $this->periodo_dictado_selec);
+toba::memoria()->set_dato_operacion('ano_plan_selec', $this->ano_plan_selec);
+toba::memoria()->set_dato_operacion('horas_totales_selec', $this->horas_totales_selec);
+toba::memoria()->set_dato_operacion('horas_semanales_selec', $this->horas_semanales_selec);
+toba::memoria()->set_dato_operacion('correlativas_para_cursar_selec', $this->correlativas_para_cursar_selec);
+toba::memoria()->set_dato_operacion('correlativas_para_aprobar_selec', $this->correlativas_para_aprobar_selec);
+toba::memoria()->set_dato_operacion('contenidos_minimos_selec', $this->contenidos_minimos_selec);
+toba::memoria()->set_dato_operacion('competencias_selec', $this->competencias_selec);
+toba::memoria()->set_dato_operacion('plan_ordenanzas_selec', $this->plan_ordenanzas_selec);
+toba::memoria()->set_dato_operacion('apellido_resp_selec', $this->apellido_resp_selec);
+toba::memoria()->set_dato_operacion('nombre_resp_selec', $this->nombre_resp_selec);
+toba::memoria()->set_dato_operacion('cargo_resp_selec', $this->cargo_resp_selec);
+toba::memoria()->set_dato_operacion('equipo_catedra_selec', $this->equipo_catedra_selec);
+toba::memoria()->set_dato_operacion('fundamentacion_selec', $this->fundamentacion_selec);
+toba::memoria()->set_dato_operacion('objetivos_selec', $this->objetivos_selec);
+toba::memoria()->set_dato_operacion('programa_analitico_selec', $this->programa_analitico_selec);
+toba::memoria()->set_dato_operacion('bibliografia_selec', $this->bibliografia_selec);
+toba::memoria()->set_dato_operacion('propuesta_metodologica_selec', $this->propuesta_metodologica_selec);
+toba::memoria()->set_dato_operacion('evaluacion_acreditacion_selec', $this->evaluacion_acreditacion_selec);
+toba::memoria()->set_dato_operacion('distribucion_horaria_selec', $this->distribucion_horaria_selec);
+toba::memoria()->set_dato_operacion('horas_teoricas_selec', $this->horas_teoricas_selec);
+toba::memoria()->set_dato_operacion('horas_practicas_selec', $this->horas_practicas_selec);
+toba::memoria()->set_dato_operacion('horas_teoricopracticas_selec', $this->horas_teoricopracticas_selec);
+toba::memoria()->set_dato_operacion('cronograma_tentativo_selec', $this->cronograma_tentativo_selec);
+toba::memoria()->set_dato_operacion('estado_selec', $this->estado_selec);
+toba::memoria()->set_dato_operacion('comentarios_selec', $this->comentarios_selec);
+toba::memoria()->set_dato_operacion('comentario_selec', $this->comentario_selec);
+toba::memoria()->set_dato_operacion('cod_carrera_selec', $this->cod_carrera_selec);
+toba::memoria()->set_dato_operacion('id_programa_selec', $this->id_programa_selec);
 			
 			
 			// Establecer los datos en el formulario
 			$form->set_datos($datos_programa);
 
 			// Setear de solo lectura para 'contenidos_minimos'
-			// $form->set_solo_lectura(array('contenidos_minimos'), true);
-
-			// Definir carreras que no muestran horas teóricas prácticas
-			$carreras_coneau = array('LBIB', 'LENB', 'ICIB', 'IELB', 'IETB', 'IMEB', 'IPEB', 'IQUB');
-
-			// Verificar si la carrera pertenece a las que están en el array
-			if (in_array($this->cod_carrera_selec, $carreras_coneau)) {
-			//if (in_array($datos_programa['cod_carrera'], $carreras_coneau)) {
-				// Hacer el campo "horas_teoricopracticas" solo lectura
-				$form->set_solo_lectura(array('horas_teoricopracticas'), true);
-					toba::notificacion()->agregar("No editable");
-			} else {
-				// Asegurarse de que el campo sea editable
-				$form->set_solo_lectura(array('horas_teoricopracticas'), false);
-				toba::notificacion()->agregar("Editable");        
-			}
+			$form->set_solo_lectura(array('contenidos_minimos'), true);
 		}
 	} else {
 		// Si no hay datos cargados, eliminar el evento de eliminar
@@ -282,82 +268,10 @@ toba::memoria()->set_dato_operacion('id_programa_selec', $this->id_programa_sele
 }
 
 	
+	
 
 
 function evt__formulario_con_todo__modificacion($datos) {
-	// Obtener los datos obligatorios
-	$this->id_programa_seleccionado = toba::memoria()->get_dato_operacion('id_programa_seleccionado');
-	$datos_programa = $this->dep('datos')->tabla('programas')->get_datos_programa($this->id_programa_seleccionado);
-
-	$estado = isset($datos['estado']) ? $datos['estado'] : "docente";
-	$equipo_catedra = isset($datos['equipo_catedra']) ? $datos['equipo_catedra'] : "";
-	$fundamentacion = isset($datos['fundamentacion']) ? $datos['fundamentacion'] : "";
-	$objetivos = isset($datos['objetivos']) ? $datos_programa['objetivos'] : "";
-	$programa_analitico = isset($datos['programa_analitico']) ? $datos_programa['programa_analitico'] : "";
-	$bibliografia = isset($datos['bibliografia']) ? $datos_programa['bibliografia'] : "";
-	$propuesta_metodologica = isset($datos['propuesta_metodologica']) ? $datos_programa['propuesta_metodologica'] : "";
-	$evaluacion_acreditacion = isset($datos['evaluacion_acreditacion']) ? $datos_programa['evaluacion_acreditacion'] : "";
-	$distribucion_horaria = isset($datos['distribucion_horaria']) ? $datos_programa['distribucion_horaria'] : "";
-	$horas_teoricas = isset($datos['horas_teoricas']) ? $datos_programa['horas_teoricas'] : "";
-	$horas_practicas = isset($datos['horas_practicas']) ? $datos_programa['horas_practicas'] : "";
-	$horas_teoricopracticas = isset($datos['horas_teoricopracticas']) ? $datos_programa['horas_teoricopracticas'] : "";
-	$cronograma_tentativo = isset($datos['cronograma_tentativo']) ? $datos_programa['cronograma_tentativo'] : "";
-	//
-	// Obtener las horas
-	$horas_totales = isset($datos['horas_totales']) ? $datos['horas_totales'] : 0;
-	$horas_practicas = isset($datos['horas_practicas']) ? $datos['horas_practicas'] : 0;
-	$horas_teoricas = isset($datos['horas_teoricas']) ? $datos['horas_teoricas'] : 0;
-	$horas_teoricopracticas = isset($datos['horas_teoricopracticas']) ? $datos['horas_teoricopracticas'] : 0;
-	$cod_carrera = isset($datos['cod_carrera']) ? $datos['cod_carrera'] : 0;
-	// Definir carreras que no muestran horas teóricas prácticas
-	$carreras_coneau = array('LBIB', 'LENB', 'ICIB', 'IELB', 'IETB', 'IMEB', 'IPEB', 'IQUB');
-	// Calcular el subtotal de horas dependiendo si es coneau o no 
-	
-		if (in_array($cod_carrera, $carreras_coneau)) {
-		$subtotal_horas = $horas_practicas + $horas_teoricas;
-			toba::notificacion()->agregar("carrera: $cod_carrera, acredita ante coneau",'info');
-			
-			//pone en cero las horas teoricopracticas  
-			$datos['horas_teoricopracticas'] = 0;
-
-		} else {
-		$subtotal_horas = $horas_practicas + $horas_teoricas + $horas_teoricopracticas;
-			toba::notificacion()->agregar("carrera: $cod_carrera, no acredita ante coneau",'info');
-		}  
-		
-		
-// Validar si las horas coinciden
-if ($subtotal_horas != $horas_totales) {
-	// Asignar 0 a las horas
-	$datos['horas_teoricas'] = 0;
-	$datos['horas_practicas'] = 0;
-	$datos['horas_teoricopracticas'] = 0;
-	$datos['horas_totales'] = 0;
-
-	// Cambiar el estado a "docente"
-	$datos['estado'] = 'docente';
-
-	// Guardar los datos modificados antes del error
-	$this->dep('datos')->tabla('programas')->set($datos);
-	$this->dep('datos')->sincronizar();
-
-	// Lanzar el error para que el usuario corrija las horas
-	throw new toba_error("La suma de horas no coincide con la carga horaria total por plan de estudios, por favor corrija.");
-}
-
-	
-	// Validar estado es depto y faltan cargar datos obligatorios
-		if ($estado === "depto" && empty($fundamentacion)) {
-				// Cambiar el estado a "docente"
-			$datos['estado'] = 'docente';
-
-			// Guardar los datos modificados antes del error
-			$this->dep('datos')->tabla('programas')->set($datos);
-			$this->dep('datos')->sincronizar();
-			throw new toba_error("Falta cargar datos obligatorios, por favor corrija.");
-		}
-
-	
 
 	// Manejo de comentarios
 	$comentario = isset($datos['comentario']) ? $datos['comentario'] : '';
@@ -387,10 +301,10 @@ if ($subtotal_horas != $horas_totales) {
 	$this->dep('datos')->tabla('programas')->set($datos);
 
 	// Agregar una notificación para mostrar al guardar correctamente
-	toba::notificacion()->agregar("Su programa ha sido guardado correctamente",$this->cod_carrera_selec,'info');
+	toba::notificacion()->agregar("Su programa ha sido guardado correctamente", 'info');
 
 	// Refrescar el formulario para mostrar el nuevo subtotal
-	//$this->dep('datos')->tabla('programas')->sincronizar();
+	$this->dep('datos')->tabla('programas')->sincronizar();
 }
 
 	
@@ -409,9 +323,9 @@ if ($subtotal_horas != $horas_totales) {
 		$excepciones = array('toba', 'vero', 'nacho');
 
 		if (in_array($usuario_id, $excepciones)) {
-			$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_docente();
+			$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_depto();
 		} else {
-			$datos = $this->dep('datos')->tabla('programas')->get_listado_filtrado($usuario_id);
+			$datos = $this->dep('datos')->tabla('programas')->get_listado_filtrado_depto($usuario_id, $nombre_usuario);
 		}
 		
 		foreach ($datos as $key => $registro) {
@@ -444,7 +358,7 @@ if ($subtotal_horas != $horas_totales) {
 
 	$this->dep('datos')->cargar($datos);
 	$this->set_pantalla('pant_edicion');
-} 
+}
 		
 	
 	
@@ -462,10 +376,10 @@ if ($subtotal_horas != $horas_totales) {
 
 		if (in_array($usuario_id, $excepciones)) {
 			// Si el usuario es una excepción, obtener todos los datos
-			$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_depto();
+			$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_sac();
 		} else {
 				// Si no es una excepción, aplicar el filtro por legajo_resp y estado
-			$datos = $this->dep('datos')->tabla('programas')->get_listado_enviados($usuario_id);
+			$datos = $this->dep('datos')->tabla('programas')->get_listado_enviados_depto($usuario_id, $nombre_usuario);
 		}
 		foreach ($datos as $key => $registro) {
 			if ($registro ['estado'] === 'docente') {
@@ -517,8 +431,6 @@ if ($subtotal_horas != $horas_totales) {
 
 	function evt__guardar()
 	{
-	
-			
 		$this->dep('datos')->sincronizar();
 		$this->resetear();
 	}
@@ -526,7 +438,7 @@ if ($subtotal_horas != $horas_totales) {
 
 
 
-	//--$datos_programa---------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------
 	//---- Eventos ----------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------
 
