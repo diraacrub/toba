@@ -43,6 +43,11 @@ private $comentarios_selec;
 private $comentario_selec;
 private $cod_carrera_selec;
 private $id_programa_selec;
+private $firma_doc_selec;
+private $firma_dto_selec;
+private $firma_sac_selec;
+	
+
 
 	
 	function vista_impresion(toba_impresion $salida)
@@ -90,33 +95,81 @@ private $id_programa_selec;
 	// Verificar si el valor de id_programa_seleccionado está disponible
 	if (isset($this->id_programa_seleccionado)) {
 		
-			// Mensaje para el nombre de la materia
-		$salida->titulo('Nombre Materia: ' . $this->nombre_materia_selec);
-
-		
-		// Formato para ID del programa dentro de un cuadro
-		$formato_id_programa = '
-			<div style="border: 1px solid black; padding: 10px; margin: 10px 0;">
-				<strong>ID Programa Seleccionado:</strong> <em>' . $this->id_programa_seleccionado . '</em>
-			</div>';
-		$salida->mensaje($formato_id_programa);
 	
 		// Construir el mensaje con formato HTML para la distribución horaria
-		$formato_distribucion_horaria = '<strong>Distribución horaria:</strong><br>' . $this->distribucion_horaria_selec;
+		//$formato_distribucion_horaria = '<strong>Distribución horaria:</strong><br>' . $this->distribucion_horaria_selec;
 					
 		$imagen = toba::proyecto()->get_path().'/www/img/logo_toba_siu.jpg';
-		$encabezado = '<img src="https://web.crub.uncoma.edu.ar/wp-content/uploads/2021/04/logo-unco-bariloche-azul-gris.png" alt="Logo Toba SIU">';
+		
+		$abre_div_style_1 = '<div style="font-size: 15px; font-family: Times New Roman">';
+		$cierra_div_style_1 = '</div>';
 
+		//texto corrido hacia la derecha
+		$abre_div_style_2 = '<div style="margin-left: 20px;">';
+		$cierra_div_style_2 = '</div>';
 		
-		// Imprimir la distribución horaria
-		$salida->mensaje($formato_distribucion_horaria . $encabezado) ;
-		
+		// Encabezado imagen UNCo más chico y alineado a la izquierda
+		$encabezado = '<img src="https://web.crub.uncoma.edu.ar/wp-content/uploads/2021/04/logo-unco-bariloche-azul-gris.png" alt="Logo Toba SIU" style="width: 200px; height: auto; float: left; margin-right: 20px;">';
+		$salida->mensaje($encabezado . ' <br><br><br><br><br><br><br><br> ') ;
+
 		// SALIDA DE TODOS LOS CAMPOS
-		$salida->titulo('Año académico: ' . $this->ano_academico_selec);
-		$salida->titulo('Materia: ' . $this->nombre_materia_selec);
-		$salida->titulo('Cod.Guaraní: ' . $this->cod_guarani_selec);
-		$salida->titulo('Carrera: ' . $this->nombre_carrera_selec);
-		$salida->titulo('Departamento: ' . $this->depto_selec);
+		$salida->mensaje('<div style="text-align: center; font-size: 15px; font-family: Times New Roman">AÑO ACADÉMICO: '
+			. '<strong>' . $this->ano_academico_selec . '</strong></div><br><br>');
+		$salida->mensaje('<div style="font-size: 15px; font-family: Times New Roman">DEPARTAMENTO: '
+			. $this->depto_selec . '</div>');
+		$salida->mensaje('<div style="font-size: 15px; font-family: Times New Roman">PROGRAMA DE CÁTEDRA: '
+			. '<strong>' . $this->nombre_materia_selec . '</strong><br> (Cod.Guaraní: '.$this->cod_guarani_selec.')</div>');
+		$salida->mensaje($abre_div_style_1.'OPTATIVA: ' . $this->optativa_selec.$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'CARRERA A LA QUE PERTENECE Y/O SE OFRECE: <br>' 
+							. $this->nombre_carrera_selec.$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'ÁREA: ' . $this->area_selec.$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'ORIENTACIÓN: ' . $this->orientacion_selec.$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'PLAN DE ESTUDIOS ORD.: ' . $this->plan_ordenanzas_selec.$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'TRAYECTO (PEF): ' . $this->trayecto_selec.$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'CARGA HORARIA SEMANAL SEGÚN PLAN DE ESTUDIOS: ' . $this->horas_semanales_selec.$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'CARGA HORARIA TOTAL: ' . $this->horas_totales_selec.$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'RÉGIMEN: ' . $this->periodo_dictado_selec.$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'EQUIPO DE CÁTEDRA: <br>'.
+				$abre_div_style_2.'<strong>'.
+				$this->apellido_resp_selec.', '.$this->nombre_resp_selec.
+				' - ' . $this->cargo_resp_selec.'</strong><br>'
+				.nl2br($this->equipo_catedra_selec).$cierra_div_style_2.$cierra_div_style_1);        
+		$salida->mensaje($abre_div_style_1.'ASIGNATURAS CORRELATIVAS (según plan de estudios): '
+		.$abre_div_style_2
+		.'- PARA CURSAR: <br> ' . nl2br($this->correlativas_para_cursar_selec).'<br> <br>'
+		.'- PARA RENDIR EXAMEN FINAL: <br>' . nl2br($this->correlativas_para_aprobar_selec).$cierra_div_style_1.$cierra_div_style_2);
+		$salida->mensaje($abre_div_style_1.'<strong> 1. FUNDAMENTACIÓN:</strong> <br>' . $this->fundamentacion_selec.$cierra_div_style_1);              
+		$salida->mensaje($abre_div_style_1.'<strong> 2. OJETIVOS:</strong> <br>' . $this->objetivos_selec.$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'<strong> 3. CONTENIDOS SEGÚN PLAN DE ESTUDIOS: </strong> <br>' . nl2br($this->contenidos_minimos_selec).$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'Competencias: ' . nl2br($this->competencias_selec).$cierra_div_style_1);
+		
+		
+		
+		
+		$salida->mensaje($abre_div_style_1.'Programa analítico: ' . $this->programa_analitico_selec.$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'Bibliografía: ' . $this->bibliografia_selec.$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'Propuesta Metodológica: ' . $this->propuesta_metodologica_selec.$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'Evaluación y acreditación: ' . $this->evaluacion_acreditacion_selec.$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'Distribución Horaria: ' . $this->distribucion_horaria_selec.$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'Horas teóricas: ' . $this->horas_teoricas_selec.$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'Horas prácticas: ' . $this->horas_practicas_selec.$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'Horas teorico-prácticas: ' . $this->horas_teoricopracticas_selec.$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'Cronograma tentativo: ' . $this->cronograma_tentativo_selec.$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'Estado: ' . $this->estado_selec.$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'Comentarios: ' . $this->comentarios_selec.$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'Comentario: ' . $this->comentario_selec.$cierra_div_style_1);
+		$salida->mensaje($abre_div_style_1.'Codigo carrera: ' . $this->cod_carrera_selec.$cierra_div_style_1);
+		
+		$salida->mensaje('<div style="border: 1px solid black; padding: 10px; margin: 10px 0;">
+			<strong>ID Control:</strong> <em>' . $this->id_programa_seleccionado . '</em></div>');
+
+
+	
+	
+	
+	
+	
+		$salida->titulo($abre_div_style_1.'Carrera: ' . $this->nombre_carrera_selec).$cierra_div_style_1;
 		$salida->titulo('Area: ' . $this->area_selec);
 		$salida->titulo('Orientación: ' . $this->orientacion_selec);
 		$salida->titulo('Optativa: ' . $this->optativa_selec);
@@ -125,15 +178,15 @@ private $id_programa_selec;
 		$salida->titulo('Año: ' . $this->ano_plan_selec);
 		$salida->titulo('Horas totales: ' . $this->horas_totales_selec);
 		$salida->titulo('Horas semanales: ' . $this->horas_semanales_selec);
-		$salida->titulo('Correlativas para cursar:: ' . $this->correlativas_para_cursar_selec);
-		$salida->titulo('Correlativas para rendir: ' . $this->correlativas_para_aprobar_selec);
-		$salida->titulo('Contenidos Mínimos: ' . $this->contenidos_minimos_selec);
-		$salida->titulo('Competencias: ' . $this->competencias_selec);
+		$salida->titulo('Correlativas para cursar: <br> ' . nl2br($this->correlativas_para_cursar_selec));
+		$salida->titulo('Correlativas para rendir: <br>' . nl2br($this->correlativas_para_aprobar_selec));
+		$salida->titulo('Contenidos Mínimos: ' . nl2br($this->contenidos_minimos_selec));
+		$salida->titulo('Competencias: ' . nl2br($this->competencias_selec));
 		$salida->titulo('Plan de Estudios Ord.: ' . $this->plan_ordenanzas_selec);
 		$salida->titulo('Apellido: ' . $this->apellido_resp_selec);
 		$salida->titulo('Nombre: ' . $this->nombre_resp_selec);
 		$salida->titulo('Cargo: ' . $this->cargo_resp_selec);
-		$salida->titulo('Equipo de cátedra: ' . $this->equipo_catedra_selec);
+		$salida->titulo('Equipo de cátedra: ' . nl2br($this->equipo_catedra_selec));
 		$salida->titulo('Fundamentación: ' . $this->fundamentacion_selec);
 		$salida->titulo('Objetivos: ' . $this->objetivos_selec);
 		$salida->titulo('Programa analítico: ' . $this->programa_analitico_selec);
@@ -150,11 +203,13 @@ private $id_programa_selec;
 		$salida->titulo('Comentario: ' . $this->comentario_selec);
 		$salida->titulo('Codigo carrera: ' . $this->cod_carrera_selec);
 		
+		$salida->mensaje('<div style="border: 1px solid black; padding: 10px; margin: 10px 0;">
+			<strong>Código carrera:</strong> <em>' . $this->cod_carrera_selec . '</em></div>');
+
+		$salida->mensaje('<div style="border: 1px solid black; padding: 10px; margin: 10px 0;">
+			<strong>ID Control:</strong> <em>' . $this->id_programa_seleccionado . '</em></div>');
 
 
-		// Obtener los datos del programa seleccionado
-		$datos_programa = $this->dep('datos')->tabla('programas')->get_datos_programa($this->id_programa_seleccionado);
-		// Aquí podrías imprimir otros datos de $datos_programa si es necesario
 	} else {
 		$salida->titulo('No se ha seleccionado un programa.');
 	}
@@ -213,6 +268,10 @@ $this->estado_selec = $datos_programa['estado'];
 $this->comentarios_selec = $datos_programa['comentarios'];
 $this->cod_carrera_selec = $datos_programa['cod_carrera'];
 $this->id_programa_selec = $datos_programa['id_programa'];
+			
+$this->firma_doc_selec = $datos_programa['firma_doc'];
+$this->firma_dto_selec = $datos_programa['firma_dto'];
+$this->firma_sac_selecc = $datos_programa['firma_sac'];
 // Almacenar en memoria
 toba::memoria()->set_dato_operacion('ano_academico_selec', $this->ano_academico_selec); 
 toba::memoria()->set_dato_operacion('nombre_materia_selec', $this->nombre_materia_selec); 
@@ -252,7 +311,9 @@ toba::memoria()->set_dato_operacion('comentarios_selec', $this->comentarios_sele
 toba::memoria()->set_dato_operacion('comentario_selec', $this->comentario_selec); 
 toba::memoria()->set_dato_operacion('cod_carrera_selec', $this->cod_carrera_selec); 
 toba::memoria()->set_dato_operacion('id_programa_selec', $this->id_programa_selec); 
-			
+toba::memoria()->set_dato_operacion('firma_doc_selec', $this->firma_doc_selec);
+toba::memoria()->set_dato_operacion('firma_dto_selec', $this->firma_dto_selec);
+toba::memoria()->set_dato_operacion('firma_sac_selec', $this->firma_sac_selec);                 
 			
 			// Establecer los datos en el formulario
 			$form->set_datos($datos_programa);
@@ -268,11 +329,11 @@ toba::memoria()->set_dato_operacion('id_programa_selec', $this->id_programa_sele
 			//if (in_array($datos_programa['cod_carrera'], $carreras_coneau)) {
 				// Hacer el campo "horas_teoricopracticas" solo lectura
 				$form->set_solo_lectura(array('horas_teoricopracticas'), true);
-					toba::notificacion()->agregar("No editable");
+					//toba::notificacion()->agregar("No editable");
 			} else {
 				// Asegurarse de que el campo sea editable
 				$form->set_solo_lectura(array('horas_teoricopracticas'), false);
-				toba::notificacion()->agregar("Editable");        
+				//toba::notificacion()->agregar("Editable");        
 			}
 		}
 	} else {
@@ -282,9 +343,64 @@ toba::memoria()->set_dato_operacion('id_programa_selec', $this->id_programa_sele
 }
 
 	
-
-
 function evt__formulario_con_todo__modificacion($datos) {
+
+	// Manejo de comentarios
+	$comentario = isset($datos['comentario']) ? $datos['comentario'] : '';
+	if (!empty($comentario)) {
+		// Obtener el timestamp y el nombre del usuario
+		$timestamp = date('Y-m-d H:i:s');
+		$usuario_id = toba::usuario()->get_id();
+		$nombre_completo = toba::usuario()->get_nombre();
+		
+		// Crear el HTML del comentario
+		$nuevo_comentario = "<div style='border: 1px solid #ccc; padding: 10px; margin-top: 10px;'>
+								<strong>$nombre_completo ($usuario_id) - $timestamp</strong><br>
+								<p style='margin: 5px 0;'>$comentario</p>
+							</div>";
+
+		// Obtener el contenido existente del campo comentarios
+		$comentarios = $this->dep('datos')->tabla('programas')->get_columna('comentarios');
+
+		// Concatenar el nuevo comentario al contenido existente
+		$nuevo_comentarios = $comentarios . $nuevo_comentario;
+
+		// Asignar el nuevo valor a la columna comentarios
+		$datos['comentarios'] = $nuevo_comentarios;
+	}
+
+	// *** Lógica para actualizar firma_dto y firma_sac según el estado ***
+	if (isset($datos['estado'])) {
+		// Obtener el estado actual
+		$estado_nuevo = $datos['estado'];
+
+		if($estado_nuevo === 'depto') {
+			// Si el estado cambia a 'depto', actualizar 'docente' con la firma electrónica
+
+			// Obtener el nombre completo del usuario SAC
+			$nombre_completo = toba::usuario()->get_nombre();
+
+			// Crear un objeto DateTime con la zona horaria de Argentina
+			$timestamp_obj = new DateTime('now', new DateTimeZone('America/Argentina/Buenos_Aires'));
+			$formatted_timestamp = $timestamp_obj->format('Y-m-d H:i:s');
+
+			// Crear el contenido para 'firma_docente'
+			$datos['firma_doc'] = "Firmado electrónicamente por $nombre_completo - Responsable de Cátedra - $formatted_timestamp";
+		}
+	}
+	// *** Fin de la lógica para actualizar firma_dto y firma_sac ***
+
+	// Guardar los datos modificados en la tabla 'programas'
+	$this->dep('datos')->tabla('programas')->set($datos);
+
+	// Agregar una notificación para mostrar al guardar correctamente
+	toba::notificacion()->agregar("Su programa ha sido guardado correctamente", 'info');
+
+	// Sincronizar los datos con la base de datos
+	$this->dep('datos')->tabla('programas')->sincronizar();
+}
+
+function evt__formulario_con_todo__modificacion_viejo($datos) {
 	// Obtener los datos obligatorios
 	$this->id_programa_seleccionado = toba::memoria()->get_dato_operacion('id_programa_seleccionado');
 	$datos_programa = $this->dep('datos')->tabla('programas')->get_datos_programa($this->id_programa_seleccionado);
@@ -315,14 +431,14 @@ function evt__formulario_con_todo__modificacion($datos) {
 	
 		if (in_array($cod_carrera, $carreras_coneau)) {
 		$subtotal_horas = $horas_practicas + $horas_teoricas;
-			toba::notificacion()->agregar("carrera: $cod_carrera, acredita ante coneau",'info');
+			//toba::notificacion()->agregar("carrera: $cod_carrera, acredita ante coneau",'info');
 			
 			//pone en cero las horas teoricopracticas  
 			$datos['horas_teoricopracticas'] = 0;
 
 		} else {
 		$subtotal_horas = $horas_practicas + $horas_teoricas + $horas_teoricopracticas;
-			toba::notificacion()->agregar("carrera: $cod_carrera, no acredita ante coneau",'info');
+			//toba::notificacion()->agregar("carrera: $cod_carrera, no acredita ante coneau",'info');
 		}  
 		
 		

@@ -16,7 +16,7 @@ INSERT INTO apex_objeto (proyecto, objeto, anterior, identificador, reflexivo, c
 	'toba', --clase_proyecto
 	'toba_ci', --clase
 	'13', --punto_montaje
-	'ci_programas', --subclase
+	'ci_para_dptos_programas', --subclase
 	'programas/ci_para_dptos_programas.php', --subclase_archivo
 	NULL, --objeto_categoria_proyecto
 	NULL, --objeto_categoria

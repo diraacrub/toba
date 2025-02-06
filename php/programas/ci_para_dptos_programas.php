@@ -1,5 +1,5 @@
 <?php
-class ci_programas extends catedras_ci
+class ci_para_dptos_programas extends catedras_ci
 
 {
 	//esto es de operaciones departamentos
@@ -44,6 +44,9 @@ private $comentarios_selec;
 private $comentario_selec;
 private $cod_carrera_selec;
 private $id_programa_selec;
+private $firma_doc_selec;
+private $firma_dto_selec;
+private $firma_sac_selec;
 
 	
 	function vista_impresion(toba_impresion $salida)
@@ -214,6 +217,9 @@ $this->comentarios_selec = $datos_programa['comentarios'];
 //$this->comentario_selec = $datos_programa['comentario'];
 $this->cod_carrera_selec = $datos_programa['cod_carrera'];
 $this->id_programa_selec = $datos_programa['id_programa'];
+$this->firma_doc_selec = $datos_programa['firma_doc'];
+$this->firma_dto_selec = $datos_programa['firma_dto'];
+$this->firma_sac_selecc = $datos_programa['firma_sac'];
 // Almacenar en memoria
 toba::memoria()->set_dato_operacion('ano_academico_selec', $this->ano_academico_selec);
 toba::memoria()->set_dato_operacion('nombre_materia_selec', $this->nombre_materia_selec);
@@ -254,6 +260,10 @@ toba::memoria()->set_dato_operacion('comentario_selec', $this->comentario_selec)
 toba::memoria()->set_dato_operacion('cod_carrera_selec', $this->cod_carrera_selec);
 toba::memoria()->set_dato_operacion('id_programa_selec', $this->id_programa_selec);
 			
+toba::memoria()->set_dato_operacion('firma_doc_selec', $this->firma_doc_selec);
+toba::memoria()->set_dato_operacion('firma_dto_selec', $this->firma_dto_selec);
+toba::memoria()->set_dato_operacion('firma_sac_selec', $this->firma_sac_selec);          
+			
 			
 			// Establecer los datos en el formulario
 			$form->set_datos($datos_programa);
@@ -271,7 +281,7 @@ toba::memoria()->set_dato_operacion('id_programa_selec', $this->id_programa_sele
 	
 
 
-function evt__formulario_con_todo__modificacion($datos) {
+function evt__formulario_con_todo__modificacion_original($datos) {
 
 	// Manejo de comentarios
 	$comentario = isset($datos['comentario']) ? $datos['comentario'] : '';
@@ -304,6 +314,67 @@ function evt__formulario_con_todo__modificacion($datos) {
 	toba::notificacion()->agregar("Su programa ha sido guardado correctamente", 'info');
 
 	// Refrescar el formulario para mostrar el nuevo subtotal
+	$this->dep('datos')->tabla('programas')->sincronizar();
+}
+
+	function evt__formulario_con_todo__modificacion($datos) {
+
+	// Manejo de comentarios
+	$comentario = isset($datos['comentario']) ? $datos['comentario'] : '';
+	if (!empty($comentario)) {
+		// Obtener el timestamp y el nombre del usuario
+		$timestamp = date('Y-m-d H:i:s');
+		$usuario_id = toba::usuario()->get_id();
+		$nombre_completo = toba::usuario()->get_nombre();
+		
+		// Crear el HTML del comentario
+		$nuevo_comentario = "<div style='border: 1px solid #ccc; padding: 10px; margin-top: 10px;'>
+								<strong>$nombre_completo ($usuario_id) - $timestamp</strong><br>
+								<p style='margin: 5px 0;'>$comentario</p>
+								</div>";
+
+		// Obtener el contenido existente del campo comentarios
+		$comentarios = $this->dep('datos')->tabla('programas')->get_columna('comentarios');
+
+		// Concatenar el nuevo comentario al contenido existente
+		$nuevo_comentarios = $comentarios . $nuevo_comentario;
+
+		// Asignar el nuevo valor a la columna comentarios
+		$datos['comentarios'] = $nuevo_comentarios;
+	}
+
+	// *** Lógica para actualizar firma_doc y firma_dto según el estado ***
+	if (isset($datos['estado'])) {
+		// Obtener el estado actual
+		$estado_nuevo = $datos['estado'];
+
+		if ($estado_nuevo === 'docente') {
+			// Si el estado cambia a 'docente', eliminar el contenido de 'firma_doc'
+			$datos['firma_doc'] = '';
+		} elseif ($estado_nuevo === 'sac') {
+			// Si el estado cambia a 'sac', actualizar 'firma_dto' con la firma electrónica
+
+			// Obtener el nombre completo del usuario
+			$nombre_completo = toba::usuario()->get_nombre();
+
+			// Crear un objeto DateTime con la zona horaria de Argentina
+			$timestamp = new DateTime('now', new DateTimeZone('America/Argentina/Buenos_Aires'));
+			$formatted_timestamp = $timestamp->format('Y-m-d H:i:s');
+
+			// Crear el contenido para 'firma_dto'
+			
+			$datos['firma_dto'] = "Firmado electrónicamente por $nombre_completo - Responsable de Departamento/Delegación - $formatted_timestamp";
+		}
+	}
+	// *** Fin de la lógica para actualizar firma_doc y firma_dto ***
+
+	// Guardar los datos modificados en la tabla 'programas'
+	$this->dep('datos')->tabla('programas')->set($datos);
+
+	// Agregar una notificación para mostrar al guardar correctamente
+	toba::notificacion()->agregar("Su programa ha sido guardado correctamente", 'info');
+
+	// Sincronizar los datos con la base de datos
 	$this->dep('datos')->tabla('programas')->sincronizar();
 }
 
@@ -470,5 +541,10 @@ function evt__formulario_con_todo__modificacion($datos) {
 	//-----------------------------------------------------------------------------------
 
 
+}class ci_programas_depto extends catedras_ci
+{
+}class ci_para_deptos_programas extends catedras_ci
+{
 }
+
 ?>

@@ -1,5 +1,5 @@
 <?php
-class ci_programas extends catedras_ci
+class ci_programas_viejo extends catedras_ci
 
 {
 	//esto es de operaciones departamentos

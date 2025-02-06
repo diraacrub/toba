@@ -18,6 +18,12 @@ class catedras_autoload
 	}
 
 	static protected $clases = array(
+		'ci_abm_materias' => 'abm_materias/ci_abm_materias.php',
+		'ci_abm_programas' => 'abm_programas/ci_abm_programas.php',
+		'ci_aval_programas' => 'aval_programas/ci_aval_programas.php',
+		'catedras_autoload' => 'catedras_autoload.php',
+		'dt_materias' => 'datos/dt_materias.php',
+		'dt_programas' => 'datos/dt_programas.php',
 		'catedras_comando' => 'extension_toba/catedras_comando.php',
 		'catedras_modelo' => 'extension_toba/catedras_modelo.php',
 		'catedras_ci' => 'extension_toba/componentes/catedras_ci.php',
@@ -37,6 +43,17 @@ class catedras_autoload
 		'catedras_ei_grafico' => 'extension_toba/componentes/catedras_ei_grafico.php',
 		'catedras_ei_mapa' => 'extension_toba/componentes/catedras_ei_mapa.php',
 		'catedras_servicio_web' => 'extension_toba/componentes/catedras_servicio_web.php',
+		'huayca_comando' => 'extension_toba/huayca_comando.php',
+		'ci_imprimir_programas' => 'imprimir_programas/ci_imprimir_programas.php',
+		'ci_login' => 'login/ci_login.php',
+		'cuadro_autologin' => 'login/cuadro_autologin.php',
+		'pant_login' => 'login/pant_login.php',
+		'ci_para_dptos_programas' => 'programas/ci_para_dptos_programas.php',
+		'ci_programas_depto' => 'programas/ci_para_dptos_programas.php',
+		'ci_para_deptos_programas' => 'programas/ci_para_dptos_programas.php',
+		'ci_para_sac_programas' => 'programas/ci_para_sac_programas.php',
+		'ci_programas' => 'programas/ci_programas.php',
+		'ci_programas_viejo' => 'sac_/ci_para_dptos_programas.php',
 	);
 }
 ?>
