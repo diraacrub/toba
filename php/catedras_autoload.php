@@ -22,6 +22,7 @@ class catedras_autoload
 		'ci_abm_programas' => 'abm_programas/ci_abm_programas.php',
 		'ci_aval_programas' => 'aval_programas/ci_aval_programas.php',
 		'catedras_autoload' => 'catedras_autoload.php',
+		'ci_control' => 'control/ci_control.php',
 		'dt_materias' => 'datos/dt_materias.php',
 		'dt_programas' => 'datos/dt_programas.php',
 		'catedras_comando' => 'extension_toba/catedras_comando.php',
@@ -53,6 +54,7 @@ class catedras_autoload
 		'ci_para_deptos_programas' => 'programas/ci_para_dptos_programas.php',
 		'ci_para_sac_programas' => 'programas/ci_para_sac_programas.php',
 		'ci_programas' => 'programas/ci_programas.php',
+		'ci_sac_control_programas' => 'programas/ci_sac_control_programas.php',
 		'ci_programas_viejo' => 'sac_/ci_para_dptos_programas.php',
 	);
 }

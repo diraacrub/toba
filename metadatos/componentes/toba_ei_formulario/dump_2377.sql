@@ -148,9 +148,13 @@ Universidad Nacional del Comahue</span></span></p><p style="text-align: center;"
 			<td colspan="2" style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); width: 116px; text-align: left;">&nbsp;<strong>Cod. Carrera:</strong>[ef id=cod_carrera]</td>
 		</tr>
 		<tr>
-			<td colspan="2" style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); width: 116px; text-align: left;">&nbsp;<strong>Departamento:</strong>[ef id=depto]</td>
-			<td style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); width: 116px; text-align: left;">&nbsp;<strong>Area:</strong>[ef id=area]</td>
-			<td style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); width: 116px; text-align: left;">&nbsp;<strong>Orientaci&oacute;n:</strong>[ef id=orientacion]</td>
+			<td colspan="4" style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); width: 116px; text-align: left;"><strong>Departamento:</strong>[ef id=depto]</td>
+		</tr>
+		<tr>
+			<td colspan="4" style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); width: 116px; text-align: left;"><strong>Area:</strong>[ef id=area]</td>
+		</tr>
+		<tr>
+			<td colspan="4" style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); width: 116px; text-align: left;"><strong>Orientaci&oacute;n:</strong>[ef id=orientacion]</td>
 		</tr>
 		<tr>
 			<td style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); width: 116px; text-align: left;"><span style="font-size:11px;"><span style="overflow:hidden"><span style="overflow-wrap:break-word"><span style="font-variant: normal; white-space: pre-wrap;"><span style="font-family:Arial,sans-serif"><span style="color:#000000"><span style="font-weight:700"><span style="font-style:normal"><span style="text-decoration:none">A&ntilde;o seg&uacute;n plan:</span></span></span></span></span></span><span style="font-variant: normal; white-space: pre-wrap;"><span style="font-family:Arial,sans-serif"><span style="color:#000000"><span style="font-weight:400"><span style="font-style:normal"><span style="text-decoration:none">[ef id=ano_plan]</span></span></span></span></span></span></span></span></span></td>
@@ -834,15 +838,15 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
-	NULL, --colapsado
-	NULL, --desactivado
+	'0', --colapsado
+	'0', --desactivado
 	NULL, --estilo
 	NULL, --total
 	NULL, --inicializacion
-	NULL, --permitir_html
-	NULL, --deshabilitar_rest_func
+	'1', --permitir_html
+	'0', --deshabilitar_rest_func
 	NULL, --estado_defecto
-	NULL, --solo_lectura
+	'0', --solo_lectura
 	'0', --solo_lectura_modificacion
 	NULL, --carga_metodo
 	NULL, --carga_clase
@@ -886,7 +890,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL, --check_desc_si
 	NULL, --check_desc_no
 	NULL, --check_ml_toggle
-	NULL, --fijo_sin_estado
+	'0', --fijo_sin_estado
 	NULL, --editor_ancho
 	NULL, --editor_alto
 	NULL, --editor_botonera
@@ -915,15 +919,15 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
-	NULL, --colapsado
-	NULL, --desactivado
+	'0', --colapsado
+	'0', --desactivado
 	NULL, --estilo
 	NULL, --total
 	NULL, --inicializacion
-	NULL, --permitir_html
-	NULL, --deshabilitar_rest_func
+	'1', --permitir_html
+	'0', --deshabilitar_rest_func
 	NULL, --estado_defecto
-	NULL, --solo_lectura
+	'0', --solo_lectura
 	'0', --solo_lectura_modificacion
 	NULL, --carga_metodo
 	NULL, --carga_clase
@@ -967,7 +971,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL, --check_desc_si
 	NULL, --check_desc_no
 	NULL, --check_ml_toggle
-	NULL, --fijo_sin_estado
+	'0', --fijo_sin_estado
 	NULL, --editor_ancho
 	NULL, --editor_alto
 	NULL, --editor_botonera
@@ -2373,15 +2377,15 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
-	NULL, --colapsado
-	NULL, --desactivado
+	'0', --colapsado
+	'0', --desactivado
 	NULL, --estilo
 	NULL, --total
 	NULL, --inicializacion
-	NULL, --permitir_html
-	NULL, --deshabilitar_rest_func
+	'1', --permitir_html
+	'0', --deshabilitar_rest_func
 	NULL, --estado_defecto
-	NULL, --solo_lectura
+	'0', --solo_lectura
 	'0', --solo_lectura_modificacion
 	NULL, --carga_metodo
 	NULL, --carga_clase
@@ -2425,7 +2429,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL, --check_desc_si
 	NULL, --check_desc_no
 	NULL, --check_ml_toggle
-	NULL, --fijo_sin_estado
+	'0', --fijo_sin_estado
 	NULL, --editor_ancho
 	NULL, --editor_alto
 	NULL, --editor_botonera

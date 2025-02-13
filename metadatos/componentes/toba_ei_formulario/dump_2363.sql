@@ -126,7 +126,7 @@ INSERT INTO apex_objeto_ut_formulario (objeto_ut_formulario_proyecto, objeto_ut_
 <span style="color:#2980b9;">Centro Regional Universitario Bariloche<br />
 Universidad Nacional del Comahue</span></span></p><p style="text-align: center;">&nbsp;</p>
 <div>
-<table align="center" border="4" cellpadding="0" cellspacing="0" style="border:none; border-collapse:collapse" width="601">
+<table align="center" border="4" cellpadding="0" cellspacing="0" style="border: none; border-collapse: collapse;" width="601">
 	<colgroup>
 		<col width="116" />
 		<col width="126" />
@@ -148,9 +148,18 @@ Universidad Nacional del Comahue</span></span></p><p style="text-align: center;"
 			<td colspan="2" style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); width: 116px; text-align: left;">&nbsp;<strong>Cod. Carrera:</strong>[ef id=cod_carrera]</td>
 		</tr>
 		<tr>
-			<td colspan="2" style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); width: 116px; text-align: left;">&nbsp;<strong>Departamento:</strong>[ef id=depto]</td>
-			<td style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); width: 116px; text-align: left;">&nbsp;<strong>Area:</strong>[ef id=area]</td>
-			<td style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); width: 116px; text-align: left;">&nbsp;<strong>Orientaci&oacute;n:</strong>[ef id=orientacion]</td>
+			<td colspan="4" style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); width: 116px; text-align: left;"><strong>Departamento:</strong>[ef id=depto]</td>
+		</tr>
+		<tr>
+			<td colspan="4" style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); width: 116px; text-align: left;"><strong>Area:</strong>[ef id=area]</td>
+		</tr>
+		<tr>
+			<td colspan="4" style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); width: 116px; text-align: left;"><strong>Orientaci&oacute;n:</strong>[ef id=orientacion]</td>
+		</tr>
+		<tr>
+			<td colspan="2" style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); width: 116px; text-align: left;">&nbsp;</td>
+			<td style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); width: 116px; text-align: left; white-space: nowrap;">&nbsp;</td>
+			<td style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); width: 116px; text-align: left;">&nbsp;</td>
 		</tr>
 		<tr>
 			<td style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); width: 116px; text-align: left;"><span style="font-size:11px;"><span style="overflow:hidden"><span style="overflow-wrap:break-word"><span style="font-variant: normal; white-space: pre-wrap;"><span style="font-family:Arial,sans-serif"><span style="color:#000000"><span style="font-weight:700"><span style="font-style:normal"><span style="text-decoration:none">A&ntilde;o seg&uacute;n plan:</span></span></span></span></span></span><span style="font-variant: normal; white-space: pre-wrap;"><span style="font-family:Arial,sans-serif"><span style="color:#000000"><span style="font-weight:400"><span style="font-style:normal"><span style="text-decoration:none">[ef id=ano_plan]</span></span></span></span></span></span></span></span></span></td>
@@ -173,16 +182,14 @@ Universidad Nacional del Comahue</span></span></p><p style="text-align: center;"
 			<td colspan="4" style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); padding: 7px; width: 116px; text-align: left;"><p style="line-height:1.38"><span style="font-size:11px;"><span style="overflow:hidden"><span style="overflow-wrap:break-word"><span style="font-variant: normal; white-space: pre-wrap;"><span style="font-family:Arial,sans-serif"><span style="color:#000000"><span style="font-weight:700"><span style="font-style:normal"><span style="text-decoration:none">Contenidos m&iacute;nimos:</span></span></span></span></span></span><span style="font-variant: normal; white-space: pre-wrap;"><span style="font-family:Arial,sans-serif"><span style="color:#000000"><span style="font-weight:400"><span style="font-style:normal"><span style="text-decoration:none">[ef id=contenidos_minimos]</span></span></span></span></span></span></span></span></span></p></td>
 		</tr>
 		<tr>
-			<td colspan="4" style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); padding: 7px; width: 116px; text-align: left;"><p style="line-height:1.38"><span style="font-size:11px;"><span style="overflow:hidden"><span style="overflow-wrap:break-word"><span style="font-variant: normal; white-space: pre-wrap;"><span style="font-family:Arial,sans-serif"><span style="color:#000000"><span style="font-weight:700"><span style="font-style:normal"><span style="text-decoration:none">Competencias:</span></span></span></span></span></span><span style="font-variant: normal; white-space: pre-wrap;"><span style="font-family:Arial,sans-serif"><span style="color:#000000"><span style="font-weight:400"><span style="font-style:normal"><span style="text-decoration:none">[ef id=competencias]</span></span></span></span></span></span></span></span></span></p></td>
-		</tr>
-		<tr>
 			<td style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); padding: 7px; width: 116px; text-align: center;"><p style="line-height: 1.38; text-align: left;"><span style="font-size:11px;"><span style="overflow:hidden"><span style="overflow-wrap:break-word"><span style="font-variant: normal; white-space: pre-wrap;"><span style="font-family:Arial,sans-serif"><span style="color:#000000"><span style="font-weight:700"><span style="font-style:normal"><span style="text-decoration:none">Docente Responsable:</span></span></span></span></span></span></span></span></span></p></td>
 			<td style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); padding: 7px; width: 116px;"><span style="font-size:11px;">Apellido:&nbsp;<span style="overflow:hidden"><span style="overflow-wrap:break-word"><span style="font-variant: normal; white-space: pre-wrap;"><span style="font-family:Arial,sans-serif"><span style="color:#000000"><span style="font-weight:400"><span style="font-style:normal"><span style="text-decoration:none">[ef id=apellido_resp]</span></span></span></span></span></span></span></span></span></td>
 			<td style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); padding: 7px; width: 116px;"><span style="font-size:11px;">Nombre:&nbsp;<span style="overflow:hidden"><span style="overflow-wrap:break-word"><span style="font-variant: normal; white-space: pre-wrap;"><span style="font-family:Arial,sans-serif"><span style="color:#000000"><span style="font-weight:400"><span style="font-style:normal"><span style="text-decoration:none">[ef id=nombre_resp]</span></span></span></span></span></span></span></span></span></td>
 			<td style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; background-color: rgb(235, 237, 239); padding: 7px; width: 116px;"><span style="font-size:11px;">Cargo:&nbsp;<span style="overflow:hidden"><span style="overflow-wrap:break-word"><span style="font-variant: normal; white-space: pre-wrap;"><span style="font-family:Arial,sans-serif"><span style="color:#000000"><span style="font-weight:400"><span style="font-style:normal"><span style="text-decoration:none">[ef id=cargo_resp]</span></span></span></span></span></span></span></span></span></td>
 		</tr>
 		<tr>
-			<td colspan="4" style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; padding: 7px; width: 116px; text-align: left;"><p style="line-height:1.38"><span style="font-size:11px;"><span style="overflow:hidden"><span style="overflow-wrap:break-word"><span style="font-variant: normal; white-space: pre-wrap;"><span style="font-family:Arial,sans-serif"><span style="color:#000000"><span style="font-weight:700"><span style="font-style:normal"><span style="text-decoration:none">Equipo de C&aacute;tedra:</span></span></span></span></span></span><span style="font-variant: normal; white-space: pre-wrap;"><span style="font-family:Arial,sans-serif"><span style="color:#000000"><span style="font-weight:400"><span style="font-style:normal"><span style="text-decoration:none">[ef id=equipo_catedra]</span></span></span></span></span></span></span></span></span></p></td>
+			<td colspan="4" style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; padding: 7px; width: 116px; text-align: left;"><p style="line-height:1.38"><span style="font-size:11px;"><span style="overflow:hidden"><span style="overflow-wrap:break-word"><span style="font-variant: normal; white-space: pre-wrap;"><span style="font-family:Arial,sans-serif"><span style="color:#000000"><span style="font-weight:700"><span style="font-style:normal"><span style="text-decoration:none">Equipo de C&aacute;tedra (sin responsable de c&aacute;tedra):</span></span></span></span></span></span></span></span></span><br />
+			<span style="font-size:11px;"><span style="overflow:hidden"><span style="overflow-wrap:break-word"><span style="font-variant: normal; white-space: pre-wrap;"><span style="font-family:Arial,sans-serif"><span style="color:#000000"><span style="font-weight:400"><span style="font-style:normal"><span style="text-decoration:none">(un docente por l&iacute;nea, ej: APELLIDO, NOMBRE - AYS1) [ef id=equipo_catedra]</span></span></span></span></span></span></span></span></span></p></td>
 		</tr>
 		<tr>
 			<td colspan="4" style="border-width: 2px; border-style: solid; border-color: rgb(128, 128, 128); vertical-align: middle; padding: 7px; width: 116px; text-align: left;"><p style="line-height:1.38"><span style="font-size:11px;"><span style="overflow:hidden"><span style="overflow-wrap:break-word"><span style="font-variant: normal; white-space: pre-wrap;"><span style="font-family:Arial,sans-serif"><span style="color:#000000"><span style="font-weight:700"><span style="font-style:normal"><span style="text-decoration:none">Fundamentaci&oacute;n:</span></span></span></span></span></span><span style="font-variant: normal; white-space: pre-wrap;"><span style="font-family:Arial,sans-serif"><span style="color:#000000"><span style="font-weight:400"><span style="font-style:normal"><span style="text-decoration:none">[ef id=fundamentacion]</span></span></span></span></span></span></span></span></span></p></td>
@@ -357,15 +364,15 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
-	NULL, --colapsado
-	NULL, --desactivado
+	'0', --colapsado
+	'0', --desactivado
 	NULL, --estilo
 	NULL, --total
 	NULL, --inicializacion
-	NULL, --permitir_html
-	NULL, --deshabilitar_rest_func
+	'1', --permitir_html
+	'0', --deshabilitar_rest_func
 	NULL, --estado_defecto
-	NULL, --solo_lectura
+	'0', --solo_lectura
 	'0', --solo_lectura_modificacion
 	NULL, --carga_metodo
 	NULL, --carga_clase
@@ -409,7 +416,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL, --check_desc_si
 	NULL, --check_desc_no
 	NULL, --check_ml_toggle
-	NULL, --fijo_sin_estado
+	'0', --fijo_sin_estado
 	NULL, --editor_ancho
 	NULL, --editor_alto
 	NULL, --editor_botonera
@@ -762,15 +769,15 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
-	NULL, --colapsado
-	NULL, --desactivado
+	'0', --colapsado
+	'0', --desactivado
 	NULL, --estilo
 	NULL, --total
 	NULL, --inicializacion
-	NULL, --permitir_html
-	NULL, --deshabilitar_rest_func
+	'1', --permitir_html
+	'0', --deshabilitar_rest_func
 	NULL, --estado_defecto
-	NULL, --solo_lectura
+	'0', --solo_lectura
 	'0', --solo_lectura_modificacion
 	NULL, --carga_metodo
 	NULL, --carga_clase
@@ -814,7 +821,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL, --check_desc_si
 	NULL, --check_desc_no
 	NULL, --check_ml_toggle
-	NULL, --fijo_sin_estado
+	'0', --fijo_sin_estado
 	NULL, --editor_ancho
 	NULL, --editor_alto
 	NULL, --editor_botonera
@@ -843,15 +850,15 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
-	NULL, --colapsado
-	NULL, --desactivado
+	'0', --colapsado
+	'0', --desactivado
 	NULL, --estilo
 	NULL, --total
 	NULL, --inicializacion
-	NULL, --permitir_html
-	NULL, --deshabilitar_rest_func
+	'1', --permitir_html
+	'0', --deshabilitar_rest_func
 	NULL, --estado_defecto
-	NULL, --solo_lectura
+	'0', --solo_lectura
 	'0', --solo_lectura_modificacion
 	NULL, --carga_metodo
 	NULL, --carga_clase
@@ -895,7 +902,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL, --check_desc_si
 	NULL, --check_desc_no
 	NULL, --check_ml_toggle
-	NULL, --fijo_sin_estado
+	'0', --fijo_sin_estado
 	NULL, --editor_ancho
 	NULL, --editor_alto
 	NULL, --editor_botonera
@@ -924,15 +931,15 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
-	NULL, --colapsado
-	NULL, --desactivado
+	'0', --colapsado
+	'0', --desactivado
 	NULL, --estilo
 	NULL, --total
 	NULL, --inicializacion
-	NULL, --permitir_html
-	NULL, --deshabilitar_rest_func
+	'1', --permitir_html
+	'0', --deshabilitar_rest_func
 	NULL, --estado_defecto
-	NULL, --solo_lectura
+	'0', --solo_lectura
 	'0', --solo_lectura_modificacion
 	NULL, --carga_metodo
 	NULL, --carga_clase
@@ -976,7 +983,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL, --check_desc_si
 	NULL, --check_desc_no
 	NULL, --check_ml_toggle
-	NULL, --fijo_sin_estado
+	'0', --fijo_sin_estado
 	NULL, --editor_ancho
 	NULL, --editor_alto
 	NULL, --editor_botonera
@@ -1236,87 +1243,6 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL  --placeholder
 );
 INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_formulario, objeto_ei_formulario_proyecto, identificador, elemento_formulario, columnas, obligatorio, oculto_relaja_obligatorio, orden, etiqueta, etiqueta_estilo, descripcion, colapsado, desactivado, estilo, total, inicializacion, permitir_html, deshabilitar_rest_func, estado_defecto, solo_lectura, solo_lectura_modificacion, carga_metodo, carga_clase, carga_include, carga_dt, carga_consulta_php, carga_sql, carga_fuente, carga_lista, carga_col_clave, carga_col_desc, carga_maestros, carga_cascada_relaj, cascada_mantiene_estado, carga_permite_no_seteado, carga_no_seteado, carga_no_seteado_ocultar, edit_tamano, edit_maximo, edit_mascara, edit_unidad, edit_rango, edit_filas, edit_columnas, edit_wrap, edit_resaltar, edit_ajustable, edit_confirmar_clave, edit_expreg, popup_item, popup_proyecto, popup_editable, popup_ventana, popup_carga_desc_metodo, popup_carga_desc_clase, popup_carga_desc_include, popup_puede_borrar_estado, fieldset_fin, check_valor_si, check_valor_no, check_desc_si, check_desc_no, check_ml_toggle, fijo_sin_estado, editor_ancho, editor_alto, editor_botonera, editor_config_file, selec_cant_minima, selec_cant_maxima, selec_utilidades, selec_tamano, selec_ancho, selec_serializar, selec_cant_columnas, upload_extensiones, punto_montaje, placeholder) VALUES (
-	'5723', --objeto_ei_formulario_fila
-	'2363', --objeto_ei_formulario
-	'catedras', --objeto_ei_formulario_proyecto
-	'competencias', --identificador
-	'ef_editable_textarea', --elemento_formulario
-	'competencias', --columnas
-	'0', --obligatorio
-	'0', --oculto_relaja_obligatorio
-	'17', --orden
-	NULL, --etiqueta
-	NULL, --etiqueta_estilo
-	NULL, --descripcion
-	'0', --colapsado
-	'0', --desactivado
-	NULL, --estilo
-	NULL, --total
-	NULL, --inicializacion
-	'0', --permitir_html
-	'0', --deshabilitar_rest_func
-	NULL, --estado_defecto
-	'1', --solo_lectura
-	'0', --solo_lectura_modificacion
-	NULL, --carga_metodo
-	NULL, --carga_clase
-	NULL, --carga_include
-	NULL, --carga_dt
-	NULL, --carga_consulta_php
-	NULL, --carga_sql
-	NULL, --carga_fuente
-	NULL, --carga_lista
-	NULL, --carga_col_clave
-	NULL, --carga_col_desc
-	NULL, --carga_maestros
-	NULL, --carga_cascada_relaj
-	'0', --cascada_mantiene_estado
-	'0', --carga_permite_no_seteado
-	NULL, --carga_no_seteado
-	NULL, --carga_no_seteado_ocultar
-	NULL, --edit_tamano
-	NULL, --edit_maximo
-	NULL, --edit_mascara
-	NULL, --edit_unidad
-	NULL, --edit_rango
-	'6', --edit_filas
-	'40', --edit_columnas
-	NULL, --edit_wrap
-	'0', --edit_resaltar
-	'0', --edit_ajustable
-	NULL, --edit_confirmar_clave
-	NULL, --edit_expreg
-	NULL, --popup_item
-	NULL, --popup_proyecto
-	NULL, --popup_editable
-	NULL, --popup_ventana
-	NULL, --popup_carga_desc_metodo
-	NULL, --popup_carga_desc_clase
-	NULL, --popup_carga_desc_include
-	NULL, --popup_puede_borrar_estado
-	NULL, --fieldset_fin
-	NULL, --check_valor_si
-	NULL, --check_valor_no
-	NULL, --check_desc_si
-	NULL, --check_desc_no
-	NULL, --check_ml_toggle
-	NULL, --fijo_sin_estado
-	NULL, --editor_ancho
-	NULL, --editor_alto
-	NULL, --editor_botonera
-	NULL, --editor_config_file
-	NULL, --selec_cant_minima
-	NULL, --selec_cant_maxima
-	NULL, --selec_utilidades
-	NULL, --selec_tamano
-	NULL, --selec_ancho
-	NULL, --selec_serializar
-	NULL, --selec_cant_columnas
-	NULL, --upload_extensiones
-	NULL, --punto_montaje
-	NULL  --placeholder
-);
-INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_formulario, objeto_ei_formulario_proyecto, identificador, elemento_formulario, columnas, obligatorio, oculto_relaja_obligatorio, orden, etiqueta, etiqueta_estilo, descripcion, colapsado, desactivado, estilo, total, inicializacion, permitir_html, deshabilitar_rest_func, estado_defecto, solo_lectura, solo_lectura_modificacion, carga_metodo, carga_clase, carga_include, carga_dt, carga_consulta_php, carga_sql, carga_fuente, carga_lista, carga_col_clave, carga_col_desc, carga_maestros, carga_cascada_relaj, cascada_mantiene_estado, carga_permite_no_seteado, carga_no_seteado, carga_no_seteado_ocultar, edit_tamano, edit_maximo, edit_mascara, edit_unidad, edit_rango, edit_filas, edit_columnas, edit_wrap, edit_resaltar, edit_ajustable, edit_confirmar_clave, edit_expreg, popup_item, popup_proyecto, popup_editable, popup_ventana, popup_carga_desc_metodo, popup_carga_desc_clase, popup_carga_desc_include, popup_puede_borrar_estado, fieldset_fin, check_valor_si, check_valor_no, check_desc_si, check_desc_no, check_ml_toggle, fijo_sin_estado, editor_ancho, editor_alto, editor_botonera, editor_config_file, selec_cant_minima, selec_cant_maxima, selec_utilidades, selec_tamano, selec_ancho, selec_serializar, selec_cant_columnas, upload_extensiones, punto_montaje, placeholder) VALUES (
 	'5724', --objeto_ei_formulario_fila
 	'2363', --objeto_ei_formulario
 	'catedras', --objeto_ei_formulario_proyecto
@@ -1487,7 +1413,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'plan_ordenanzas', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'18', --orden
+	'17', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -1649,7 +1575,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'apellido_resp', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'19', --orden
+	'18', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -1730,7 +1656,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'nombre_resp', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'20', --orden
+	'19', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -1811,7 +1737,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'cargo_resp', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'21', --orden
+	'20', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -1892,7 +1818,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'equipo_catedra', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'22', --orden
+	'21', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -2135,7 +2061,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'fundamentacion', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'23', --orden
+	'22', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -2216,7 +2142,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'objetivos', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'24', --orden
+	'23', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -2297,7 +2223,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'programa_analitico', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'25', --orden
+	'24', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -2378,7 +2304,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'bibliografia', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'26', --orden
+	'25', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -2459,7 +2385,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'propuesta_metodologica', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'27', --orden
+	'26', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -2540,7 +2466,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'evaluacion_acreditacion', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'28', --orden
+	'27', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -2621,7 +2547,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'distribucion_horaria', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'29', --orden
+	'28', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -2702,7 +2628,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'cronograma_tentativo', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'33', --orden
+	'32', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -2783,7 +2709,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'estado', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'34', --orden
+	'33', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -2864,7 +2790,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'comentarios', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'35', --orden
+	'34', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -2945,7 +2871,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'horas_teoricas', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'30', --orden
+	'29', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -3026,7 +2952,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'horas_practicas', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'31', --orden
+	'30', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -3107,7 +3033,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'horas_teoricopracticas', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'32', --orden
+	'31', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -3188,7 +3114,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'comentario', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'36', --orden
+	'35', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -3269,7 +3195,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'cod_carrera', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'37', --orden
+	'36', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -3350,7 +3276,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'id_programa', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'38', --orden
+	'37', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -3431,7 +3357,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'firma_doc', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'39', --orden
+	'38', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -3512,7 +3438,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'firma_dto', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'40', --orden
+	'39', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
@@ -3593,7 +3519,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'firma_sac', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
-	'41', --orden
+	'40', --orden
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion

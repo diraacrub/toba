@@ -13,3 +13,45 @@
 	position: absolute;
 	opacity: 90;
 }
+
+
+
+
+.mi-clase-celda {
+    width: 10px !important;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+        /* Contenedor principal con ancho máximo de 600px, centrado */
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+       
+        /* Estilo para las tarjetas */
+        .card {
+            background-color: #ffffff;  /* Fondo blanco */
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        /* Encabezado de la tarjeta */
+        .card h2 {
+            color: #0074D9;           /* Color azul para el texto */
+            font-size: 24px;          /* Letras grandes */
+            margin-top: 0;
+        }
+        /* Párrafo dentro de la tarjeta */
+        .card p {
+            color: #0074D9;           /* Color azul para el texto */
+            font-size: 18px;          /* Letras grandes */
+            margin: 0;
+        }

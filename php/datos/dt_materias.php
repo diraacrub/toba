@@ -19,8 +19,27 @@ class dt_materias extends catedras_datos_tabla
 
 
 
-	function get_listado()
+	function get_listado($filtro=array())
 	{
+		$where = array();
+		if (isset($filtro['id_materia'])) {
+			$where[] = "id_materia = ".quote($filtro['id_materia']);
+		}
+		if (isset($filtro['nombre_carrera'])) {
+			$where[] = "nombre_carrera ILIKE ".quote("%{$filtro['nombre_carrera']}%");
+		}
+		if (isset($filtro['nombre_materia'])) {
+			$where[] = "nombre_materia ILIKE ".quote("%{$filtro['nombre_materia']}%");
+		}
+		if (isset($filtro['ano_plan'])) {
+			$where[] = "ano_plan = ".quote($filtro['ano_plan']);
+		}
+		if (isset($filtro['depto_principal'])) {
+			$where[] = "depto_principal ILIKE ".quote("%{$filtro['depto_principal']}%");
+		}
+		if (isset($filtro['cod_carrera'])) {
+			$where[] = "cod_carrera ILIKE ".quote("%{$filtro['cod_carrera']}%");
+		}
 		$sql = "SELECT
 			t_m.id_materia,
 			t_m.nombre_carrera,
@@ -49,8 +68,12 @@ class dt_materias extends catedras_datos_tabla
 		FROM
 			materias as t_m
 		ORDER BY nombre_carrera";
+		if (count($where)>0) {
+			$sql = sql_concatenar_where($sql, $where);
+		}
 		return toba::db('catedras')->consultar($sql);
 	}
+
 
 	
 	

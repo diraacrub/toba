@@ -27,7 +27,7 @@ INSERT INTO apex_molde_operacion_abms (proyecto, molde, tabla, gen_usa_filtro, g
 	'catedras', --proyecto
 	'9', --molde
 	'materias', --tabla
-	'0', --gen_usa_filtro
+	'1', --gen_usa_filtro
 	'1', --gen_separar_pantallas
 	NULL, --filtro_comprobar_parametros
 	NULL, --cuadro_eof
@@ -86,7 +86,7 @@ INSERT INTO apex_molde_operacion_abms_fila (proyecto, molde, fila, orden, column
 	'Id Materia', --etiqueta
 	'1', --en_cuadro
 	'1', --en_form
-	'0', --en_filtro
+	'1', --en_filtro
 	'=', --filtro_operador
 	'0', --cuadro_estilo
 	'7', --cuadro_formato
@@ -118,7 +118,7 @@ INSERT INTO apex_molde_operacion_abms_fila (proyecto, molde, fila, orden, column
 	'Nombre Carrera', --etiqueta
 	'1', --en_cuadro
 	'1', --en_form
-	'0', --en_filtro
+	'1', --en_filtro
 	'ILIKE', --filtro_operador
 	'4', --cuadro_estilo
 	'1', --cuadro_formato
@@ -150,7 +150,7 @@ INSERT INTO apex_molde_operacion_abms_fila (proyecto, molde, fila, orden, column
 	'Nombre Materia', --etiqueta
 	'1', --en_cuadro
 	'1', --en_form
-	'0', --en_filtro
+	'1', --en_filtro
 	'ILIKE', --filtro_operador
 	'4', --cuadro_estilo
 	'14', --cuadro_formato
@@ -182,7 +182,7 @@ INSERT INTO apex_molde_operacion_abms_fila (proyecto, molde, fila, orden, column
 	'Ano Plan', --etiqueta
 	'1', --en_cuadro
 	'1', --en_form
-	'0', --en_filtro
+	'1', --en_filtro
 	'=', --filtro_operador
 	'0', --cuadro_estilo
 	'7', --cuadro_formato
@@ -310,7 +310,7 @@ INSERT INTO apex_molde_operacion_abms_fila (proyecto, molde, fila, orden, column
 	'Depto Principal', --etiqueta
 	'1', --en_cuadro
 	'1', --en_form
-	'0', --en_filtro
+	'1', --en_filtro
 	'ILIKE', --filtro_operador
 	'4', --cuadro_estilo
 	'1', --cuadro_formato
@@ -630,7 +630,7 @@ INSERT INTO apex_molde_operacion_abms_fila (proyecto, molde, fila, orden, column
 	'Cod Carrera', --etiqueta
 	'1', --en_cuadro
 	'1', --en_form
-	'0', --en_filtro
+	'1', --en_filtro
 	'ILIKE', --filtro_operador
 	'4', --cuadro_estilo
 	'1', --cuadro_formato
