@@ -21,16 +21,16 @@
             padding: 20px;
             margin-bottom: 20px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            text-align: center;
+            text-align: left;
         }
         .card h2 {
             color: #001f3f;
-            font-size: 20px;
+            font-size: 18px;
             margin-top: 0;
         }
         .card p {
             color: #001f3f;
-            font-size: 16px;
+            font-size: 14px;
             margin: 0 0 10px;
         }
         .logo {
@@ -40,33 +40,67 @@
         }
     </style>';
 
-    echo '<div class="container">';
+echo '<div class="container">';
 
-        echo '<div class="logo">';
-            echo toba_recurso::imagen_proyecto("logo_grande.gif", true);
-        echo '</div>';
-
-        $perfil_usuario = toba::usuario()->get_perfiles_funcionales();
-        $nombre_completo = toba::usuario()->get_nombre();
-
-        $contenido_exclusivo = '';
-
-        if (in_array("docente", $perfil_usuario) || in_array("docente fale", $perfil_usuario)) {
-            $contenido_exclusivo .= '<p>Pod&eacute;s acceder al instructivo de carga en <a href="https://example.com/docentes" target="_blank">este enlace</a>.</p>';
-        }
-        if (in_array("sacfale", $perfil_usuario) || in_array("sacrub", $perfil_usuario)) {
-            $contenido_exclusivo .= '<p>Pod&eacute;s acceder al instructivo de carga en <a href="https://example.com/docentes" target="_blank">este enlac</a>.</p>';
-      }
-        if (in_array("ecologia", $perfil_usuario) || in_array("zoologia", $perfil_usuario) || in_array("matematica", $perfil_usuario)) {
-            $contenido_exclusivo .= '<p>Pod&eacute;s acceder al instructivo de carga en <a href="https://example.com/docentes" target="_blank">este enlac</a>.</p>';
-        }
-
-        echo '<div class="card">';
-            echo '<h2>' . $nombre_completo . '</h2>';
-            if (!empty($contenido_exclusivo)) {
-                echo $contenido_exclusivo;
-            }
-        echo '</div>';
-
+    echo '<div class="logo">';
+        echo toba_recurso::imagen_proyecto("logo_grande.gif", true);
     echo '</div>';
+
+    $perfil_usuario = toba::usuario()->get_perfiles_funcionales();
+    $nombre_completo = toba::usuario()->get_nombre();
+
+    $contenido_exclusivo = '';
+
+    if (in_array("docente", $perfil_usuario) || in_array("docentefadel", $perfil_usuario)) {
+        $contenido_exclusivo .= '<p>Pod&eacute;s acceder al instructivo de carga para docentes en <a href="https://drive.google.com/file/d/1VtaOj1DK8GRMU83HbEzbkVerjmTBiwL5/view?usp=sharing" target="_blank">este enlace</a>.</p>';
+    }
+    if (in_array("sacfale", $perfil_usuario) || in_array("sacrub", $perfil_usuario)) {
+        $contenido_exclusivo .= '<p>Pod&eacute;s acceder al instructivo <a href="https://example.com/docentes" target="_blank">este enlace</a>.</p>';
+    }
+    
+    // Definir el arreglo de perfiles válidos
+    $perfiles_validos = array(
+        'biologiageneral',
+        'botanica',
+        'didactica',
+        'ecologia',
+        'educacionfisica',
+        'enfermeria',
+        'estadistica',
+        'explotacionderecursosacuaticos',
+        'fisica',
+        'geologiaypetroleo',
+        'idiomasextranjerosconpropositosespecificos',
+        'ingenieriacivil',
+        'matematica',
+        'politicaeducacional',
+        'psicologia',
+        'quimica',
+        'zoologia'
+    );
+
+    // Convertir los perfiles del usuario a minúsculas para una comparación correcta
+    $perfil_usuario_lower = array_map('strtolower', $perfil_usuario);
+    
+    // Verificar si existe alguna coincidencia entre los perfiles del usuario y los perfiles válidos
+    if (count(array_intersect($perfil_usuario_lower, $perfiles_validos)) > 0) {
+           $contenido_exclusivo .= '<p>En el item DEPARTAMENTOS podr&aacute; revisar los programas.<br><br>   
+    Puede cambiar el "Estado" a "Vuelve al Docente para revisar" o "Firmar y enviar a SAC".<br><br>
+    Puede agregar comentarios utilizando el campo "Nuevo Comentario".<br><br>
+    Recuerde que siempre debe usar la opci&oacute;n "Guardar" para no perder los cambios.</p>';
+}
+
+    echo '<div class="card">';
+        echo '<h2>Hola ' . $nombre_completo . '</h2>';
+        if (!empty($contenido_exclusivo)) {
+            echo $contenido_exclusivo;
+        }
+    echo '</div>';
+
+echo '</div>';
+
+
+
+
+
 ?>
