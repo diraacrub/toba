@@ -4,8 +4,8 @@
 ------------------------------------------------------------
 INSERT INTO apex_usuario_grupo_acc (proyecto, usuario_grupo_acc, nombre, nivel_acceso, descripcion, vencimiento, dias, hora_entrada, hora_salida, listar, permite_edicion, menu_usuario) VALUES (
 	'catedras', --proyecto
-	'docentefale', --usuario_grupo_acc
-	'Docente FALE', --nombre
+	'educacionfisica', --usuario_grupo_acc
+	'Educación Física', --nombre
 	NULL, --nivel_acceso
 	NULL, --descripcion
 	NULL, --vencimiento
@@ -24,26 +24,38 @@ INSERT INTO apex_usuario_grupo_acc (proyecto, usuario_grupo_acc, nombre, nivel_a
 --- INICIO Grupo de desarrollo 0
 INSERT INTO apex_usuario_grupo_acc_item (proyecto, usuario_grupo_acc, item_id, item) VALUES (
 	'catedras', --proyecto
-	'docentefale', --usuario_grupo_acc
+	'educacionfisica', --usuario_grupo_acc
 	NULL, --item_id
 	'1'  --item
 );
 INSERT INTO apex_usuario_grupo_acc_item (proyecto, usuario_grupo_acc, item_id, item) VALUES (
 	'catedras', --proyecto
-	'docentefale', --usuario_grupo_acc
+	'educacionfisica', --usuario_grupo_acc
 	NULL, --item_id
 	'2'  --item
 );
 INSERT INTO apex_usuario_grupo_acc_item (proyecto, usuario_grupo_acc, item_id, item) VALUES (
 	'catedras', --proyecto
-	'docentefale', --usuario_grupo_acc
+	'educacionfisica', --usuario_grupo_acc
 	NULL, --item_id
 	'3468'  --item
 );
 INSERT INTO apex_usuario_grupo_acc_item (proyecto, usuario_grupo_acc, item_id, item) VALUES (
 	'catedras', --proyecto
-	'docentefale', --usuario_grupo_acc
+	'educacionfisica', --usuario_grupo_acc
 	NULL, --item_id
 	'3469'  --item
+);
+INSERT INTO apex_usuario_grupo_acc_item (proyecto, usuario_grupo_acc, item_id, item) VALUES (
+	'catedras', --proyecto
+	'educacionfisica', --usuario_grupo_acc
+	NULL, --item_id
+	'3471'  --item
+);
+INSERT INTO apex_usuario_grupo_acc_item (proyecto, usuario_grupo_acc, item_id, item) VALUES (
+	'catedras', --proyecto
+	'educacionfisica', --usuario_grupo_acc
+	NULL, --item_id
+	'3472'  --item
 );
 --- FIN Grupo de desarrollo 0
