@@ -1,5 +1,5 @@
 ------------------------------------------------------------
---[3475]--  PROGRAMAS APROBADOS 
+--[3475]--  PROGRAMAS CRUB APROBADOS 
 ------------------------------------------------------------
 
 ------------------------------------------------------------
@@ -23,12 +23,12 @@ INSERT INTO apex_item (item_id, proyecto, item, padre_id, padre_proyecto, padre,
 	NULL, --actividad_buffer
 	NULL, --actividad_patron_proyecto
 	NULL, --actividad_patron
-	'PROGRAMAS APROBADOS', --nombre
+	'PROGRAMAS CRUB APROBADOS', --nombre
 	NULL, --descripcion
 	NULL, --punto_montaje
 	NULL, --actividad_accion
 	'1', --menu
-	'2', --orden
+	'5', --orden
 	NULL, --solicitud_registrar
 	NULL, --solicitud_obs_tipo_proyecto
 	NULL, --solicitud_obs_tipo
