@@ -1,5 +1,5 @@
 ------------------------------------------------------------
---[3477]--  OPERACIONES SAC 
+--[3477]--  SECRETARÍA ACADÉMICA 
 ------------------------------------------------------------
 
 ------------------------------------------------------------
@@ -23,7 +23,7 @@ INSERT INTO apex_item (item_id, proyecto, item, padre_id, padre_proyecto, padre,
 	NULL, --actividad_buffer
 	NULL, --actividad_patron_proyecto
 	NULL, --actividad_patron
-	'OPERACIONES SAC', --nombre
+	'SECRETARÍA ACADÉMICA', --nombre
 	NULL, --descripcion
 	NULL, --punto_montaje
 	NULL, --actividad_accion

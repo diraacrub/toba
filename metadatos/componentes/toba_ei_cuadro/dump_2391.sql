@@ -198,7 +198,7 @@ INSERT INTO apex_objeto_ei_cuadro_columna (objeto_cuadro_proyecto, objeto_cuadro
 	'1423', --objeto_cuadro_col
 	'ano_academico', --clave
 	'9', --orden
-	'Ano academico', --titulo
+	'Año Académico', --titulo
 	'ei-cuadro-col-tit', --estilo_titulo
 	'4', --estilo
 	NULL, --ancho
