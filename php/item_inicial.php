@@ -55,7 +55,7 @@ echo '<div class="container">';
         $contenido_exclusivo .= '<p>Pod&eacute;s acceder al instructivo de carga para docentes en <a href="https://drive.google.com/file/d/1VtaOj1DK8GRMU83HbEzbkVerjmTBiwL5/view?usp=sharing" target="_blank">este enlace</a>.</p>';
     }
     if (in_array("sacfale", $perfil_usuario) || in_array("sacrub", $perfil_usuario)) {
-        $contenido_exclusivo .= '<p>Pod&eacute;s acceder al instructivo <a href="https://example.com/docentes" target="_blank">este enlace</a>.</p>';
+        $contenido_exclusivo .= '<p></p>';
     }
     
     // Definir el arreglo de perfiles válidos
@@ -84,10 +84,7 @@ echo '<div class="container">';
     
     // Verificar si existe alguna coincidencia entre los perfiles del usuario y los perfiles válidos
     if (count(array_intersect($perfil_usuario_lower, $perfiles_validos)) > 0) {
-           $contenido_exclusivo .= '<p>En el item DEPARTAMENTOS podr&aacute; revisar los programas.<br><br>   
-    Puede cambiar el "Estado" a "Vuelve al Docente para revisar" o "Firmar y enviar a SAC".<br><br>
-    Puede agregar comentarios utilizando el campo "Nuevo Comentario".<br><br>
-    Recuerde que siempre debe usar la opci&oacute;n "Guardar" para no perder los cambios.</p>';
+           $contenido_exclusivo .= '<p>Pod&eacute;s acceder al instructivo de carga para Departamentos en <a href="https://drive.google.com/file/d/1nk1S9NckIwT8yO7zuH13_tbW-u-FVgPe/view?usp=sharing" target="_blank">este enlace</a>.</p>';
 }
 
     echo '<div class="card">';
