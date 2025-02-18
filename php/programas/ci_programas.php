@@ -609,7 +609,7 @@ toba::memoria()->set_dato_operacion('firma_sac_selec', $this->firma_sac_selec);
 		$this->pantalla()->eliminar_evento('eliminar');
 	}
 	
-toba::notificacion()->agregar("En esta sección usted puede completar los datos del Programa, guardar los cambios para seguir completando en otra ocasión y, cuando esté listo firmar y enviar al Departamento",'info');
+toba::notificacion()->agregar("En esta sección usted puede completar los datos del Programa, guardar los cambios para seguir completando en otra ocasión y, cuando esté listo, firmar electrónicamente y enviar al Departamento",'info');
 
 
 

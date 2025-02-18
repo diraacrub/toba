@@ -1,5 +1,5 @@
 <?php
-class ci_depto_control extends catedras_ci
+class ci_control extends catedras_ci
 {
 	protected $s__datos_filtro;
 
