@@ -334,7 +334,7 @@ function vista_impresion(toba_impresion $salida)
 		// Inyectar estilos para impresión
 $salida->mensaje('<style>
 	@page {
-		margin: 0;
+		margin: 50px;
 	}
 	body {
 		margin: 0;

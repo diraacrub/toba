@@ -112,7 +112,7 @@ function vista_impresion(toba_impresion $salida)
 		// Inyectar estilos para impresión
 $salida->mensaje('<style>
 	@page {
-		margin: 0;
+		margin: 50px;
 	}
 	body {
 		margin: 0;
@@ -466,7 +466,7 @@ function evt__formulario_con_todo__modificacion_original($datos) {
 
 			// Crear el contenido para 'firma_dto'
 			
-			$datos['firma_dto'] = "Firmado electrónicamente por $nombre_completo - Responsable de Departamento/Delegación - $formatted_timestamp";
+			$datos['firma_dto'] = "Conformidad del Departamento: Firmado electrónicamente por $nombre_completo - Responsable de Departamento/Delegación/Coordinación de Carrera - $formatted_timestamp";
 		}
 	}
 	// *** Fin de la lógica para actualizar firma_doc y firma_dto ***

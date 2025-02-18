@@ -63,6 +63,7 @@ class dt_programas extends catedras_datos_tabla
 	}
 
 
+	// listado control de sac
 	
 	function get_listado_control($filtro=array())
 	{
@@ -128,6 +129,73 @@ class dt_programas extends catedras_datos_tabla
 	}
 
 
+	// listados de control para deptos (uno para excepcines y el otro para los dptos)
+	function get_listado_control_depto($filtro=array())
+	{
+		$where = array();
+		if (isset($filtro['id_programa'])) {
+			$where[] = "id_programa = ".quote($filtro['id_programa']);
+		}
+		if (isset($filtro['id_designacion'])) {
+			$where[] = "id_designacion = ".quote($filtro['id_designacion']);
+		}
+		if (isset($filtro['id_asignacion'])) {
+			$where[] = "id_asignacion = ".quote($filtro['id_asignacion']);
+		}
+		if (isset($filtro['legajo_resp'])) {
+			$where[] = "legajo_resp = ".quote($filtro['legajo_resp']);
+		}
+		if (isset($filtro['dni_resp'])) {
+			$where[] = "dni_resp = ".quote($filtro['dni_resp']);
+		}
+		if (isset($filtro['apellido_resp'])) {
+			$where[] = "apellido_resp ILIKE ".quote("%{$filtro['apellido_resp']}%");
+		}
+		if (isset($filtro['nombre_resp'])) {
+			$where[] = "nombre_resp ILIKE ".quote("%{$filtro['nombre_resp']}%");
+		}
+		if (isset($filtro['cargo_resp'])) {
+			$where[] = "cargo_resp ILIKE ".quote("%{$filtro['cargo_resp']}%");
+		}
+		if (isset($filtro['equipo_catedra'])) {
+			$where[] = "equipo_catedra ILIKE ".quote("%{$filtro['equipo_catedra']}%");
+		}
+		if (isset($filtro['id_materia_prog'])) {
+			$where[] = "id_materia_prog = ".quote($filtro['id_materia_prog']);
+		}
+		if (isset($filtro['periodo_dictado'])) {
+			$where[] = "periodo_dictado ILIKE ".quote("%{$filtro['periodo_dictado']}%");
+		}
+		if (isset($filtro['ano_academico'])) {
+			$where[] = "ano_academico ILIKE ".quote("%{$filtro['ano_academico']}%");
+		}
+		if (isset($filtro['estado'])) {
+			$where[] = "estado ILIKE ".quote("%{$filtro['estado']}%");
+		}
+		if (isset($filtro['nombre_materia'])) {
+			$where[] = "nombre_materia ILIKE ".quote("%{$filtro['nombre_materia']}%");
+		}
+						
+		$sql = "SELECT
+			t_p.*,
+			t_m.*
+		FROM
+			programas as t_p,
+			materias as t_m
+		WHERE
+				t_p.id_materia_prog = t_m.id_materia  
+			AND
+				t_p.estado IN ('docente')    
+		ORDER BY nombre_materia";
+		if (count($where)>0) {
+			$sql = sql_concatenar_where($sql, $where);
+		}
+		return toba::db('catedras')->consultar($sql);
+	}
+
+
+		
+	
 
 	//------------ get_listado de repuesto pos si se borra al realizar alguna acción
 		function get_listado_de_repuesto()

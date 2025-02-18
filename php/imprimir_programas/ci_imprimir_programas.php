@@ -303,7 +303,7 @@ toba::memoria()->set_dato_operacion('firma_sac_selec', $this->firma_sac_selec);
 		// Inyectar estilos para impresión
 $salida->mensaje('<style>
 	@page {
-		margin: 0;
+		margin: 50px;
 	}
 	body {
 		margin: 0;

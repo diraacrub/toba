@@ -110,7 +110,7 @@ function vista_impresion(toba_impresion $salida)
 		// Inyectar estilos para impresión
 $salida->mensaje('<style>
 	@page {
-		margin: 0;
+		margin: 50px;
 	}
 	body {
 		margin: 0;
@@ -418,7 +418,7 @@ function evt__formulario_con_todo__modificacion($datos) {
 			$formatted_timestamp = $timestamp_obj->format('Y-m-d H:i:s');
 
 			// Crear el contenido para 'firma_sac'
-			$datos['firma_sac'] = "Firmado electrónicamente por $nombre_completo - Secretaría Académica - $formatted_timestamp";
+			$datos['firma_sac'] = "Conformidad de la Secretaría Académica: Firmado electrónicamente por $nombre_completo - Secretaría Académica - $formatted_timestamp";
 		}
 	}
 	// *** Fin de la lógica para actualizar firma_dto y firma_sac ***
