@@ -65,7 +65,7 @@ class dt_programas extends catedras_datos_tabla
 
 	// listado control de sac
 	
-	function get_listado_control($filtro=array())
+	function get_listado_control_excepciones($filtro=array())
 	{
 		$where = array();
 		if (isset($filtro['id_programa'])) {
@@ -128,9 +128,197 @@ class dt_programas extends catedras_datos_tabla
 		return toba::db('catedras')->consultar($sql);
 	}
 
+	function get_listado_control($filtro=array(),$usuario_id, $deptos_principales)
+	{ 
+		
+		$where = array();
+		if (isset($filtro['id_programa'])) {
+			$where[] = "id_programa = ".quote($filtro['id_programa']);
+		}
+		if (isset($filtro['id_designacion'])) {
+			$where[] = "id_designacion = ".quote($filtro['id_designacion']);
+		}
+		if (isset($filtro['id_asignacion'])) {
+			$where[] = "id_asignacion = ".quote($filtro['id_asignacion']);
+		}
+		if (isset($filtro['legajo_resp'])) {
+			$where[] = "legajo_resp = ".quote($filtro['legajo_resp']);
+		}
+		if (isset($filtro['dni_resp'])) {
+			$where[] = "dni_resp = ".quote($filtro['dni_resp']);
+		}
+		if (isset($filtro['apellido_resp'])) {
+			$where[] = "apellido_resp ILIKE ".quote("%{$filtro['apellido_resp']}%");
+		}
+		if (isset($filtro['nombre_resp'])) {
+			$where[] = "nombre_resp ILIKE ".quote("%{$filtro['nombre_resp']}%");
+		}
+		if (isset($filtro['cargo_resp'])) {
+			$where[] = "cargo_resp ILIKE ".quote("%{$filtro['cargo_resp']}%");
+		}
+		if (isset($filtro['equipo_catedra'])) {
+			$where[] = "equipo_catedra ILIKE ".quote("%{$filtro['equipo_catedra']}%");
+		}
+		if (isset($filtro['id_materia_prog'])) {
+			$where[] = "id_materia_prog = ".quote($filtro['id_materia_prog']);
+		}
+		if (isset($filtro['periodo_dictado'])) {
+			$where[] = "periodo_dictado ILIKE ".quote("%{$filtro['periodo_dictado']}%");
+		}
+		if (isset($filtro['ano_academico'])) {
+			$where[] = "ano_academico ILIKE ".quote("%{$filtro['ano_academico']}%");
+		}
+		if (isset($filtro['estado'])) {
+			$where[] = "estado ILIKE ".quote("%{$filtro['estado']}%");
+		}
+		if (isset($filtro['nombre_materia'])) {
+			$where[] = "nombre_materia ILIKE ".quote("%{$filtro['nombre_materia']}%");
+		}
+		
+		// --- Preparar el filtro por departamentos principales ---
+		if (empty($deptos_principales)) {
+			// Si la lista está vacía, no se aplica filtro alguno (1=1 siempre es verdadero)
+			$filtro_deptos = "1=1";
+		} else {
+			// Se arma la lista de departamentos con la función quote() para evitar inyecciones SQL
+			$lista = array();
+			foreach ($deptos_principales as $dept) {
+			$lista[] = quote($dept);
+			}
+		$lista_str = implode(',', $lista);
+		$filtro_deptos = "t_m.depto_principal IN ($lista_str)";
+		}
+
+		// --- Consulta SQL con el filtro aplicado ---
+		$sql = "SELECT
+				t_p.*,
+				t_m.*
+			FROM
+				programas AS t_p
+			JOIN
+				materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
+			WHERE
+				t_p.estado IN ('docente','depto')
+				AND $filtro_deptos
+			ORDER BY nombre_materia";
+		
+		if (count($where)>0) {
+			$sql = sql_concatenar_where($sql, $where);
+		}
+		return toba::db('catedras')->consultar($sql);
+	}
+
+
+	
+	
+	
 
 	// listados de control para deptos (uno para excepcines y el otro para los dptos)
-	function get_listado_control_depto($filtro=array())
+	function get_listado_control_depto($filtro=array(),$perfil_usuario)
+	{
+		$perfiles_validos = array(
+	'biologiageneral',
+	'botanica',
+	'didactica',
+	'ecologia',
+	'educacionfisica',
+	'enfermeria',
+	'estadistica',
+	'explotacionderecursosacuaticos',
+	'fisica',
+	'geologiaypetroleo',
+	'idiomasextranjerosconpropositosespecificos',
+	'ingenieriacivil',
+	'matematica',
+	'politicaeducacional',
+	'psicologia',
+	'quimica',
+	'zoologia'
+);
+
+	
+	// Se recorre el arreglo de perfiles funcionales para buscar uno de los perfiles válidos
+	$perfil = '';
+	foreach ($perfil_usuario as $perfil_item) {
+		// Comparamos en minúsculas para evitar problemas de mayúsculas/minúsculas
+		if (in_array(strtolower($perfil_item), $perfiles_validos)) {
+			$perfil = $perfil_item;
+			break;  // Se toma el primero que coincida
+		}
+	}
+	
+	if ($perfil === '') {
+		throw new Exception("El perfil funcional no está definido.");
+	}
+	
+	// Escapamos el valor para evitar inyección SQL (ajusta según tu framework)
+	$perfilEscaped = pg_escape_string($perfil);
+	// Construimos el literal SQL: se deben usar comillas simples para literales
+	$perfilLiteral = "'" . $perfilEscaped . "'";
+		
+		
+		$where = array();
+		if (isset($filtro['id_programa'])) {
+			$where[] = "id_programa = ".quote($filtro['id_programa']);
+		}
+		if (isset($filtro['id_designacion'])) {
+			$where[] = "id_designacion = ".quote($filtro['id_designacion']);
+		}
+		if (isset($filtro['id_asignacion'])) {
+			$where[] = "id_asignacion = ".quote($filtro['id_asignacion']);
+		}
+		if (isset($filtro['legajo_resp'])) {
+			$where[] = "legajo_resp = ".quote($filtro['legajo_resp']);
+		}
+		if (isset($filtro['dni_resp'])) {
+			$where[] = "dni_resp = ".quote($filtro['dni_resp']);
+		}
+		if (isset($filtro['apellido_resp'])) {
+			$where[] = "apellido_resp ILIKE ".quote("%{$filtro['apellido_resp']}%");
+		}
+		if (isset($filtro['nombre_resp'])) {
+			$where[] = "nombre_resp ILIKE ".quote("%{$filtro['nombre_resp']}%");
+		}
+		if (isset($filtro['cargo_resp'])) {
+			$where[] = "cargo_resp ILIKE ".quote("%{$filtro['cargo_resp']}%");
+		}
+		if (isset($filtro['equipo_catedra'])) {
+			$where[] = "equipo_catedra ILIKE ".quote("%{$filtro['equipo_catedra']}%");
+		}
+		if (isset($filtro['id_materia_prog'])) {
+			$where[] = "id_materia_prog = ".quote($filtro['id_materia_prog']);
+		}
+		if (isset($filtro['periodo_dictado'])) {
+			$where[] = "periodo_dictado ILIKE ".quote("%{$filtro['periodo_dictado']}%");
+		}
+		if (isset($filtro['ano_academico'])) {
+			$where[] = "ano_academico ILIKE ".quote("%{$filtro['ano_academico']}%");
+		}
+		if (isset($filtro['estado'])) {
+			$where[] = "estado ILIKE ".quote("%{$filtro['estado']}%");
+		}
+		if (isset($filtro['nombre_materia'])) {
+			$where[] = "nombre_materia ILIKE ".quote("%{$filtro['nombre_materia']}%");
+		}
+						
+	$sql = "SELECT
+				t_p.*,
+				t_m.*
+			FROM
+				programas AS t_p
+			JOIN
+				materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
+			WHERE
+				replace(translate(lower(t_m.depto_principal), 'áéíóúÁÉÍÓÚ', 'aeiouaeiou'), ' ', '')
+				ILIKE replace(translate(lower($perfilLiteral), 'áéíóúÁÉÍÓÚ', 'aeiouaeiou'), ' ', '')
+				AND t_p.estado = 'docente'
+			ORDER BY
+				nombre_materia";
+		
+		return toba::db('catedras')->consultar($sql);
+	}
+
+function get_listado_control_depto_excepciones($filtro=array())
 	{
 		$where = array();
 		if (isset($filtro['id_programa'])) {
@@ -193,7 +381,7 @@ class dt_programas extends catedras_datos_tabla
 		return toba::db('catedras')->consultar($sql);
 	}
 
-
+	
 		
 	
 

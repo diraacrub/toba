@@ -303,7 +303,7 @@ toba::memoria()->set_dato_operacion('firma_sac_selec', $this->firma_sac_selec);
 		// Inyectar estilos para impresión
 $salida->mensaje('<style>
 	@page {
-		margin: 50px;
+			margin: 50px
 	}
 	body {
 		margin: 0;
@@ -355,8 +355,9 @@ $salida->mensaje('<div class="print-container"><table>');
 	$salida->mensaje('</thead>');
 		
 		// Contenido (tbody)
+
 		$salida->mensaje('<tbody>');
-		$salida->mensaje('<tr><td>');
+		$salida->mensaje('<tr><td colspan="2">');
 		
 		// Variables para facilitar la escritura de estilos en los DIV
 		$abre_div_style_1 = '<div style="text-align: justify; font-size: 15px; font-family: \'Times New Roman\';">';
@@ -411,21 +412,23 @@ $salida->mensaje('<div class="print-container"><table>');
 		
 		$salida->mensaje('</td></tr>');
 		$salida->mensaje('</tbody>');
+
 		
 
 		// Footer (tfoot)
 		$salida->mensaje('<tfoot>');
 		$salida->mensaje('<tr>');
 			// Celda de la izquierda con el texto
-			$salida->mensaje('<td style="text-align: left; padding: 0; margin: 0;">');
-			$salida->mensaje(
-				$this->firma_doc_selec . '<br>' .
-				$this->firma_dto_selec . '<br>' .
-				$this->firma_sac_selec . '<br>' .
-			'<span style="font-size:8px;">Estado: ' . $this->estado_selec . '</span><br>' .
-			'<span style="font-size:8px;">Número de Identificacion en <a href="https://huayca.crub.uncoma.edu.ar/catedras/1.0/">huayca.crub.uncoma.edu.ar</a> ' . $this->id_programa_seleccionado . '</span>'
-			);
-			$salida->mensaje('</td>');
+// Celda de la izquierda con el texto
+$salida->mensaje('<td style="text-align: left; padding: 0; margin: 0;">');
+$salida->mensaje(
+	'<span style="font-size:8px;"><strong> ' . strtoupper($this->estado_selec) . '</strong></span><br>' .
+	'<span style="font-size:6px;">' . $this->firma_doc_selec . '</span><br>' .
+	'<span style="font-size:6px;">' . $this->firma_dto_selec . '</span><br>' .
+	'<span style="font-size:6px;">' . $this->firma_sac_selec . '</span><br>' .
+	'<span style="font-size:6px;">Número de Identificacion en <a href="https://huayca.crub.uncoma.edu.ar/catedras/1.0/">huayca.crub.uncoma.edu.ar</a> ' . $this->id_programa_seleccionado . '</span>'
+);
+$salida->mensaje('</td>');
 			// Celda de la derecha con la imagen
 			$salida->mensaje('<td style="text-align: right; padding: 0; margin: 0;">');
 			$salida->mensaje('<img src="/catedras/1.0/img/logo.gif" style="max-height: 20px;">'); // Ajusta el tamaño de la imagen según sea necesario

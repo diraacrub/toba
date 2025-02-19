@@ -110,7 +110,7 @@ function vista_impresion(toba_impresion $salida)
 		// Inyectar estilos para impresión
 $salida->mensaje('<style>
 	@page {
-		margin: 50px;
+		margin: 50px 50px 50px 50px;
 	}
 	body {
 		margin: 0;
@@ -163,7 +163,7 @@ $salida->mensaje('<div class="print-container"><table>');
 		
 		// Contenido (tbody)
 		$salida->mensaje('<tbody>');
-		$salida->mensaje('<tr><td>');
+		$salida->mensaje('<tr><td colspan="2">');
 		
 		// Variables para facilitar la escritura de estilos en los DIV
 		$abre_div_style_1 = '<div style="text-align: justify; font-size: 15px; font-family: \'Times New Roman\';">';
@@ -224,12 +224,12 @@ $salida->mensaje('<div class="print-container"><table>');
 		$salida->mensaje('<tfoot>');
 		$salida->mensaje('<tr>');
 			// Celda de la izquierda con el texto
-			$salida->mensaje('<td style="text-align: left; padding: 0; margin: 0;">');
+			$salida->mensaje('<td style="text-align: left; padding: 0; margin: 0;font-size:4px;">');
 			$salida->mensaje(
-				$this->firma_doc_selec . '<br>' .
-				$this->firma_dto_selec . '<br>' .
-				'<span style="font-size:8px;">Estado: ' . $this->estado_selec . '  - <strong>FALTAN FIRMAS </strong> </span><br>' .
-				'<span style="font-size:8px;">Número de Identificacion en <a href="https://huayca.crub.uncoma.edu.ar/catedras/1.0/">huayca.crub.uncoma.edu.ar</a> ' . $this->id_programa_seleccionado . '</span>'
+				'<span style="font-size:6px;">Estado: ' . $this->estado_selec . '  - <strong>FALTAN FIRMAS </strong> </span><br>' .
+				'<span style="font-size:6px;">' . $this->firma_doc_selec . '</span><br>' .
+				'<span style="font-size:6px;">' . $this->firma_dto_selec . '</span><br>' .               
+				'<span style="font-size:6px;">Número de Identificacion en <a href="https://huayca.crub.uncoma.edu.ar/catedras/1.0/">huayca.crub.uncoma.edu.ar</a> ' . $this->id_programa_seleccionado . '</span>'
 			);                
 			
 			$salida->mensaje('</td>');
@@ -491,7 +491,7 @@ function conf__cuadro(toba_ei_cuadro $cuadro)
 	// Si el array de perfiles funcionales contiene 'sac'
 	if (in_array('saccrub', $perfil_usuario)) {
 		// Por ejemplo, para 'sac' la lista podría ser:
-		$deptos_principales = array('ECOLOGÍA', 'MATEMÁTICA', 'FÍSICA', 'QUÍMICA', 'BIOLOGÍA GENERAL','BOTÁNICA','EDUCACIÓN FÍSICA', 'DIDÁCTICA', 'ESTADÍSTICA','ENFERMERÍA','INGENIERÍA CIVIL','POLÍTICA EDUCACIONAL','PSICOLOGÍA','GEOLOGÍA Y PETRÓLEO','EXPLOTACIÓN DE RECURSOS ACUÁTICOS', 'ZOOLOGÍA');
+		$deptos_principales = array('ECOLOGÍA','EXPLOTACIÓN DE RECURSOS ACUÁTICOS', 'MATEMÁTICA', 'FÍSICA', 'QUÍMICA', 'BIOLOGÍA GENERAL','BOTÁNICA','EDUCACIÓN FÍSICA', 'DIDÁCTICA', 'ESTADÍSTICA','ENFERMERÍA','INGENIERÍA CIVIL','POLÍTICA EDUCACIONAL','PSICOLOGÍA','GEOLOGÍA Y PETRÓLEO', 'ZOOLOGÍA');
 	}
 	// Si el array de perfiles funcionales contiene 'sacfale'
 	elseif (in_array('sacfadel', $perfil_usuario)) {
@@ -555,10 +555,10 @@ function conf__enviados(catedras_ei_cuadro $cuadro)
 	// Si el array de perfiles funcionales contiene 'saccrub'
 	if (in_array('saccrub', $perfiles_funcionales)) {
 		// Para 'saccrub' la lista podría ser:
-		$deptos_principales = array('ECOLOGÍA', 'MATEMÁTICA', 'FÍSICA', 'QUÍMICA', 'BIOLOGÍA GENERAL','BOTÁNICA','EDUCACIÓN FÍSICA', 'DIDÁCTICA', 'ESTADÍSTICA','ENFERMERÍA','INGENIERÍA CIVIL','POLÍTICA EDUCACIONAL','PSICOLOGÍA','GEOLOGÍA Y PETRÓLEO','EXPLOTACIÓN DE RECURSOS ACUÁTICOS', 'ZOOLOGÍA');
+		$deptos_principales = array('ECOLOGÍA','EXPLOTACIÓN DE RECURSOS ACUÁTICOS', 'MATEMÁTICA', 'FÍSICA', 'QUÍMICA', 'BIOLOGÍA GENERAL','BOTÁNICA','EDUCACIÓN FÍSICA', 'DIDÁCTICA', 'ESTADÍSTICA','ENFERMERÍA','INGENIERÍA CIVIL','POLÍTICA EDUCACIONAL','PSICOLOGÍA','GEOLOGÍA Y PETRÓLEO','ZOOLOGÍA');
 	}
 	// Si el array de perfiles funcionales contiene 'sacfale'
-	elseif (in_array('sacfale', $perfiles_funcionales)) {
+	elseif (in_array('sacfadel', $perfiles_funcionales)) {
 		// Para 'sacfale' la lista es:
 		$deptos_principales = array('IDIOMAS EXTRANJEROS CON PROPÓSITOS ESPECÍFICOS');
 	}

@@ -23,7 +23,7 @@ class catedras_autoload
 		'ci_aval_programas' => 'aval_programas/ci_aval_programas.php',
 		'catedras_autoload' => 'catedras_autoload.php',
 		'ci_control' => 'control/ci_control.php',
-		'ci_depto_control' => 'control_depto/ci_control.php',
+		'ci_control_depto' => 'control/ci_control_depto.php',
 		'dt_materias' => 'datos/dt_materias.php',
 		'dt_programas' => 'datos/dt_programas.php',
 		'catedras_comando' => 'extension_toba/catedras_comando.php',

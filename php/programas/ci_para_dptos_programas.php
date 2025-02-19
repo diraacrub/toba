@@ -112,7 +112,7 @@ function vista_impresion(toba_impresion $salida)
 		// Inyectar estilos para impresión
 $salida->mensaje('<style>
 	@page {
-		margin: 50px;
+		margin: 50px 50px 50px 50px; /* top, right, bottom, left */
 	}
 	body {
 		margin: 0;
@@ -165,7 +165,7 @@ $salida->mensaje('<div class="print-container"><table>');
 		
 		// Contenido (tbody)
 		$salida->mensaje('<tbody>');
-		$salida->mensaje('<tr><td>');
+		$salida->mensaje('<tr><td colspan="2">');
 		
 		// Variables para facilitar la escritura de estilos en los DIV
 		$abre_div_style_1 = '<div style="text-align: justify; font-size: 15px; font-family: \'Times New Roman\';">';
@@ -228,10 +228,10 @@ $salida->mensaje('<div class="print-container"><table>');
 			// Celda de la izquierda con el texto
 			$salida->mensaje('<td style="text-align: left; padding: 0; margin: 0;">');
 			$salida->mensaje(
-				$this->firma_doc_selec . '<br>' .
-				'<span style="font-size:8px;">Estado: ' . $this->estado_selec . '  - <strong>FALTAN FIRMAS </strong> </span><br>' .
-				'<span style="font-size:8px;">Número de Identificacion en <a href="https://huayca.crub.uncoma.edu.ar/catedras/1.0/">huayca.crub.uncoma.edu.ar</a> ' . $this->id_programa_seleccionado . '</span>'
-			);
+				'<span style="font-size:6px;">Estado: ' . $this->estado_selec . '  - <strong>FALTAN FIRMAS </strong> </span><br>' .
+				'<span style="font-size:6px;">' . $this->firma_doc_selec . '</span><br>' .
+				'<span style="font-size:6px;">Número de Identificacion en <a href="https://huayca.crub.uncoma.edu.ar/catedras/1.0/">huayca.crub.uncoma.edu.ar</a> ' . $this->id_programa_seleccionado . '</span>'
+			);   
 			$salida->mensaje('</td>');
 			// Celda de la derecha con la imagen
 			$salida->mensaje('<td style="text-align: right; padding: 0; margin: 0;">');
