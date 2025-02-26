@@ -705,6 +705,7 @@ function evt__formulario_con_todo__modificacion($datos) {
 
 			// Se cambia el estado a "docente"
 			$datos['estado'] = 'docente';
+			$datos['firma_doc'] = ''; // Se borra la firma electrónica
 
 			// Guardar los datos modificados antes de lanzar el error
 			$this->dep('datos')->tabla('programas')->set($datos);
@@ -729,6 +730,7 @@ if ($estado === "depto" && (
 )) {
 	// Cambiar el estado a "docente"
 	$datos['estado'] = 'docente';
+	$datos['firma_doc'] = ''; // Se borra la firma electrónica
 
 	// Guardar los datos modificados antes del error
 	$this->dep('datos')->tabla('programas')->set($datos);
