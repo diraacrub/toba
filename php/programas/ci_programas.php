@@ -726,7 +726,7 @@ if ($estado === "depto" && (
 	empty($evaluacion_acreditacion) ||
 	empty($distribucion_horaria) ||
 	empty($cronograma_tentativo) ||
-	($horas_practicas == 0 && $horas_teoricas == 0)
+	($horas_practicas == 0 && $horas_teoricas == 0 && $horas_teoricopracticas == 0)
 )) {
 	// Cambiar el estado a "docente"
 	$datos['estado'] = 'docente';

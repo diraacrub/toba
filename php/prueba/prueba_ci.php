@@ -57,11 +57,11 @@ class prueba_ci extends catedras_ci
 		$hora = date("H:i", $hora_inicio);
 		$horarios[] = array(
 	'hora' => $hora,
-	'lunes' => '', 
-	'martes' => '', 
-	'miercoles' => '',
-	'jueves' => '',
-	'viernes' => ''
+	//'lunes' => '', 
+	//'martes' => '', 
+	//'miercoles' => '',
+	//'jueves' => '',
+	//'viernes' => ''
 			);
 
 
