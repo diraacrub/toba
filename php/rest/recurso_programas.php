@@ -35,7 +35,7 @@ class recurso_programas implements modelable
         $ano_academico      = isset($_GET['ano_academico']) ? $_GET['ano_academico'] : null;
         $cod_carrera        = isset($_GET['cod_carrera']) ? $_GET['cod_carrera'] : null;
         $nombre_materia     = isset($_GET['nombre_materia']) ? $_GET['nombre_materia'] : null;
-        
+
         // Nuevos filtros
         $horas_semanales    = isset($_GET['horas_semanales']) ? $_GET['horas_semanales'] : null;
         $depto_principal    = isset($_GET['depto_principal']) ? $_GET['depto_principal'] : null;
