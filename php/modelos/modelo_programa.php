@@ -23,7 +23,8 @@ class modelo_programa {
     static function get_programas_con_materia() {
         $sql = "SELECT p.*, m.* 
                 FROM programas p 
-                LEFT JOIN materias m ON p.id_materia_prog = m.id_materia";
+                LEFT JOIN materias m ON p.id_materia_prog = m.id_materia
+                WHERE p.estado = 'aprobado'";
         return toba::db()->consultar($sql);
     }
 
@@ -32,7 +33,7 @@ class modelo_programa {
         $sql = "SELECT p.*, m.* 
                 FROM programas p 
                 LEFT JOIN materias m ON p.id_materia_prog = m.id_materia
-                WHERE p.id_programa = " . quote($id_programa);
+                WHERE p.id_programa = " . quote($id_programa) . " AND p.estado = 'aprobado'";
         return toba::db()->consultar_fila($sql);
     }
 
@@ -43,7 +44,7 @@ class modelo_programa {
         $sql = "SELECT p.*, m.* 
                 FROM programas p 
                 LEFT JOIN materias m ON p.id_materia_prog = m.id_materia
-                WHERE p.id_programa IN ($lista_ids)";
+                WHERE p.id_programa IN ($lista_ids) AND p.estado = 'aprobado'";
         return toba::db()->consultar($sql);
     }
 
@@ -53,7 +54,8 @@ class modelo_programa {
     static function get_programas_reducidos() {
         $sql = "SELECT p.id_programa, p.ano_academico, m.cod_guarani, m.cod_carrera, m.nombre_materia, m.plan_guarani, m.plan_ordenanzas
                 FROM programas p 
-                LEFT JOIN materias m ON p.id_materia_prog = m.id_materia";
+                LEFT JOIN materias m ON p.id_materia_prog = m.id_materia
+                WHERE p.estado = 'aprobado'";
         return toba::db()->consultar($sql);
     }
 
@@ -64,13 +66,16 @@ class modelo_programa {
         $sql = "SELECT p.id_programa, p.ano_academico, m.cod_guarani, m.cod_carrera, m.nombre_materia, m.plan_guarani, m.plan_ordenanzas
                 FROM programas p 
                 LEFT JOIN materias m ON p.id_materia_prog = m.id_materia
-                WHERE p.id_programa IN ($lista_ids)";
+                WHERE p.id_programa IN ($lista_ids) AND p.estado = 'aprobado'";
         return toba::db()->consultar($sql);
     }
 
     // Método para armar dinámicamente la cláusula WHERE para filtros (información completa)
     static function get_programas_con_materia_by_filters($filters, $ids = null) {
         $conditions = array();
+        // Aseguramos que solo se devuelvan programas aprobados
+        $conditions[] = "p.estado = 'aprobado'";
+
         // Definimos la cadena de acentos a quitar y sus equivalentes
         $from  = 'áàâäãéèêëíìîïóòôöõúùûüñ';
         $to    = 'aaaaaeeeeiiiioooouuuun';
@@ -141,6 +146,9 @@ class modelo_programa {
     // Método para armar dinámicamente la cláusula WHERE para filtros (información reducida)
     static function get_programas_reducidos_by_filters($filters, $ids = null) {
         $conditions = array();
+        // Aseguramos que solo se devuelvan programas aprobados
+        $conditions[] = "p.estado = 'aprobado'";
+
         $from  = 'áàâäãéèêëíìîïóòôöõúùûüñ';
         $to    = 'aaaaaeeeeiiiioooouuuun';
 
