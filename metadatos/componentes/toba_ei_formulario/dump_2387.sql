@@ -3267,7 +3267,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'2387', --objeto_ei_formulario
 	'catedras', --objeto_ei_formulario_proyecto
 	'comentarios', --identificador
-	'ef_fijo', --elemento_formulario
+	'ef_html', --elemento_formulario
 	'comentarios', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
