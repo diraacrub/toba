@@ -1,8 +1,16 @@
 <?php
-class modelo_materia {
-
-    // Helper: elimina acentos y pasa a minúsculas
+class modelo_materia {    // Helper: elimina acentos y maneja caracteres Unicode
     static function removeAccents($string) {
+        if (!is_string($string)) {
+            return $string;
+        }
+        
+        // Asegurar que estamos trabajando con UTF-8
+        if (!mb_check_encoding($string, 'UTF-8')) {
+            $string = mb_convert_encoding($string, 'UTF-8');
+        }
+        
+        // Mapa de caracteres Unicode con acentos a sus equivalentes sin acentos
         $unwanted_array = array(
             'Á'=>'A', 'À'=>'A', 'Â'=>'A', 'Ä'=>'A', 'Ã'=>'A',
             'á'=>'a', 'à'=>'a', 'â'=>'a', 'ä'=>'a', 'ã'=>'a',
@@ -14,8 +22,29 @@ class modelo_materia {
             'ó'=>'o', 'ò'=>'o', 'ô'=>'o', 'ö'=>'o', 'õ'=>'o',
             'Ú'=>'U', 'Ù'=>'U', 'Û'=>'U', 'Ü'=>'U',
             'ú'=>'u', 'ù'=>'u', 'û'=>'u', 'ü'=>'u',
-            'Ñ'=>'N', 'ñ'=>'n'
+            'Ñ'=>'N', 'ñ'=>'n',
+            // Caracteres Unicode adicionales representados en formato JSON como \uXXXX
+            "\u00C1"=>'A', "\u00C0"=>'A', "\u00C2"=>'A', "\u00C4"=>'A', "\u00C3"=>'A',
+            "\u00E1"=>'a', "\u00E0"=>'a', "\u00E2"=>'a', "\u00E4"=>'a', "\u00E3"=>'a',
+            "\u00C9"=>'E', "\u00C8"=>'E', "\u00CA"=>'E', "\u00CB"=>'E',
+            "\u00E9"=>'e', "\u00E8"=>'e', "\u00EA"=>'e', "\u00EB"=>'e',
+            "\u00CD"=>'I', "\u00CC"=>'I', "\u00CE"=>'I', "\u00CF"=>'I',
+            "\u00ED"=>'i', "\u00EC"=>'i', "\u00EE"=>'i', "\u00EF"=>'i',
+            "\u00D3"=>'O', "\u00D2"=>'O', "\u00D4"=>'O', "\u00D6"=>'O', "\u00D5"=>'O',
+            "\u00F3"=>'o', "\u00F2"=>'o', "\u00F4"=>'o', "\u00F6"=>'o', "\u00F5"=>'o',
+            "\u00DA"=>'U', "\u00D9"=>'U', "\u00DB"=>'U', "\u00DC"=>'U',
+            "\u00FA"=>'u', "\u00F9"=>'u', "\u00FB"=>'u', "\u00FC"=>'u',
+            "\u00D1"=>'N', "\u00F1"=>'n'
         );
+        
+        // Si estamos tratando con los códigos de escapado JSON (\uXXXX)
+        if (strpos($string, '\u') !== false) {
+            // Convertir \uXXXX a caracteres reales
+            $string = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($matches) {
+                return mb_convert_encoding(pack('H*', $matches[1]), 'UTF-8', 'UTF-16BE');
+            }, $string);
+        }
+        
         return strtr($string, $unwanted_array);
     }
 
@@ -42,87 +71,82 @@ class modelo_materia {
         $conditions = array();
         
         // Definimos la cadena de acentos a quitar y sus equivalentes
-        $from = 'áàâäãéèêëíìîïóòôöõúùûüñ';
-        $to   = 'aaaaaeeeeiiiioooouuuun';
+        $from = 'áàâäãéèêëíìîïóòôöõúùûüñÁÀÂÄÃÉÈÊËÍÌÎÏÓÒÔÖÕÚÙÛÜÑ';
+        $to   = 'aaaaaeeeeiiiioooouuuunAAAAAEEEEIIIIOOOOOUUUUN';
 
         // Filtro por departamento
         if (isset($filters['departamento'])) {
-            $val = self::removeAccents(strtolower($filters['departamento']));
+            $val = self::removeAccents(mb_strtolower($filters['departamento'], 'UTF-8'));
             $val_sql = toba::db()->quote($val);
-            $conditions[] = "(translate(lower(depto_principal), '$from', '$to') = $val_sql OR translate(lower(depto), '$from', '$to') = $val_sql)";
+            $conditions[] = "(translate(lower(convert_to(depto_principal, 'UTF8')), '$from', '$to') = $val_sql OR translate(lower(convert_to(depto, 'UTF8')), '$from', '$to') = $val_sql)";
         }
-        
-        // Filtro específico por depto_principal
+          // Filtro específico por depto_principal
         if (isset($filters['depto_principal'])) {
-            $val = self::removeAccents(strtolower($filters['depto_principal']));
+            $val = self::removeAccents(mb_strtolower($filters['depto_principal'], 'UTF-8'));
             $val_sql = toba::db()->quote($val);
-            $conditions[] = "translate(lower(depto_principal), '$from', '$to') = $val_sql";
+            $conditions[] = "translate(lower(convert_to(depto_principal, 'UTF8')), '$from', '$to') = $val_sql";
         }
 
         // Filtro específico por depto 
         if (isset($filters['depto'])) {
-            $val = self::removeAccents(strtolower($filters['depto']));
+            $val = self::removeAccents(mb_strtolower($filters['depto'], 'UTF-8'));
             $val_sql = toba::db()->quote($val);
-            $conditions[] = "translate(lower(depto), '$from', '$to') = $val_sql";
+            $conditions[] = "translate(lower(convert_to(depto, 'UTF8')), '$from', '$to') = $val_sql";
         }
         
         // Filtro por área
         if (isset($filters['area'])) {
-            $val = self::removeAccents(strtolower($filters['area']));
+            $val = self::removeAccents(mb_strtolower($filters['area'], 'UTF-8'));
             $val_sql = toba::db()->quote($val);
-            $conditions[] = "translate(lower(area), '$from', '$to') = $val_sql";
+            $conditions[] = "translate(lower(convert_to(area, 'UTF8')), '$from', '$to') = $val_sql";
         }
         
         // Filtro por orientación
         if (isset($filters['orientacion'])) {
-            $val = self::removeAccents(strtolower($filters['orientacion']));
+            $val = self::removeAccents(mb_strtolower($filters['orientacion'], 'UTF-8'));
             $val_sql = toba::db()->quote($val);
-            $conditions[] = "translate(lower(orientacion), '$from', '$to') = $val_sql";
+            $conditions[] = "translate(lower(convert_to(orientacion, 'UTF8')), '$from', '$to') = $val_sql";
         }
-        
-        // Filtro para comprobar si contenidos_mínimos está vacío o no
+          // Filtro para comprobar si contenidos_mínimos está vacío o no
         if (isset($filters['contenidos_minimos_empty']) && $filters['contenidos_minimos_empty'] === 'true') {
-            $conditions[] = "(contenidos_minimos IS NULL OR contenidos_minimos = '')";
+            $conditions[] = "(contenidos_minimos IS NULL OR TRIM(contenidos_minimos) = '')";
         } else if (isset($filters['contenidos_minimos_empty']) && $filters['contenidos_minimos_empty'] === 'false') {
-            $conditions[] = "(contenidos_minimos IS NOT NULL AND contenidos_minimos <> '')";
+            $conditions[] = "(contenidos_minimos IS NOT NULL AND TRIM(contenidos_minimos) <> '')";
         }
-        
-        // Búsqueda por contenido en contenidos_mínimos
+          // Búsqueda por contenido en contenidos_mínimos
         if (isset($filters['contenidos_minimos'])) {
             $search = trim($filters['contenidos_minimos']);
             $words = preg_split('/\s+/', $search);
             foreach ($words as $word) {
-                $word_proc = self::removeAccents(strtolower($word));
+                $word_proc = self::removeAccents(mb_strtolower($word, 'UTF-8'));
                 $word_sql = toba::db()->quote('%'.$word_proc.'%');
-                $conditions[] = "translate(lower(contenidos_minimos), '$from', '$to') LIKE $word_sql";
+                $conditions[] = "translate(lower(convert_to(contenidos_minimos, 'UTF8')), '$from', '$to') LIKE $word_sql";
             }
         }
 
         // Filtro por nombre de materia
         if (isset($filters['nombre_materia'])) {
-            $val = self::removeAccents(strtolower($filters['nombre_materia']));
+            $val = self::removeAccents(mb_strtolower($filters['nombre_materia'], 'UTF-8'));
             $val_sql = toba::db()->quote("%".$val."%");
-            $conditions[] = "translate(lower(nombre_materia), '$from', '$to') LIKE $val_sql";
+            $conditions[] = "translate(lower(convert_to(nombre_materia, 'UTF8')), '$from', '$to') LIKE $val_sql";
         }
 
         // Filtro por nombre de carrera
         if (isset($filters['nombre_carrera'])) {
-            $val = self::removeAccents(strtolower($filters['nombre_carrera']));
+            $val = self::removeAccents(mb_strtolower($filters['nombre_carrera'], 'UTF-8'));
             $val_sql = toba::db()->quote("%".$val."%");
-            $conditions[] = "translate(lower(nombre_carrera), '$from', '$to') LIKE $val_sql";
+            $conditions[] = "translate(lower(convert_to(nombre_carrera, 'UTF8')), '$from', '$to') LIKE $val_sql";
         }
 
         // Filtro por año del plan
         if (isset($filters['ano_plan'])) {
             $val = intval($filters['ano_plan']);
             $conditions[] = "ano_plan = $val";
-        }
-
-        // Filtro por periodo del plan
+        }        // Filtro por periodo del plan
         if (isset($filters['periodo_plan'])) {
-            $val = self::removeAccents(strtolower($filters['periodo_plan']));
+            $val = self::removeAccents(mb_strtolower($filters['periodo_plan'], 'UTF-8'));
             $val_sql = toba::db()->quote($val);
-            $conditions[] = "translate(lower(periodo_plan), '$from', '$to') = $val_sql";
+            $conditions[] = "translate(lower(convert_to(periodo_plan, 'UTF8')), '$from', '$to') = $val_sql";
         }
 
         // Filtro por horas totales
@@ -139,37 +163,35 @@ class modelo_materia {
 
         // Filtro por optativa
         if (isset($filters['optativa'])) {
-            $val = self::removeAccents(strtolower($filters['optativa']));
+            $val = self::removeAccents(mb_strtolower($filters['optativa'], 'UTF-8'));
             $val_sql = toba::db()->quote($val);
-            $conditions[] = "translate(lower(optativa), '$from', '$to') = $val_sql";
-        }
-
-        // Filtro por trayecto
+            $conditions[] = "translate(lower(convert_to(optativa, 'UTF8')), '$from', '$to') = $val_sql";
+        }        // Filtro por trayecto
         if (isset($filters['trayecto'])) {
-            $val = self::removeAccents(strtolower($filters['trayecto']));
+            $val = self::removeAccents(mb_strtolower($filters['trayecto'], 'UTF-8'));
             $val_sql = toba::db()->quote($val);
-            $conditions[] = "translate(lower(trayecto), '$from', '$to') = $val_sql";
+            $conditions[] = "translate(lower(convert_to(trayecto, 'UTF8')), '$from', '$to') = $val_sql";
         }
 
         // Filtro por código de carrera
         if (isset($filters['cod_carrera'])) {
-            $val = self::removeAccents(strtolower($filters['cod_carrera']));
+            $val = self::removeAccents(mb_strtolower($filters['cod_carrera'], 'UTF-8'));
             $val_sql = toba::db()->quote($val);
-            $conditions[] = "translate(lower(cod_carrera), '$from', '$to') = $val_sql";
+            $conditions[] = "translate(lower(convert_to(cod_carrera, 'UTF8')), '$from', '$to') = $val_sql";
         }
 
         // Filtro por plan_guarani
         if (isset($filters['plan_guarani'])) {
-            $val = self::removeAccents(strtolower($filters['plan_guarani']));
+            $val = self::removeAccents(mb_strtolower($filters['plan_guarani'], 'UTF-8'));
             $val_sql = toba::db()->quote($val);
-            $conditions[] = "translate(lower(plan_guarani), '$from', '$to') = $val_sql";
+            $conditions[] = "translate(lower(convert_to(plan_guarani, 'UTF8')), '$from', '$to') = $val_sql";
         }
 
         // Filtro por código guaraní
         if (isset($filters['cod_guarani'])) {
-            $val = self::removeAccents(strtolower($filters['cod_guarani']));
+            $val = self::removeAccents(mb_strtolower($filters['cod_guarani'], 'UTF-8'));
             $val_sql = toba::db()->quote($val);
-            $conditions[] = "translate(lower(cod_guarani), '$from', '$to') = $val_sql";
+            $conditions[] = "translate(lower(convert_to(cod_guarani, 'UTF8')), '$from', '$to') = $val_sql";
         }
 
         // Filtrar por IDs específicos
