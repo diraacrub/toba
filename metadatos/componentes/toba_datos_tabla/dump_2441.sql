@@ -1,5 +1,5 @@
 ------------------------------------------------------------
---[2430]--  planificaciones 
+--[2441]--  informes 
 ------------------------------------------------------------
 
 ------------------------------------------------------------
@@ -9,18 +9,18 @@
 --- INICIO Grupo de desarrollo 0
 INSERT INTO apex_objeto (proyecto, objeto, anterior, identificador, reflexivo, clase_proyecto, clase, punto_montaje, subclase, subclase_archivo, objeto_categoria_proyecto, objeto_categoria, nombre, titulo, colapsable, descripcion, fuente_datos_proyecto, fuente_datos, solicitud_registrar, solicitud_obj_obs_tipo, solicitud_obj_observacion, parametro_a, parametro_b, parametro_c, parametro_d, parametro_e, parametro_f, usuario, creacion, posicion_botonera) VALUES (
 	'catedras', --proyecto
-	'2430', --objeto
+	'2441', --objeto
 	NULL, --anterior
 	NULL, --identificador
 	NULL, --reflexivo
 	'toba', --clase_proyecto
 	'toba_datos_tabla', --clase
 	'13', --punto_montaje
-	'dt_planificaciones', --subclase
-	'datos/dt_planificaciones.php', --subclase_archivo
+	'dt_informes', --subclase
+	'datos/dt_informes.php', --subclase_archivo
 	NULL, --objeto_categoria_proyecto
 	NULL, --objeto_categoria
-	'planificaciones', --nombre
+	'informes', --nombre
 	NULL, --titulo
 	NULL, --colapsable
 	NULL, --descripcion
@@ -36,7 +36,7 @@ INSERT INTO apex_objeto (proyecto, objeto, anterior, identificador, reflexivo, c
 	NULL, --parametro_e
 	NULL, --parametro_f
 	NULL, --usuario
-	'2025-03-12 13:02:14', --creacion
+	'2025-03-21 12:17:23', --creacion
 	NULL  --posicion_botonera
 );
 --- FIN Grupo de desarrollo 0
@@ -46,14 +46,14 @@ INSERT INTO apex_objeto (proyecto, objeto, anterior, identificador, reflexivo, c
 ------------------------------------------------------------
 INSERT INTO apex_objeto_db_registros (objeto_proyecto, objeto, max_registros, min_registros, punto_montaje, ap, ap_clase, ap_archivo, tabla, tabla_ext, alias, modificar_claves, fuente_datos_proyecto, fuente_datos, permite_actualizacion_automatica, esquema, esquema_ext) VALUES (
 	'catedras', --objeto_proyecto
-	'2430', --objeto
+	'2441', --objeto
 	NULL, --max_registros
 	NULL, --min_registros
 	'13', --punto_montaje
 	'1', --ap
 	NULL, --ap_clase
 	NULL, --ap_archivo
-	'planificaciones', --tabla
+	'informes', --tabla
 	NULL, --tabla_ext
 	NULL, --alias
 	'0', --modificar_claves
@@ -71,51 +71,107 @@ INSERT INTO apex_objeto_db_registros (objeto_proyecto, objeto, max_registros, mi
 --- INICIO Grupo de desarrollo 0
 INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
 	'catedras', --objeto_proyecto
-	'2430', --objeto
-	'913', --col_id
-	'id_planificacion', --columna
+	'2441', --objeto
+	'931', --col_id
+	'id_informe', --columna
 	'E', --tipo
 	'1', --pk
-	'planificaciones_id_planificacion_seq', --secuencia
+	'informes_id_informe_seq', --secuencia
 	NULL, --largo
 	NULL, --no_nulo
-	'1', --no_nulo_db
+	'0', --no_nulo_db
 	'0', --externa
-	'planificaciones'  --tabla
+	NULL  --tabla
 );
 INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
 	'catedras', --objeto_proyecto
-	'2430', --objeto
-	'914', --col_id
-	'ano_acad_planif', --columna
+	'2441', --objeto
+	'932', --col_id
+	'id_prog_informe', --columna
+	'C', --tipo
+	'0', --pk
+	NULL, --secuencia
+	NULL, --largo
+	NULL, --no_nulo
+	'0', --no_nulo_db
+	'0', --externa
+	NULL  --tabla
+);
+INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
+	'catedras', --objeto_proyecto
+	'2441', --objeto
+	'933', --col_id
+	'inscriptos', --columna
 	'E', --tipo
 	'0', --pk
 	NULL, --secuencia
 	NULL, --largo
 	NULL, --no_nulo
-	'1', --no_nulo_db
+	'0', --no_nulo_db
 	'0', --externa
-	'planificaciones'  --tabla
+	NULL  --tabla
 );
 INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
 	'catedras', --objeto_proyecto
-	'2430', --objeto
-	'915', --col_id
-	'id_prog_planif', --columna
+	'2441', --objeto
+	'934', --col_id
+	'comenzaron', --columna
 	'E', --tipo
 	'0', --pk
 	NULL, --secuencia
 	NULL, --largo
 	NULL, --no_nulo
-	'1', --no_nulo_db
+	'0', --no_nulo_db
 	'0', --externa
-	'planificaciones'  --tabla
+	NULL  --tabla
 );
 INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
 	'catedras', --objeto_proyecto
-	'2430', --objeto
-	'916', --col_id
-	'equipo_catedra_planif', --columna
+	'2441', --objeto
+	'935', --col_id
+	'aprobaron', --columna
+	'E', --tipo
+	'0', --pk
+	NULL, --secuencia
+	NULL, --largo
+	NULL, --no_nulo
+	'0', --no_nulo_db
+	'0', --externa
+	NULL  --tabla
+);
+INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
+	'catedras', --objeto_proyecto
+	'2441', --objeto
+	'936', --col_id
+	'abandonaron', --columna
+	'E', --tipo
+	'0', --pk
+	NULL, --secuencia
+	NULL, --largo
+	NULL, --no_nulo
+	'0', --no_nulo_db
+	'0', --externa
+	NULL  --tabla
+);
+INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
+	'catedras', --objeto_proyecto
+	'2441', --objeto
+	'937', --col_id
+	'desaprobaron', --columna
+	'E', --tipo
+	'0', --pk
+	NULL, --secuencia
+	NULL, --largo
+	NULL, --no_nulo
+	'0', --no_nulo_db
+	'0', --externa
+	NULL  --tabla
+);
+INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
+	'catedras', --objeto_proyecto
+	'2441', --objeto
+	'938', --col_id
+	'causas_abandono_desap', --columna
 	'X', --tipo
 	'0', --pk
 	NULL, --secuencia
@@ -123,13 +179,13 @@ INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, colum
 	NULL, --no_nulo
 	'0', --no_nulo_db
 	'0', --externa
-	'planificaciones'  --tabla
+	NULL  --tabla
 );
 INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
 	'catedras', --objeto_proyecto
-	'2430', --objeto
-	'917', --col_id
-	'dist_horaria_planif', --columna
+	'2441', --objeto
+	'939', --col_id
+	'caract_grupo', --columna
 	'X', --tipo
 	'0', --pk
 	NULL, --secuencia
@@ -137,13 +193,13 @@ INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, colum
 	NULL, --no_nulo
 	'0', --no_nulo_db
 	'0', --externa
-	'planificaciones'  --tabla
+	NULL  --tabla
 );
 INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
 	'catedras', --objeto_proyecto
-	'2430', --objeto
-	'918', --col_id
-	'horarios_consulta', --columna
+	'2441', --objeto
+	'940', --col_id
+	'estrategias', --columna
 	'X', --tipo
 	'0', --pk
 	NULL, --secuencia
@@ -151,13 +207,13 @@ INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, colum
 	NULL, --no_nulo
 	'0', --no_nulo_db
 	'0', --externa
-	'planificaciones'  --tabla
+	NULL  --tabla
 );
 INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
 	'catedras', --objeto_proyecto
-	'2430', --objeto
-	'919', --col_id
-	'otras_tareas', --columna
+	'2441', --objeto
+	'941', --col_id
+	'consideraciones_interior', --columna
 	'X', --tipo
 	'0', --pk
 	NULL, --secuencia
@@ -165,13 +221,13 @@ INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, colum
 	NULL, --no_nulo
 	'0', --no_nulo_db
 	'0', --externa
-	'planificaciones'  --tabla
+	NULL  --tabla
 );
 INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
 	'catedras', --objeto_proyecto
-	'2430', --objeto
-	'920', --col_id
-	'bibliografia_pedida', --columna
+	'2441', --objeto
+	'942', --col_id
+	'analisis_actividades', --columna
 	'X', --tipo
 	'0', --pk
 	NULL, --secuencia
@@ -179,13 +235,13 @@ INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, colum
 	NULL, --no_nulo
 	'0', --no_nulo_db
 	'0', --externa
-	'planificaciones'  --tabla
+	NULL  --tabla
 );
 INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
 	'catedras', --objeto_proyecto
-	'2430', --objeto
-	'921', --col_id
-	'actividades_internas', --columna
+	'2441', --objeto
+	'943', --col_id
+	'suficiencia_adecuacion', --columna
 	'X', --tipo
 	'0', --pk
 	NULL, --secuencia
@@ -193,13 +249,13 @@ INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, colum
 	NULL, --no_nulo
 	'0', --no_nulo_db
 	'0', --externa
-	'planificaciones'  --tabla
+	NULL  --tabla
 );
 INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
 	'catedras', --objeto_proyecto
-	'2430', --objeto
-	'922', --col_id
-	'actividades_externas', --columna
+	'2441', --objeto
+	'944', --col_id
+	'evaluacion_ays', --columna
 	'X', --tipo
 	'0', --pk
 	NULL, --secuencia
@@ -207,13 +263,13 @@ INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, colum
 	NULL, --no_nulo
 	'0', --no_nulo_db
 	'0', --externa
-	'planificaciones'  --tabla
+	NULL  --tabla
 );
 INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
 	'catedras', --objeto_proyecto
-	'2430', --objeto
-	'923', --col_id
-	'libros_pub', --columna
+	'2441', --objeto
+	'945', --col_id
+	'articulacion', --columna
 	'X', --tipo
 	'0', --pk
 	NULL, --secuencia
@@ -221,13 +277,13 @@ INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, colum
 	NULL, --no_nulo
 	'0', --no_nulo_db
 	'0', --externa
-	'planificaciones'  --tabla
+	NULL  --tabla
 );
 INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
 	'catedras', --objeto_proyecto
-	'2430', --objeto
-	'924', --col_id
-	'apuntes_pub', --columna
+	'2441', --objeto
+	'946', --col_id
+	'capacitacion', --columna
 	'X', --tipo
 	'0', --pk
 	NULL, --secuencia
@@ -235,13 +291,13 @@ INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, colum
 	NULL, --no_nulo
 	'0', --no_nulo_db
 	'0', --externa
-	'planificaciones'  --tabla
+	NULL  --tabla
 );
 INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
 	'catedras', --objeto_proyecto
-	'2430', --objeto
-	'925', --col_id
-	'guia_trabajos_pub', --columna
+	'2441', --objeto
+	'947', --col_id
+	'analisis_por_cargo', --columna
 	'X', --tipo
 	'0', --pk
 	NULL, --secuencia
@@ -249,90 +305,20 @@ INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, colum
 	NULL, --no_nulo
 	'0', --no_nulo_db
 	'0', --externa
-	'planificaciones'  --tabla
+	NULL  --tabla
 );
 INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
 	'catedras', --objeto_proyecto
-	'2430', --objeto
-	'926', --col_id
-	'publicaciones_periodicas', --columna
-	'X', --tipo
+	'2441', --objeto
+	'949', --col_id
+	'estado_informe', --columna
+	'C', --tipo
 	'0', --pk
 	NULL, --secuencia
 	NULL, --largo
 	NULL, --no_nulo
 	'0', --no_nulo_db
 	'0', --externa
-	'planificaciones'  --tabla
-);
-INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
-	'catedras', --objeto_proyecto
-	'2430', --objeto
-	'927', --col_id
-	'opinion_area', --columna
-	'X', --tipo
-	'0', --pk
-	NULL, --secuencia
-	NULL, --largo
-	NULL, --no_nulo
-	'0', --no_nulo_db
-	'0', --externa
-	'planificaciones'  --tabla
-);
-INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
-	'catedras', --objeto_proyecto
-	'2430', --objeto
-	'928', --col_id
-	'opinion_depto', --columna
-	'X', --tipo
-	'0', --pk
-	NULL, --secuencia
-	NULL, --largo
-	NULL, --no_nulo
-	'0', --no_nulo_db
-	'0', --externa
-	'planificaciones'  --tabla
-);
-INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
-	'catedras', --objeto_proyecto
-	'2430', --objeto
-	'929', --col_id
-	'observaciones_planif', --columna
-	'X', --tipo
-	'0', --pk
-	NULL, --secuencia
-	NULL, --largo
-	NULL, --no_nulo
-	'0', --no_nulo_db
-	'0', --externa
-	'planificaciones'  --tabla
-);
-INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
-	'catedras', --objeto_proyecto
-	'2430', --objeto
-	'930', --col_id
-	'comentarios_planif', --columna
-	'X', --tipo
-	'0', --pk
-	NULL, --secuencia
-	NULL, --largo
-	NULL, --no_nulo
-	'0', --no_nulo_db
-	'0', --externa
-	'planificaciones'  --tabla
-);
-INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
-	'catedras', --objeto_proyecto
-	'2430', --objeto
-	'951', --col_id
-	'estado_planificacion', --columna
-	'X', --tipo
-	'0', --pk
-	NULL, --secuencia
-	NULL, --largo
-	NULL, --no_nulo
-	'0', --no_nulo_db
-	'0', --externa
-	'planificaciones'  --tabla
+	NULL  --tabla
 );
 --- FIN Grupo de desarrollo 0

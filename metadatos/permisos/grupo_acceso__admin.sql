@@ -124,4 +124,22 @@ INSERT INTO apex_usuario_grupo_acc_item (proyecto, usuario_grupo_acc, item_id, i
 	NULL, --item_id
 	'3490'  --item
 );
+INSERT INTO apex_usuario_grupo_acc_item (proyecto, usuario_grupo_acc, item_id, item) VALUES (
+	'catedras', --proyecto
+	'admin', --usuario_grupo_acc
+	NULL, --item_id
+	'3491'  --item
+);
+INSERT INTO apex_usuario_grupo_acc_item (proyecto, usuario_grupo_acc, item_id, item) VALUES (
+	'catedras', --proyecto
+	'admin', --usuario_grupo_acc
+	NULL, --item_id
+	'3492'  --item
+);
+INSERT INTO apex_usuario_grupo_acc_item (proyecto, usuario_grupo_acc, item_id, item) VALUES (
+	'catedras', --proyecto
+	'admin', --usuario_grupo_acc
+	NULL, --item_id
+	'3493'  --item
+);
 --- FIN Grupo de desarrollo 0

@@ -896,5 +896,19 @@ function get_listado_enviados_sac($usuario_id, $deptos_principales)
 	
 	
 	
+		function get_descripciones()
+		{
+			$sql = "SELECT id_programa, apellido_resp FROM programas ORDER BY apellido_resp";
+			return toba::db('catedras')->consultar($sql);
+		}
+
+
+
+	function get_descripciones_2()
+	{
+		$sql = "SELECT id_programa, apellido_resp FROM programas ORDER BY apellido_resp";
+		return toba::db('catedras')->consultar($sql);
+	}
+
 }
 ?>
