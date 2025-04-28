@@ -6,16 +6,14 @@ use SIUToba\rest\lib\modelable;
 require_once __DIR__ . '/../modelos/modelo_materia.php';
 
 /**
- * @description Operaciones sobre Materias (endpoint singular)
+ * @description Operaciones sobre Materias
  */
-class recurso_materia implements modelable
+class recurso_materias implements modelable
 {
     // Método documentativo para la generación de modelos (no obligatorio para el funcionamiento)
     static function _get_modelos(){
         return array();
-    }
-
-    // Método para obtener la lista de materias.
+    }    // Método para obtener la lista de materias.
     // Permite filtrar por:
     // - id_materia (parámetro "ids")
     // - departamento (búsqueda en depto_principal y depto)
@@ -25,7 +23,7 @@ class recurso_materia implements modelable
     // - orientacion (búsqueda en orientación)
     // - contenidos_minimos_empty (true/false para verificar si contenidos_minimos está vacío o no)
     // - contenidos_minimos (búsqueda flexible en contenidos_minimos, insensible a mayúsculas, espacios, tildes)
-    // - nombre_materia (búsqueda con LIKE)
+    // - nombre_materia (búsqueda con LIKE, insensible a mayúsculas, espacios, tildes)
     // - nombre_carrera (búsqueda con LIKE)
     // - ano_plan (valor exacto)
     // - periodo_plan (valor exacto)
@@ -98,7 +96,7 @@ class recurso_materia implements modelable
     }
 
     // Método para obtener una materia en particular por su ID
-    // Se invoca, por ejemplo, con GET /rest/materia/{id}
+    // Se invoca, por ejemplo, con GET /rest/materias/{id}
     static function get($id){
         $materia = modelo_materia::get_materia_by_id($id);
         rest::response()->get($materia);
