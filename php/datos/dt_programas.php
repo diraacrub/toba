@@ -88,6 +88,9 @@ class dt_programas extends catedras_datos_tabla
 	function get_listado_abm_programas_filtrado($filtro=array())
 	{
 		$where = array();
+		if (isset($filtro['nombre_materia'])) {
+			$where[] = "nombre_materia ILIKE ".quote("%{$filtro['nombre_materia']}%");
+		}
 		if (isset($filtro['id_programa'])) {
 			$where[] = "id_programa = ".quote($filtro['id_programa']);
 		}

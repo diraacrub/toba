@@ -124,6 +124,17 @@ class ci_planificaciones extends catedras_ci
 		toba::logger()->info("Nombre del usuario: $nombre_usuario");
 	}
 
+		function evt__enviados__seleccion($datos)
+	{
+		$this->id_planificacion_seleccionada = $datos['id_planificacion']; // Guardar el ID de la planif seleccionada
+		toba::memoria()->set_dato_operacion('id_planificacion_seleccionada', $this->id_planificacion_seleccionada); // Almacenar en memoria
+		
+		$this->dep('datos')->cargar($datos);
+		$this->set_pantalla('pant_ver');
+		}
+	
+	
+	
 
 	//---- Formulario -------------------------------------------------------------------
 
@@ -277,6 +288,22 @@ if ($texto_bp_vacia == $texto_bp_datos) {
 }
 
 
+///// funcion VER fromulario planif
+	
+		function conf__ver_form_planif(toba_ei_formulario $form)
+	{
+		if ($this->dep('datos')->esta_cargada()) {
+			$form->set_datos($this->dep('datos')->tabla('planificaciones')->get_datos_planificacion($this->id_planificacion_seleccionada));
+		} else {
+			$this->pantalla()->eliminar_evento('eliminar');
+		}
+
+		toba::notificacion()->info("En esta sección usted puede VER la planificación firmada y enviada.");
+	
+	}
+	//-------------------------
+	
+	
 	function resetear()
 	{
 		$this->dep('datos')->resetear();

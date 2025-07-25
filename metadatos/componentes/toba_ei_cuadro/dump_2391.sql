@@ -134,9 +134,9 @@ INSERT INTO apex_objeto_ei_cuadro_columna (objeto_cuadro_proyecto, objeto_cuadro
 	'catedras', --objeto_cuadro_proyecto
 	'2391', --objeto_cuadro
 	'1420', --objeto_cuadro_col
-	'periodo_plan', --clave
+	'periodo_dictado', --clave
 	'8', --orden
-	'Periodo plan', --titulo
+	'Periodo dictado', --titulo
 	'ei-cuadro-col-tit', --estilo_titulo
 	'4', --estilo
 	NULL, --ancho
