@@ -381,45 +381,6 @@ echo "<script type='text/javascript'>
 }
 
 	
-	
-
-
-function evt__formulario_con_todo__modificacion_original($datos) {
-
-	// Manejo de comentarios
-	$comentario = isset($datos['comentario']) ? $datos['comentario'] : '';
-	if (!empty($comentario)) {
-		// Obtener el timestamp y el nombre del usuario
-		$timestamp = date('Y-m-d H:i:s');
-		$usuario_id = toba::usuario()->get_id();
-		$nombre_completo = toba::usuario()->get_nombre();
-		
-		// Crear el HTML del comentario
-		$nuevo_comentario = "<div style='border: 1px solid #ccc; padding: 10px; margin-top: 10px;'>
-								<strong>$nombre_completo ($usuario_id) - $timestamp</strong><br>
-								<p style='margin: 5px 0;'>$comentario</p>
-								</div>";
-
-		// Obtener el contenido existente del campo comentarios
-		$comentarios = $this->dep('datos')->tabla('programas')->get_columna('comentarios');
-
-		// Concatenar el nuevo comentario al contenido existente
-		$nuevo_comentarios = $comentarios . $nuevo_comentario;
-
-		// Asignar el nuevo valor a la columna comentarios
-		$datos['comentarios'] = $nuevo_comentarios;
-	}
-
-	// Guardar los datos modificados en la tabla 'programas'
-	$this->dep('datos')->tabla('programas')->set($datos);
-
-	// Agregar una notificación para mostrar al guardar correctamente
-	toba::notificacion()->agregar("Su programa ha sido guardado correctamente", 'info');
-
-	// Refrescar el formulario para mostrar el nuevo subtotal
-	$this->dep('datos')->tabla('programas')->sincronizar();
-}
-
 	function evt__formulario_con_todo__modificacion($datos) {
 
 	// Manejo de comentarios
@@ -480,6 +441,134 @@ function evt__formulario_con_todo__modificacion_original($datos) {
 	// Sincronizar los datos con la base de datos
 	$this->dep('datos')->tabla('programas')->sincronizar();
 }
+
+	
+	
+	function conf__ver_form_con_todo(toba_ei_formulario $form)
+{
+	// Verificar si los datos están cargados
+	if ($this->dep('datos')->esta_cargada()) {
+		// Obtener los datos del programa
+		$datos_programa = $this->dep('datos')->tabla('programas')->get_datos_programa($this->id_programa_seleccionado);
+
+		// Comprobar si los datos del programa fueron obtenidos
+		if ($datos_programa) {
+			
+// Guardar los datos del programa
+$this->ano_academico_selec = $datos_programa['ano_academico'];
+$this->nombre_materia_selec = $datos_programa['nombre_materia'];
+$this->cod_guarani_selec = $datos_programa['cod_guarani'];
+$this->nombre_carrera_selec = $datos_programa['nombre_carrera'];
+$this->depto_selec = $datos_programa['depto'];
+$this->area_selec = $datos_programa['area'];
+$this->orientacion_selec = $datos_programa['orientacion'];
+$this->optativa_selec = $datos_programa['optativa'];
+$this->trayecto_selec = $datos_programa['trayecto'];
+$this->periodo_dictado_selec = $datos_programa['periodo_dictado'];
+$this->ano_plan_selec = $datos_programa['ano_plan'];
+$this->horas_totales_selec = $datos_programa['horas_totales'];
+$this->horas_semanales_selec = $datos_programa['horas_semanales'];
+$this->correlativas_para_cursar_selec = $datos_programa['correlativas_para_cursar'];
+$this->correlativas_para_aprobar_selec = $datos_programa['correlativas_para_aprobar'];
+$this->contenidos_minimos_selec = $datos_programa['contenidos_minimos'];
+$this->competencias_selec = $datos_programa['competencias'];
+$this->plan_ordenanzas_selec = $datos_programa['plan_ordenanzas'];
+$this->apellido_resp_selec = $datos_programa['apellido_resp'];
+$this->nombre_resp_selec = $datos_programa['nombre_resp'];
+$this->cargo_resp_selec = $datos_programa['cargo_resp'];
+$this->equipo_catedra_selec = $datos_programa['equipo_catedra'];
+$this->fundamentacion_selec = $datos_programa['fundamentacion'];
+$this->objetivos_selec = $datos_programa['objetivos'];
+$this->programa_analitico_selec = $datos_programa['programa_analitico'];
+$this->bibliografia_selec = $datos_programa['bibliografia'];
+$this->propuesta_metodologica_selec = $datos_programa['propuesta_metodologica'];
+$this->evaluacion_acreditacion_selec = $datos_programa['evaluacion_acreditacion'];
+$this->distribucion_horaria_selec = $datos_programa['distribucion_horaria'];
+$this->horas_teoricas_selec = $datos_programa['horas_teoricas'];
+$this->horas_practicas_selec = $datos_programa['horas_practicas'];
+$this->horas_teoricopracticas_selec = $datos_programa['horas_teoricopracticas'];
+$this->cronograma_tentativo_selec = $datos_programa['cronograma_tentativo'];
+$this->estado_selec = $datos_programa['estado'];
+$this->comentarios_selec = $datos_programa['comentarios'];
+//$this->comentario_selec = $datos_programa['comentario'];
+$this->cod_carrera_selec = $datos_programa['cod_carrera'];
+$this->id_programa_selec = $datos_programa['id_programa'];
+$this->firma_doc_selec = $datos_programa['firma_doc'];
+$this->firma_dto_selec = $datos_programa['firma_dto'];
+$this->firma_sac_selec = $datos_programa['firma_sac'];
+// Almacenar en memoria
+toba::memoria()->set_dato_operacion('ano_academico_selec', $this->ano_academico_selec);
+toba::memoria()->set_dato_operacion('nombre_materia_selec', $this->nombre_materia_selec);
+toba::memoria()->set_dato_operacion('cod_guarani_selec', $this->cod_guarani_selec);
+toba::memoria()->set_dato_operacion('nombre_carrera_selec', $this->nombre_carrera_selec);
+toba::memoria()->set_dato_operacion('depto_selec', $this->depto_selec);
+toba::memoria()->set_dato_operacion('area_selec', $this->area_selec);
+toba::memoria()->set_dato_operacion('orientacion_selec', $this->orientacion_selec);
+toba::memoria()->set_dato_operacion('optativa_selec', $this->optativa_selec);
+toba::memoria()->set_dato_operacion('trayecto_selec', $this->trayecto_selec);
+toba::memoria()->set_dato_operacion('periodo_dictado_selec', $this->periodo_dictado_selec);
+toba::memoria()->set_dato_operacion('ano_plan_selec', $this->ano_plan_selec);
+toba::memoria()->set_dato_operacion('horas_totales_selec', $this->horas_totales_selec);
+toba::memoria()->set_dato_operacion('horas_semanales_selec', $this->horas_semanales_selec);
+toba::memoria()->set_dato_operacion('correlativas_para_cursar_selec', $this->correlativas_para_cursar_selec);
+toba::memoria()->set_dato_operacion('correlativas_para_aprobar_selec', $this->correlativas_para_aprobar_selec);
+toba::memoria()->set_dato_operacion('contenidos_minimos_selec', $this->contenidos_minimos_selec);
+toba::memoria()->set_dato_operacion('competencias_selec', $this->competencias_selec);
+toba::memoria()->set_dato_operacion('plan_ordenanzas_selec', $this->plan_ordenanzas_selec);
+toba::memoria()->set_dato_operacion('apellido_resp_selec', $this->apellido_resp_selec);
+toba::memoria()->set_dato_operacion('nombre_resp_selec', $this->nombre_resp_selec);
+toba::memoria()->set_dato_operacion('cargo_resp_selec', $this->cargo_resp_selec);
+toba::memoria()->set_dato_operacion('equipo_catedra_selec', $this->equipo_catedra_selec);
+toba::memoria()->set_dato_operacion('fundamentacion_selec', $this->fundamentacion_selec);
+toba::memoria()->set_dato_operacion('objetivos_selec', $this->objetivos_selec);
+toba::memoria()->set_dato_operacion('programa_analitico_selec', $this->programa_analitico_selec);
+toba::memoria()->set_dato_operacion('bibliografia_selec', $this->bibliografia_selec);
+toba::memoria()->set_dato_operacion('propuesta_metodologica_selec', $this->propuesta_metodologica_selec);
+toba::memoria()->set_dato_operacion('evaluacion_acreditacion_selec', $this->evaluacion_acreditacion_selec);
+toba::memoria()->set_dato_operacion('distribucion_horaria_selec', $this->distribucion_horaria_selec);
+toba::memoria()->set_dato_operacion('horas_teoricas_selec', $this->horas_teoricas_selec);
+toba::memoria()->set_dato_operacion('horas_practicas_selec', $this->horas_practicas_selec);
+toba::memoria()->set_dato_operacion('horas_teoricopracticas_selec', $this->horas_teoricopracticas_selec);
+toba::memoria()->set_dato_operacion('cronograma_tentativo_selec', $this->cronograma_tentativo_selec);
+toba::memoria()->set_dato_operacion('estado_selec', $this->estado_selec);
+toba::memoria()->set_dato_operacion('comentarios_selec', $this->comentarios_selec);
+toba::memoria()->set_dato_operacion('comentario_selec', $this->comentario_selec);
+toba::memoria()->set_dato_operacion('cod_carrera_selec', $this->cod_carrera_selec);
+toba::memoria()->set_dato_operacion('id_programa_selec', $this->id_programa_selec);
+			
+toba::memoria()->set_dato_operacion('firma_doc_selec', $this->firma_doc_selec);
+toba::memoria()->set_dato_operacion('firma_dto_selec', $this->firma_dto_selec);
+toba::memoria()->set_dato_operacion('firma_sac_selec', $this->firma_sac_selec);          
+			
+			
+			// Establecer los datos en el formulario
+			$form->set_datos($datos_programa);
+			
+			
+echo "<script type='text/javascript'>
+	document.addEventListener('DOMContentLoaded', function() {
+		setTimeout(function(){
+			window.scrollTo(0, 0);
+			console.log('works!');
+		}, 1000); // Delay in milliseconds
+	});
+</script>";
+
+			// Setear de solo lectura para 'contenidos_minimos'
+			$form->set_solo_lectura(array('contenidos_minimos'), true);
+		}
+	} else {
+		// Si no hay datos cargados, eliminar el evento de eliminar
+		$this->pantalla()->eliminar_evento('eliminar');
+	}
+	
+	
+
+	toba::notificacion()->info("En esta sección usted puede VER los programas enviados a SAC.");
+		
+}
+
+	
 
 	
 	
@@ -573,6 +662,17 @@ function conf__enviados(catedras_ei_cuadro $cuadro)
 	$cuadro->set_datos($datos);
 }
 
+	function evt__enviados__seleccion($datos)
+{
+	$this->id_programa_seleccionado = $datos['id_programa']; // Guardar el ID del programa seleccionado
+	toba::memoria()->set_dato_operacion('id_programa_seleccionado', $this->id_programa_seleccionado); // Almacenar en memoria
+
+	$this->dep('datos')->cargar($datos);
+	$this->set_pantalla('pant_ver');
+}    
+	
+	
+	
 
 	// ************ SEGUNDA PANTALLA ************************
 	

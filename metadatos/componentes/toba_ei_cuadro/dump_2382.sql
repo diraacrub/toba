@@ -51,13 +51,13 @@ INSERT INTO apex_objeto_eventos (proyecto, evento_id, objeto, identificador, eti
 	'1188', --evento_id
 	'2382', --objeto
 	'seleccion', --identificador
-	NULL, --etiqueta
+	'Revisar', --etiqueta
 	'1', --maneja_datos
 	'1', --sobre_fila
 	NULL, --confirmacion
 	NULL, --estilo
 	'apex', --imagen_recurso_origen
-	'doc.gif', --imagen
+	'editar.gif', --imagen
 	'0', --en_botonera
 	NULL, --ayuda
 	'1', --orden

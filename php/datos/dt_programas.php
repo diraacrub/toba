@@ -380,7 +380,6 @@ class dt_programas extends catedras_datos_tabla
 			WHERE
 				replace(translate(lower(t_m.depto_principal), 'áéíóúÁÉÍÓÚ', 'aeiouaeiou'), ' ', '')
 				ILIKE replace(translate(lower($perfilLiteral), 'áéíóúÁÉÍÓÚ', 'aeiouaeiou'), ' ', '')
-				AND t_p.estado = 'docente'
 			ORDER BY
 				nombre_materia";
 		
@@ -441,8 +440,7 @@ function get_listado_control_depto_excepciones($filtro=array())
 			materias as t_m
 		WHERE
 				t_p.id_materia_prog = t_m.id_materia  
-			AND
-				t_p.estado IN ('docente')    
+				
 		ORDER BY nombre_materia";
 		if (count($where)>0) {
 			$sql = sql_concatenar_where($sql, $where);
