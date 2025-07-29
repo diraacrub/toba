@@ -480,6 +480,7 @@ function get_listado_control_depto_excepciones($filtro=array())
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
 			t_p.estado = 'docente'
+			AND t_m.cod_carrera NOT LIKE 'I%'                
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 		
@@ -545,7 +546,8 @@ function get_listado_control_depto_excepciones($filtro=array())
 		JOIN
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			t_p.estado IN ('depto', 'sac', 'aprobado')    
+			t_p.estado IN ('depto', 'sac', 'aprobado')
+			AND t_m.cod_carrera NOT LIKE 'I%'   
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 	}
@@ -674,7 +676,9 @@ function get_listado_para_imprimir_publico($filtro = "")
 		JOIN
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			t_p.legajo_resp = " . quote($usuario_id) . " AND t_p.estado = 'docente'
+			t_p.legajo_resp = " . quote($usuario_id) . " 
+			AND t_p.estado = 'docente'
+			AND t_m.cod_carrera NOT LIKE 'I%'
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 	}
@@ -694,6 +698,7 @@ function get_listado_para_imprimir_publico($filtro = "")
 		WHERE
 			t_p.legajo_resp = " . quote($usuario_id) . "
 			AND t_p.estado IN ('depto', 'sac', 'aprobado')
+			AND t_m.cod_carrera NOT LIKE 'I%'
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 	}

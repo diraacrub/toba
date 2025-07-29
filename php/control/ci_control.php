@@ -48,9 +48,9 @@ class ci_control extends catedras_ci
 	// Si se requieren otros casos, agrégalos aquí.
 
 	// --- Lista de usuarios que no requieren el filtro ---
-	$excepciones = array('toba', 'vero', 'nacho');
-
-	if (in_array($usuario_id, $excepciones)) {
+		$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
+		$excepciones = array('admin');
+		if (array_intersect($perfiles_funcionales, $excepciones)) {    
 		// Si el usuario es una excepción, obtener todos los datos
 		if (isset($this->s__datos_filtro)) {
 			$datos = $this->dep('datos')->tabla('programas')->get_listado_control_excepciones($this->s__datos_filtro);

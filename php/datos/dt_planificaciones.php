@@ -159,14 +159,60 @@ class dt_planificaciones extends catedras_datos_tabla
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			t_p.legajo_resp = " . quote($usuario_id) . " AND t_pl.estado_planificacion = 'docente'
+			t_p.legajo_resp = " . quote($usuario_id) . " 
+			AND t_pl.estado_planificacion = 'docente'
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 	}
 	
 //----------------
-	function get_listado_filtrado_depto($usuario_id)
+	function get_listado_filtrado_depto($usuario_id, $perfil_usuario)
 	{
+		
+	$perfiles_validos = array(
+	'biologiageneral',
+	'botanica',
+	'didactica',
+	'ecologia',
+	'educacionfisica',
+	'enfermeria',
+	'estadistica',
+	'explotacionderecursosacuaticos',
+	'fisica',
+	'geologiaypetroleo',
+	'idiomasextranjerosconpropositosespecificos',
+	'ingenieriacivil',
+	'matematica',
+	'politicaeducacional',
+	'psicologia',
+	'quimica',
+	'zoologia'
+		);
+	// Se recorre el arreglo de perfiles funcionales para buscar uno de los perfiles válidos
+	$perfil = '';
+	foreach ($perfil_usuario as $perfil_item) {
+		// Comparamos en minúsculas para evitar problemas de mayúsculas/minúsculas
+		if (in_array(strtolower($perfil_item), $perfiles_validos)) {
+			$perfil = $perfil_item;
+			break;  // Se toma el primero que coincida
+		}
+	}
+	
+	if ($perfil === '') {
+		throw new Exception("El perfil funcional no está definido.");
+	}
+	
+	// Escapamos el valor para evitar inyección SQL (ajusta según tu framework)
+	$perfilEscaped = pg_escape_string($perfil);
+	// Construimos el literal SQL: se deben usar comillas simples para literales
+	$perfilLiteral = "'" . $perfilEscaped . "'";
+	
+	/*
+		Usamos translate() para eliminar acentos:
+		- Primero aplicamos lower() a la columna y al literal para evitar diferencias de mayúsculas/minúsculas.
+		- Luego, con translate(), reemplazamos las vocales acentuadas (por ejemplo: á, é, í, ó, ú y sus mayúsculas)
+			por sus equivalentes sin acento.
+	*/
 		$sql = "SELECT
 			t_pl.*,
 			t_p.*,
@@ -178,8 +224,10 @@ class dt_planificaciones extends catedras_datos_tabla
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			t_p.legajo_resp = " . quote($usuario_id) . " AND t_pl.estado_planificacion = 'depto'
-		ORDER BY legajo_resp";
+			replace(translate(lower(t_m.depto_principal), 'áéíóúÁÉÍÓÚ', 'aeiouaeiou'), ' ', '')
+			ILIKE replace(translate(lower($perfilLiteral), 'áéíóúÁÉÍÓÚ', 'aeiouaeiou'), ' ', '')
+		AND t_pl.estado_planificacion = 'depto'
+		ORDER BY nombre_materia";
 		return toba::db('catedras')->consultar($sql);
 	}
 	
@@ -258,7 +306,7 @@ class dt_planificaciones extends catedras_datos_tabla
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			t_pl.estado_planificacion IN ('depto','aprobado')    
+			t_pl.estado_planificacion IN ('depto','aprobado')
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 	}
@@ -279,7 +327,7 @@ class dt_planificaciones extends catedras_datos_tabla
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			t_pl.estado_planificacion IN ('docente')    
+			t_pl.estado_planificacion IN ('docente')
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 	}
@@ -368,7 +416,76 @@ class dt_planificaciones extends catedras_datos_tabla
 	}
 	
 //--------------------------    
-	function get_listado_enviados_depto($usuario_id)
+	
+	function get_listado_enviados_depto($usuario_id, $perfil_usuario)
+	{
+		
+	$perfiles_validos = array(
+	'biologiageneral',
+	'botanica',
+	'didactica',
+	'ecologia',
+	'educacionfisica',
+	'enfermeria',
+	'estadistica',
+	'explotacionderecursosacuaticos',
+	'fisica',
+	'geologiaypetroleo',
+	'idiomasextranjerosconpropositosespecificos',
+	'ingenieriacivil',
+	'matematica',
+	'politicaeducacional',
+	'psicologia',
+	'quimica',
+	'zoologia'
+		);
+	// Se recorre el arreglo de perfiles funcionales para buscar uno de los perfiles válidos
+	$perfil = '';
+	foreach ($perfil_usuario as $perfil_item) {
+		// Comparamos en minúsculas para evitar problemas de mayúsculas/minúsculas
+		if (in_array(strtolower($perfil_item), $perfiles_validos)) {
+			$perfil = $perfil_item;
+			break;  // Se toma el primero que coincida
+		}
+	}
+	
+	if ($perfil === '') {
+		throw new Exception("El perfil funcional no está definido.");
+	}
+	
+	// Escapamos el valor para evitar inyección SQL (ajusta según tu framework)
+	$perfilEscaped = pg_escape_string($perfil);
+	// Construimos el literal SQL: se deben usar comillas simples para literales
+	$perfilLiteral = "'" . $perfilEscaped . "'";
+	
+	/*
+		Usamos translate() para eliminar acentos:
+		- Primero aplicamos lower() a la columna y al literal para evitar diferencias de mayúsculas/minúsculas.
+		- Luego, con translate(), reemplazamos las vocales acentuadas (por ejemplo: á, é, í, ó, ú y sus mayúsculas)
+			por sus equivalentes sin acento.
+	*/
+		$sql = "SELECT
+			t_pl.*,
+			t_p.*,
+			t_m.*
+		FROM
+			planificaciones as t_pl
+		JOIN
+			programas AS t_p ON t_pl.id_prog_planif = t_p.id_programa
+		JOIN
+			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
+		WHERE
+			replace(translate(lower(t_m.depto_principal), 'áéíóúÁÉÍÓÚ', 'aeiouaeiou'), ' ', '')
+			ILIKE replace(translate(lower($perfilLiteral), 'áéíóúÁÉÍÓÚ', 'aeiouaeiou'), ' ', '')
+		AND t_pl.estado_planificacion = 'aprobado'
+		ORDER BY nombre_materia";
+		return toba::db('catedras')->consultar($sql);
+	}
+	
+	
+	
+	
+	function get_listado_enviados_depto_falla($usuario_id)
 	{
 		$sql =
 		"SELECT

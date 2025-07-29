@@ -42,9 +42,9 @@ class ci_planificaciones extends catedras_ci
 		$nombre_usuario = toba::usuario()->get_nombre();
 
 		// Lista de usuarios que no requieren el filtro
-		$excepciones = array('toba', 'vero', 'nacho');
-
-		if (in_array($usuario_id, $excepciones)) {
+		$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
+		$excepciones = array('admin');
+		if (array_intersect($perfiles_funcionales, $excepciones)) {
 			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_docente();
 		} else {
 			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_filtrado($usuario_id);
@@ -97,9 +97,9 @@ class ci_planificaciones extends catedras_ci
 		toba::logger()->info("Perfiles funcionales del usuario ($usuario_id): " . implode(', ', $perfiles_funcionales));
 
 		// Lista de usuarios que no requieren el filtro
-		$excepciones = array('toba', 'vero', 'nacho');
-
-		if (in_array($usuario_id, $excepciones)) {
+		$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
+		$excepciones = array('admin');
+		if (array_intersect($perfiles_funcionales, $excepciones)) {        
 			// Si el usuario es una excepción, obtener todos los datos
 			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_depto_aprobado();
 		} else {

@@ -501,8 +501,9 @@ function conf__cuadro(toba_ei_cuadro $cuadro)
 	// Si necesitas contemplar otros casos, agrégalos aquí.
 
 	// --- Determinar si el usuario es una excepción (sin filtro) ---
-	$excepciones = array('toba', 'vero', 'nacho');
-	if (in_array($usuario_id, $excepciones)) {
+	$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
+	$excepciones = array('admin');
+	if (array_intersect($perfiles_funcionales, $excepciones)) {
 		$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_sac();
 	} else {
 		// Pasamos la lista de deptos_principales a la consulta filtrada
@@ -565,9 +566,9 @@ function conf__enviados(catedras_ei_cuadro $cuadro)
 	// Si se requieren otros casos, agrégalos aquí.
 
 	// --- Lista de usuarios que no requieren el filtro ---
-	$excepciones = array('toba', 'vero', 'nacho');
-
-	if (in_array($usuario_id, $excepciones)) {
+	$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
+	$excepciones = array('admin');
+	if (array_intersect($perfiles_funcionales, $excepciones)) {
 		// Si el usuario es una excepción, se obtienen todos los datos
 		$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_aprobado();
 	} else {

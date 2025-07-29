@@ -892,11 +892,11 @@ toba::notificacion()->agregar("En esta sección usted puede VER los datos del Pro
 	{
 		$usuario_id = toba::usuario()->get_id();
 		$nombre_usuario = toba::usuario()->get_nombre();
+		$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
 
 		// Lista de usuarios que no requieren el filtro
-		$excepciones = array('toba', 'vero', '23018');
-
-		if (in_array($usuario_id, $excepciones)) {
+		$excepciones = array('admin');
+		if (array_intersect($perfiles_funcionales, $excepciones)) {
 			$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_docente();
 		} else {
 			$datos = $this->dep('datos')->tabla('programas')->get_listado_filtrado($usuario_id);
@@ -944,10 +944,9 @@ toba::notificacion()->agregar("En esta sección usted puede VER los datos del Pro
 		$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
 		toba::logger()->info("Perfiles funcionales del usuario ($usuario_id): " . implode(', ', $perfiles_funcionales));
 
-		// Lista de usuarios que no requieren el filtro
-		$excepciones = array('toba', 'vero', 'nacho');
-
-		if (in_array($usuario_id, $excepciones)) {
+		$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
+		$excepciones = array('admin');
+		if (array_intersect($perfiles_funcionales, $excepciones)) {
 			// Si el usuario es una excepción, obtener todos los datos
 			$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_depto_sac_aprobado();
 		} else {

@@ -31,14 +31,15 @@ class ci_depto_planificaciones extends catedras_ci
 		
 		$usuario_id = toba::usuario()->get_id();
 		$nombre_usuario = toba::usuario()->get_nombre();
+		$perfil_usuario = toba::usuario()->get_perfiles_funcionales();
 
 		// Lista de usuarios que no requieren el filtro
-		$excepciones = array('toba', 'vero', 'nacho');
-
-		if (in_array($usuario_id, $excepciones)) {
+		$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
+		$excepciones = array('admin');
+		if (array_intersect($perfiles_funcionales, $excepciones)) {
 			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_depto();
 		} else {
-			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_filtrado_depto($usuario_id);
+			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_filtrado_depto($usuario_id, $perfil_usuario);
 		}
 		
 		foreach ($datos as $key => $registro) {
@@ -85,17 +86,18 @@ class ci_depto_planificaciones extends catedras_ci
 		$usuario_id = toba::usuario()->get_id();
 		$nombre_usuario = toba::usuario()->get_nombre();
 		$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
+		$perfil_usuario = toba::usuario()->get_perfiles_funcionales();
 		toba::logger()->info("Perfiles funcionales del usuario ($usuario_id): " . implode(', ', $perfiles_funcionales));
 
 		// Lista de usuarios que no requieren el filtro
-		$excepciones = array('toba', 'vero', 'nacho');
-
-		if (in_array($usuario_id, $excepciones)) {
+		$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
+		$excepciones = array('admin');
+		if (array_intersect($perfiles_funcionales, $excepciones)) {
 			// Si el usuario es una excepción, obtener todos los datos
 			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_aprobado();
 		} else {
 				// Si no es una excepción, aplicar el filtro por legajo_resp y estado
-			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_enviados_depto($usuario_id);
+			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_enviados_depto($usuario_id, $perfil_usuario);
 		}
 		foreach ($datos as $key => $registro) {
 			if ($registro ['estado_planificacion'] === 'docente') {

@@ -33,9 +33,10 @@ protected $s__datos_filtro;
 	$perfil_usuario = toba::usuario()->get_perfiles_funcionales();
 	
 	// Lista de usuarios que no requieren el filtro
-	$excepciones = array('toba', 'vero', 'nacho');
 	
-	if (in_array($usuario_id, $excepciones)) {
+	$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
+	$excepciones = array('admin');
+	if (array_intersect($perfiles_funcionales, $excepciones)) {
 		// Si el usuario es una excepción, obtener todos los datos
 		if (isset($this->s__datos_filtro)) {
 			$datos = $this->dep('datos')->tabla('programas')->get_listado_control_depto_excepciones($this->s__datos_filtro);
@@ -81,11 +82,11 @@ protected $s__datos_filtro;
 		$perfil_usuario   = toba::usuario()->get_perfiles_funcionales(); // Usamos el perfil
 	
 		// Lista de usuarios que no requieren el filtro
-		$excepciones = array('toba', 'vero', 'nacho');
 
-		if (in_array($usuario_id, $excepciones)) {
+		$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
+		$excepciones = array('admin');
+		if (array_intersect($perfiles_funcionales, $excepciones)) {
 			// Si el usuario es una excepción, obtener todos los datos
-			//$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_sac_aprobado();
 			if (isset($this->s__datos_filtro)) {
 				$cuadro->set_datos($this->dep('datos')->tabla('programas')->get_listado_control_depto_excepciones($this->s__datos_filtro));
 				} else {
