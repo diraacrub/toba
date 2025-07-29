@@ -250,7 +250,7 @@ class dt_planificaciones extends catedras_datos_tabla
 		return toba::db('catedras')->consultar($sql);
 	}
 	
-//----------------
+//---------------- este creo que ya no se usa
 	function get_listado_filtrado_aprobado($usuario_id)
 	{
 		$sql = "SELECT
@@ -268,7 +268,128 @@ class dt_planificaciones extends catedras_datos_tabla
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 	}
+	
+//----- SELECTS para SAC 
+	
+	function get_listado_sac_filtrado_docente($usuario_id, $perfil_usuario)
+	{
+	// Si la lista está vacía, podrías optar por no filtrar o devolver un conjunto vacío.
+	if (empty($deptos_principales)) {
+		// Aquí podrías devolver todos los registros en estado 'sac' o ninguno.
+		// return array(); // O ejecutar la consulta sin filtro.
+		// Por ejemplo, ejecutar la consulta sin filtro:
+		$filtro_deptos = "1=1";
+	} else {
+		// Crear la lista de literales SQL. Se asume que la función quote() se encarga de poner comillas simples
+		$lista = array();
+		foreach ($deptos_principales as $dept) {
+			// Puedes usar quote($dept) o construir el literal manualmente:
+			$lista[] = quote($dept);
+			// Alternativamente, si no tienes quote():
+			// $lista[] = "'" . pg_escape_string($dept) . "'";
+		}
+		// Convertir el array a una lista separada por comas
+		$lista_str = implode(',', $lista);
+		$filtro_deptos = "t_m.depto_principal IN ($lista_str)";
+	}
 
+		$sql = "SELECT
+			t_pl.*,
+			t_p.*,
+			t_m.*
+		FROM
+			planificaciones as t_pl
+		JOIN
+			programas AS t_p ON t_pl.id_prog_planif = t_p.id_programa
+		JOIN
+			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
+		WHERE
+			t_pl.estado_planificacion = 'docente'
+			AND $filtro_deptos
+		ORDER BY nombre_materia";
+		return toba::db('catedras')->consultar($sql);
+	}
+//-----    
+	function get_listado_sac_filtrado_depto($usuario_id, $perfil_usuario)
+	{
+	// Si la lista está vacía, podrías optar por no filtrar o devolver un conjunto vacío.
+	if (empty($deptos_principales)) {
+		// Aquí podrías devolver todos los registros en estado 'sac' o ninguno.
+		// return array(); // O ejecutar la consulta sin filtro.
+		// Por ejemplo, ejecutar la consulta sin filtro:
+		$filtro_deptos = "1=1";
+	} else {
+		// Crear la lista de literales SQL. Se asume que la función quote() se encarga de poner comillas simples
+		$lista = array();
+		foreach ($deptos_principales as $dept) {
+			// Puedes usar quote($dept) o construir el literal manualmente:
+			$lista[] = quote($dept);
+			// Alternativamente, si no tienes quote():
+			// $lista[] = "'" . pg_escape_string($dept) . "'";
+		}
+		// Convertir el array a una lista separada por comas
+		$lista_str = implode(',', $lista);
+		$filtro_deptos = "t_m.depto_principal IN ($lista_str)";
+	}
+
+		$sql = "SELECT
+			t_pl.*,
+			t_p.*,
+			t_m.*
+		FROM
+			planificaciones as t_pl
+		JOIN
+			programas AS t_p ON t_pl.id_prog_planif = t_p.id_programa
+		JOIN
+			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
+		WHERE
+			t_pl.estado_planificacion = 'depto'
+			AND $filtro_deptos
+		ORDER BY nombre_materia";
+		return toba::db('catedras')->consultar($sql);
+	}
+
+//------
+	function get_listado_sac_filtrado_aprobado($usuario_id, $perfil_usuario)
+	{
+	// Si la lista está vacía, podrías optar por no filtrar o devolver un conjunto vacío.
+	if (empty($deptos_principales)) {
+		// Aquí podrías devolver todos los registros en estado 'sac' o ninguno.
+		// return array(); // O ejecutar la consulta sin filtro.
+		// Por ejemplo, ejecutar la consulta sin filtro:
+		$filtro_deptos = "1=1";
+	} else {
+		// Crear la lista de literales SQL. Se asume que la función quote() se encarga de poner comillas simples
+		$lista = array();
+		foreach ($deptos_principales as $dept) {
+			// Puedes usar quote($dept) o construir el literal manualmente:
+			$lista[] = quote($dept);
+			// Alternativamente, si no tienes quote():
+			// $lista[] = "'" . pg_escape_string($dept) . "'";
+		}
+		// Convertir el array a una lista separada por comas
+		$lista_str = implode(',', $lista);
+		$filtro_deptos = "t_m.depto_principal IN ($lista_str)";
+	}
+
+		$sql = "SELECT
+			t_pl.*,
+			t_p.*,
+			t_m.*
+		FROM
+			planificaciones as t_pl
+		JOIN
+			programas AS t_p ON t_pl.id_prog_planif = t_p.id_programa
+		JOIN
+			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
+		WHERE
+			t_pl.estado_planificacion = 'aprobado'
+			AND $filtro_deptos
+		ORDER BY nombre_materia";
+		return toba::db('catedras')->consultar($sql);
+	}
+
+	
 //----------------
 	function get_listado_filtrado_docente_depto($usuario_id)
 	{

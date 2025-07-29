@@ -26,7 +26,57 @@ class ci_sac_planificaciones extends catedras_ci
 
 	//---- Cuadro -----------------------------------------------------------------------
 
-	function conf__cuadro(toba_ei_cuadro $cuadro)
+	
+function conf__cuadro(toba_ei_cuadro $cuadro)
+{
+	$usuario_id    = toba::usuario()->get_id();
+	$nombre_usuario= toba::usuario()->get_nombre();
+	$perfil_usuario= toba::usuario()->get_perfiles_funcionales();
+
+	// --- Determinar la lista de deptos_principales en función del perfil ---
+	$deptos_principales = array(); // inicializa la lista
+
+	// Si el array de perfiles funcionales contiene 'sac'
+	if (in_array('saccrub', $perfil_usuario)) {
+		// Por ejemplo, para 'sac' la lista podría ser:
+		$deptos_principales = array('ECOLOGÍA','EXPLOTACIÓN DE RECURSOS ACUÁTICOS', 'MATEMÁTICA', 'FÍSICA', 'QUÍMICA', 'BIOLOGÍA GENERAL','BOTÁNICA','EDUCACIÓN FÍSICA', 'DIDÁCTICA', 'ESTADÍSTICA','ENFERMERÍA','INGENIERÍA CIVIL','POLÍTICA EDUCACIONAL','PSICOLOGÍA','GEOLOGÍA Y PETRÓLEO', 'ZOOLOGÍA');
+	}
+	// Si el array de perfiles funcionales contiene 'sacfale'
+	elseif (in_array('sacfadel', $perfil_usuario)) {
+		// Para 'sacfale' la lista es otra:
+		$deptos_principales = array('IDIOMAS EXTRANJEROS CON PROPÓSITOS ESPECÍFICOS');
+	}
+	// --- Determinar si el usuario es una excepción (sin filtro) ---
+	$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
+	$excepciones = array('admin');
+	if (array_intersect($perfiles_funcionales, $excepciones)) {
+		$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_aprobado();
+	} else {
+		// Pasamos la lista de deptos_principales a la consulta filtrada
+		$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_sac_filtrado_aprobado($usuario_id, $deptos_principales);
+	}
+
+	// Ajustar el texto del campo 'estado' según corresponda
+	foreach ($datos as $key => $registro) {
+		if ($registro['estado'] === 'docente') {
+			$datos[$key]['estado'] = 'Borrador';
+		}
+		if ($registro['estado'] === 'depto') {
+			$datos[$key]['estado'] = 'En revisión del Departamento';
+		}
+		if ($registro['estado'] === 'sac') {
+			$datos[$key]['estado'] = 'En revisión de la Secretaría Académica';
+		}
+	}
+	
+	$cuadro->set_datos($datos);
+	toba::logger()->info("Usuario ID: $usuario_id");
+	toba::logger()->info("Nombre del usuario: $nombre_usuario");
+}
+
+	/// cuadro reemplazado borrar si anda el otro
+	
+	function conf__cuadro_reemplazado(toba_ei_cuadro $cuadro)
 	{
 		
 		$usuario_id = toba::usuario()->get_id();
@@ -98,7 +148,7 @@ class ci_sac_planificaciones extends catedras_ci
 			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_depto();
 		} else {
 				// Si no es una excepción, aplicar el filtro por legajo_resp y estado
-			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_filtrado_depto($usuario_id, $perfil_usuario);
+			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_sac_filtrado_depto($usuario_id, $perfil_usuario);
 		}
 		foreach ($datos as $key => $registro) {
 			if ($registro ['estado_planificacion'] === 'docente') {
@@ -138,7 +188,7 @@ class ci_sac_planificaciones extends catedras_ci
 			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_docente();
 		} else {
 				// Si no es una excepción, aplicar el filtro por legajo_resp y estado
-			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_filtrado_docente($usuario_id, $perfil_usuario);
+			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_sac_filtrado_docente($usuario_id, $perfil_usuario);
 		}
 		foreach ($datos as $key => $registro) {
 			if ($registro ['estado_planificacion'] === 'docente') {
