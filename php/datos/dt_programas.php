@@ -58,7 +58,7 @@ class dt_programas extends catedras_datos_tabla
 			t_p.firma_sac,
 			t_p.horas_teoricas,
 			t_p.horas_practicas,
-			t_p.horas_teoricopracticas
+			t_p.horas_teoricopracticas,
 		FROM
 			programas as t_p
 		ORDER BY apellido_resp";
@@ -117,8 +117,56 @@ class dt_programas extends catedras_datos_tabla
 		}
 		$sql = "SELECT
 			t_p.*,
-			t_m.*
+			t_m.*,
+CASE
+	WHEN LENGTH(t_p.equipo_catedra) > 0 THEN '...'
+	ELSE t_p.equipo_catedra
+END AS eq_cat,
 
+CASE
+	WHEN LENGTH(t_p.fundamentacion) > 0 THEN '...'
+	ELSE t_p.fundamentacion
+END AS fund,
+
+CASE
+	WHEN LENGTH(t_p.objetivos) > 0 THEN '...'
+	ELSE t_p.objetivos
+END AS obj,
+
+CASE
+	WHEN LENGTH(t_p.programa_analitico) > 0 THEN '...'
+	ELSE t_p.programa_analitico
+END AS prog_an,
+
+CASE
+	WHEN LENGTH(t_p.bibliografia) > 0 THEN '...'
+	ELSE t_p.bibliografia
+END AS biblio,
+
+CASE
+	WHEN LENGTH(t_p.propuesta_metodologica) > 0 THEN '...'
+	ELSE t_p.propuesta_metodologica
+END AS prop_met,
+
+CASE
+	WHEN LENGTH(t_p.evaluacion_acreditacion) > 0 THEN '...'
+	ELSE t_p.evaluacion_acreditacion
+END AS eval,
+
+CASE
+	WHEN LENGTH(t_p.firma_doc) > 0 THEN '...'
+	ELSE t_p.firma_doc
+END AS f_doc,
+
+CASE
+	WHEN LENGTH(t_p.firma_dto) > 0 THEN '...'
+	ELSE t_p.firma_dto
+END AS f_dto,
+
+CASE
+	WHEN LENGTH(t_p.firma_sac) > 0 THEN '...'
+	ELSE t_p.firma_sac
+END AS f_sac
 		FROM
 			programas as t_p,
 			materias as t_m

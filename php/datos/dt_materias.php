@@ -70,7 +70,8 @@ class dt_materias extends catedras_datos_tabla
 			t_m.plan_mocovi,
 			t_m.plan_ordenanzas,
 			t_m.cod_guarani,
-			t_m.observaciones
+			t_m.observaciones,
+			LEFT(t_m.contenidos_minimos, 30) AS cont_min
 		FROM
 			materias as t_m
 		ORDER BY nombre_carrera";

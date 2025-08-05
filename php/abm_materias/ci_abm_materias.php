@@ -33,7 +33,8 @@ class ci_abm_materias extends catedras_ci
 			$cuadro->set_datos($this->dep('datos')->tabla('materias')->get_listado());
 		}
 	}
-
+	
+	
 	function evt__cuadro__seleccion($datos)
 	{
 		$this->dep('datos')->cargar($datos);
@@ -87,5 +88,4 @@ class ci_abm_materias extends catedras_ci
 	}
 
 }
-
 ?>
