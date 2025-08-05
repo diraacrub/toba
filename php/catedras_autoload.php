@@ -21,7 +21,6 @@ class catedras_autoload
 		'ci_abm_materias' => 'abm_materias/ci_abm_materias.php',
 		'ci_abm_planificaciones' => 'abm_planificaciones/ci_abm_planificaciones.php',
 		'ci_abm_programas' => 'abm_programas/ci_abm_programas.php',
-		'mi_autenticacion_saml' => 'autenticacion/mi_autenticacion_saml.php',
 		'ci_aval_programas' => 'aval_programas/ci_aval_programas.php',
 		'catedras_autoload' => 'catedras_autoload.php',
 		'ci_control' => 'control/ci_control.php',
@@ -30,7 +29,6 @@ class catedras_autoload
 		'dt_materias' => 'datos/dt_materias.php',
 		'dt_planificaciones' => 'datos/dt_planificaciones.php',
 		'dt_programas' => 'datos/dt_programas.php',
-		'ci_planificaciones' => 'depto/ci_planificaciones.php',
 		'catedras_comando' => 'extension_toba/catedras_comando.php',
 		'catedras_modelo' => 'extension_toba/catedras_modelo.php',
 		'poblar_usuarios_comando' => 'extension_toba/comandos/poblar_usuarios.php',
@@ -62,6 +60,7 @@ class catedras_autoload
 		'ci_planificaciones_aprobadas' => 'planif_aprobadas/ci_planificaciones_aprobadas.php',
 		'ci_sac_planificaciones' => 'planif_aprobadas/ci_planificaciones_aprobadas.php',
 		'ci_depto_planificaciones' => 'planificaciones/ci_depto_planificaciones.php',
+		'ci_planificaciones' => 'planificaciones/ci_planificaciones.php',
 		'ci_para_dptos_programas' => 'programas/ci_para_dptos_programas.php',
 		'ci_programas_depto' => 'programas/ci_para_dptos_programas.php',
 		'ci_para_deptos_programas' => 'programas/ci_para_dptos_programas.php',
@@ -74,6 +73,7 @@ class catedras_autoload
 		'recurso_materias' => 'rest/recurso_materias.php',
 		'recurso_programas' => 'rest/recurso_programas.php',
 		'ci_programas_viejo' => 'sac_/ci_para_dptos_programas.php',
+		'mi_autenticacion_saml' => 'saml_onelogin/mi_autenticacion_saml.php',
 	);
 }
 ?>
