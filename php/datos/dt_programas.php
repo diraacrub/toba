@@ -58,7 +58,7 @@ class dt_programas extends catedras_datos_tabla
 			t_p.firma_sac,
 			t_p.horas_teoricas,
 			t_p.horas_practicas,
-			t_p.horas_teoricopracticas,
+			t_p.horas_teoricopracticas
 		FROM
 			programas as t_p
 		ORDER BY apellido_resp";
