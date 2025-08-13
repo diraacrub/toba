@@ -440,6 +440,29 @@ echo "<script type='text/javascript'>
 
 	// Sincronizar los datos con la base de datos
 	$this->dep('datos')->tabla('programas')->sincronizar();
+
+// trae datos para registrar movimientos
+$usuario_id = toba::usuario()->get_id();
+$id_prog= isset($datos['id_programa']) ? $datos['id_programa'] : "";    
+$est_mov= isset($datos['estado']) ? $datos['estado'] : "";        
+	// Escapar valores
+$nombre_tabla       = quote('programas');
+$id_tabla           = quote($id_prog);
+date_default_timezone_set('America/Argentina/Buenos_Aires');
+$fecha_movimiento = quote(date('Y-m-d H:i:s'));
+$tipo_movimiento    = quote('Actualización');
+$usuario_movimiento = quote($usuario_id);
+$observaciones      = quote('Guardado desde formulario_con_todo DEPTOS');
+$estado_mov         = quote($est_mov);    
+
+$sql = "
+	INSERT INTO huayca.movimientos
+	(nombre_tabla, id_tabla, fecha_movimiento, tipo_movimiento, usuario_movimiento, observaciones, estado_mov)
+	VALUES ($nombre_tabla, $id_tabla, $fecha_movimiento, $tipo_movimiento, $usuario_movimiento, $observaciones, $estado_mov)
+";
+
+toba::db()->ejecutar($sql);        
+		
 }
 
 	

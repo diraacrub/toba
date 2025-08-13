@@ -172,6 +172,31 @@ class ci_depto_planificaciones extends catedras_ci
 	}
 
 		$this->dep('datos')->tabla('planificaciones')->set($datos);
+
+// trae datos para registrar el movimiento 
+	$usuario_id = toba::usuario()->get_id();
+	$id_planif = isset($datos['id_planificacion']) ? $datos['id_planificacion'] : '';
+	$est_mov = isset($datos['estado_planificacion']) ? $datos['estado_planificacion'] : '';
+// Escapar valores
+$nombre_tabla       = quote('planificaciones');
+$id_tabla           = quote($id_planif);
+date_default_timezone_set('America/Argentina/Buenos_Aires');
+$fecha_movimiento   = quote(date('Y-m-d H:i:s'));
+$tipo_movimiento    = quote('Actualización');
+$usuario_movimiento = quote($usuario_id);
+$observaciones      = quote('Guardado desde formulario DEPTOS');
+$estado_mov         = quote($est_mov);        
+
+$sql = "
+	INSERT INTO huayca.movimientos
+	(nombre_tabla, id_tabla, fecha_movimiento, tipo_movimiento, usuario_movimiento, observaciones, estado_mov)
+	VALUES ($nombre_tabla, $id_tabla, $fecha_movimiento, $tipo_movimiento, $usuario_movimiento, $observaciones, $estado_mov)
+";
+
+toba::db()->ejecutar($sql);
+		
+
+		
 	}
 //----------------- ver form planif
 	function conf__ver_form_planif(toba_ei_formulario $form)

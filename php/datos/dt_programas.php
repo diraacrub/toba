@@ -119,6 +119,16 @@ class dt_programas extends catedras_datos_tabla
 			t_p.*,
 			t_m.*,
 CASE
+	WHEN LENGTH(t_p.comentarios) > 0 THEN '...'
+	ELSE t_p.comentarios
+END AS coment,            
+			
+CASE
+	WHEN LENGTH(t_p.observaciones) > 0 THEN '...'
+	ELSE t_p.observaciones
+END AS obs,
+			
+CASE
 	WHEN LENGTH(t_p.equipo_catedra) > 0 THEN '...'
 	ELSE t_p.equipo_catedra
 END AS eq_cat,
