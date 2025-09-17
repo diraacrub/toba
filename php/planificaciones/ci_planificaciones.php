@@ -2,6 +2,7 @@
 class ci_planificaciones extends catedras_ci
 {
 	protected $s__datos_filtro;
+	protected $s__datos_viejos; // Para guardar los datos antes de modificar  
 	
 	private $id_planificacion_seleccionada;
 	private $tabla_ec_vacia; 
@@ -9,6 +10,7 @@ class ci_planificaciones extends catedras_ci
 	
 	private $tabla_dh_vacia;
 	private $tabla_html_dh;
+	
 	
 	
 
@@ -138,8 +140,10 @@ class ci_planificaciones extends catedras_ci
 
 	//---- Formulario -------------------------------------------------------------------
 
+	
 	function conf__formulario(toba_ei_formulario $form)
 	{
+		
 		if ($this->dep('datos')->esta_cargada()) {
 			$form->set_datos($this->dep('datos')->tabla('planificaciones')->get_datos_planificacion($this->id_planificacion_seleccionada));
 		} else {
@@ -153,6 +157,24 @@ class ci_planificaciones extends catedras_ci
 	
 	function evt__formulario__modificacion($datos)
 {
+	
+		// Guardar datos viejos antes de modificar
+	
+	if ($this->dep('datos')->tabla('planificaciones')->esta_cargada()) {
+		$this->s__datos_viejos = $this->dep('datos')->tabla('planificaciones')->get();
+		} else {
+		$this->s__datos_viejos = $datos;
+		}
+	
+	// Lógica de firma electrónica según estado
+	if (isset($datos['estado_planificacion']) && $datos['estado_planificacion'] === 'depto') {
+		$nombre_completo = toba::usuario()->get_nombre();
+		$timestamp_obj = new DateTime('now', new DateTimeZone('America/Argentina/Buenos_Aires'));
+		$formatted_timestamp = $timestamp_obj->format('Y-m-d H:i:s');
+		$datos['firma_doc_planif'] = "Firmado electrónicamente por $nombre_completo - Responsable de Cátedra - $formatted_timestamp";
+	}
+		
+	
 	// Definición forzada a UTF-8 para las tablas “vacías”
 $tabla_ec_vacia = utf8_encode("Apellido Nombre Legajo Cargo y Ded.");
 $tabla_dh_vacia = utf8_encode("hr. LUNES MARTES MIERCOLES JUEVES VIERNES SABADO T P TP L T P TP L T P TP L T P TP L T P TP L T P TP L 08 09 10 11 12 13 14 15 16 17 18 19 20 21");
@@ -283,31 +305,34 @@ if ($texto_bp_vacia == $texto_bp_datos) {
 			toba::notificacion()->info("FALTA COMPLETAR CAMPOS OBLIGATORIOS");
 			toba::notificacion()->info("Los datos se guardaron pero continúa en estado BORRADOR.");
 		}
+
+	// ---- REGISTRO DE MOVIMIENTOS ----
+	$est_mov = isset($datos['estado_planificacion']) ? $datos['estado_planificacion'] : "";
+	$estado_mov = quote($est_mov);  
+	$usuario_id = toba::usuario()->get_id();
+	$nombre_tabla = quote('planificaciones');
+	date_default_timezone_set('America/Argentina/Buenos_Aires');
+	$fecha_movimiento = quote(date('Y-m-d H:i:s'));
+	$usuario_movimiento = quote($usuario_id);
+
+	// ID de la planificación
+	$planif = $this->dep('datos')->tabla('planificaciones')->get();
+	$id_planificacion = isset($planif['id_planificacion']) ? $planif['id_planificacion'] : null;    
+	$id_tabla = quote($id_planificacion);
+	$observaciones_txt = $this->armar_observaciones_planif($this->s__datos_viejos, "Actualización desde formulario");
+	$tipo_movimiento = quote('Actualización');
+	$observaciones = quote($observaciones_txt);
+	// Insert en movimientos
+	$sql = "
+		INSERT INTO huayca.movimientos
+		(nombre_tabla, id_tabla, fecha_movimiento, tipo_movimiento, usuario_movimiento, observaciones,estado_mov)
+		VALUES ($nombre_tabla, $id_tabla, $fecha_movimiento, $tipo_movimiento, $usuario_movimiento, $observaciones, $estado_mov)
+	";
+	toba::db()->ejecutar($sql);
+	//----
+
 	// Guardar los datos modificados
 	$this->dep('datos')->tabla('planificaciones')->set($datos);
-	
-// trae datos para registrar el movimiento 
-	$usuario_id = toba::usuario()->get_id();
-	$id_planif = isset($datos['id_planificacion']) ? $datos['id_planificacion'] : '';
-	$est_mov = isset($datos['estado_planificacion']) ? $datos['estado_planificacion'] : '';
-// Escapar valores
-$nombre_tabla       = quote('planificaciones');
-$id_tabla           = quote($id_planif);
-date_default_timezone_set('America/Argentina/Buenos_Aires');
-$fecha_movimiento   = quote(date('Y-m-d H:i:s'));
-$tipo_movimiento    = quote('Actualización');
-$usuario_movimiento = quote($usuario_id);
-$observaciones      = quote('Guardado desde formulario DOCENTE');
-$estado_mov         = quote($est_mov);        
-
-$sql = "
-	INSERT INTO huayca.movimientos
-	(nombre_tabla, id_tabla, fecha_movimiento, tipo_movimiento, usuario_movimiento, observaciones, estado_mov)
-	VALUES ($nombre_tabla, $id_tabla, $fecha_movimiento, $tipo_movimiento, $usuario_movimiento, $observaciones, $estado_mov)
-";
-
-toba::db()->ejecutar($sql);
-
 	// $this->resetear();
 	
 	
@@ -364,6 +389,50 @@ toba::db()->ejecutar($sql);
 		$this->dep('datos')->sincronizar();
 		$this->resetear();
 	}
+	
+	// Función auxiliar para armar observaciones de planificaciones
+private function armar_observaciones_planif($datos, $accion)
+{
+	// Campos de planif que sí queremos guardar
+	$incluir = array('id_planificacion', 'id_prog_planif', 'estado_planificacion');
+	$txt = "";
+
+	foreach ($datos as $campo => $valor) {
+		if (in_array($campo, $incluir)) {
+
+			// Si es id_prog_planif, buscamos la materia relacionada
+			if ($campo == 'id_prog_planif' && !empty($valor)) {
+				$materia = toba::db('catedras')->consultar("
+					SELECT m.nombre_materia, m.cod_carrera, m.plan_ordenanzas, m.cod_guarani,
+							p.ano_academico, p.nombre_resp, p.apellido_resp, p.periodo_dictado                    
+					FROM programas p
+					JOIN materias m ON p.id_materia_prog = m.id_materia
+					WHERE p.id_programa = " . quote($valor) . "
+				");
+				if (!empty($materia)) {
+					$info_materia = "nombre_materia: <strong>" . $materia[0]['nombre_materia'] . "</strong><br>"
+									. "cod_guarani: <strong>" . $materia[0]['cod_guarani'] . "</strong><br>"
+									. "cod_carrera: <strong>" . $materia[0]['cod_carrera'] . "</strong><br>"
+									. "plan_ordenanzas: <strong>" . $materia[0]['plan_ordenanzas'] . "</strong><br>"
+									. "ano_academico: ".$materia[0]['ano_academico']."<br>"
+									. "pariodo_dictado: ".$materia[0]['periodo_dictado']."<br>"                                           
+									. "nombre_resp: ".$materia[0]['nombre_resp']."<br>"                                           
+									. "apellido_resp: ".$materia[0]['apellido_resp'];
+					$valor .= "<br>".$info_materia;
+				}
+			}
+
+			$txt .= $campo . ": " . $valor . "<br>";
+		}
+	}
+
+	$txt .= $accion;
+	return $txt;
+}
+
+	
+	
+	
 	
 	
 }

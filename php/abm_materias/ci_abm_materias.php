@@ -2,6 +2,8 @@
 class ci_abm_materias extends catedras_ci
 {
 	protected $s__datos_filtro;
+	protected $s__datos_viejos;
+
 
 
 	//---- Filtro -----------------------------------------------------------------------
@@ -51,8 +53,21 @@ class ci_abm_materias extends catedras_ci
 			$this->pantalla()->eliminar_evento('eliminar');
 		}
 	}
-
+	
+	
 	function evt__formulario__modificacion($datos)
+{
+	// Capturamos los datos antiguos
+	if ($this->dep('datos')->tabla('materias')->esta_cargada()) {
+		$this->s__datos_viejos = $this->dep('datos')->tabla('materias')->get();
+	}
+	
+	// Guardamos los datos nuevos en el objeto de datos
+	$this->dep('datos')->tabla('materias')->set($datos);
+}
+
+
+	function evt__formulario__modificacion_borrar($datos)
 	{
 		$this->dep('datos')->tabla('materias')->set($datos);
 	}
@@ -76,16 +91,100 @@ class ci_abm_materias extends catedras_ci
 	}
 
 	function evt__eliminar()
-	{
-		$this->dep('datos')->eliminar_todo();
-		$this->resetear();
-	}
+{
+	// ---- Datos de la materia antes de eliminar ----
+	$materia = $this->dep('datos')->tabla('materias')->get();
+	$id_mat = isset($materia['id_materia']) ? $materia['id_materia'] : null;
+
+	// ---- Datos para el log ----
+	$usuario_id = toba::usuario()->get_id();
+	$nombre_tabla = quote('materias');
+	$id_tabla = quote($id_mat);
+	date_default_timezone_set('America/Argentina/Buenos_Aires');
+	$fecha_movimiento = quote(date('Y-m-d H:i:s'));
+	$tipo_movimiento = quote('Eliminación');
+	$usuario_movimiento = quote($usuario_id);
+
+	// ---- Armo el texto de observaciones con todos los campos ----
+	$observaciones_txt = $this->armar_observaciones($materia, "Eliminada desde abm Materias");
+	$observaciones = quote($observaciones_txt);
+
+	// ---- Insert en la tabla de movimientos ----
+	$sql = "
+		INSERT INTO huayca.movimientos
+		(nombre_tabla, id_tabla, fecha_movimiento, tipo_movimiento, usuario_movimiento, observaciones)
+		VALUES ($nombre_tabla, $id_tabla, $fecha_movimiento, $tipo_movimiento, $usuario_movimiento, $observaciones)
+	";
+	toba::db()->ejecutar($sql);
+
+	// ---- Elimina la materia ----
+	$this->dep('datos')->eliminar_todo();
+	$this->resetear();
+}
+
 
 	function evt__guardar()
-	{
-		$this->dep('datos')->sincronizar();
-		$this->resetear();
+{
+	$usuario_id = toba::usuario()->get_id();
+	$nombre_tabla = quote('materias');
+	date_default_timezone_set('America/Argentina/Buenos_Aires');
+	$fecha_movimiento = quote(date('Y-m-d H:i:s'));
+	$usuario_movimiento = quote($usuario_id);
+
+	$materia = $this->dep('datos')->tabla('materias')->get();
+	$id_mat = isset($materia['id_materia']) ? $materia['id_materia'] : null;    
+	$id_tabla = quote($id_mat);
+	
+	
+	if ($this->dep('datos')->tabla('materias')->esta_cargada()) {
+	// ---- Actualización ----
+	$observaciones_txt = $this->armar_observaciones($this->s__datos_viejos, "Actualización desde abm Materias");
+	$tipo_movimiento = quote('Actualización');
+} else {
+	// ---- Alta ----
+	$materia = $this->dep('datos')->tabla('materias')->get();
+	$observaciones_txt = $this->armar_observaciones($materia, "Alta desde abm Materias");
+	$tipo_movimiento = quote('Alta');
+}
+
+	$observaciones = quote($observaciones_txt);
+
+	$sql = "
+		INSERT INTO huayca.movimientos
+		(nombre_tabla, id_tabla, fecha_movimiento, tipo_movimiento, usuario_movimiento, observaciones)
+		VALUES ($nombre_tabla, $id_tabla, $fecha_movimiento, $tipo_movimiento, $usuario_movimiento, $observaciones)
+	";
+	toba::db()->ejecutar($sql);
+
+	// Guardar finalmente la materia
+	$this->dep('datos')->sincronizar();
+	$this->resetear();
+}
+
+	
+// funcion para armar el campo observaciones para la tabla movimientos    
+
+private function armar_observaciones($datos_materia, $accion)
+{
+	$excluir = array('x_dbr_clave'); // campos internos de Toba que no queremos loguear
+	$txt = "";
+	foreach ($datos_materia as $campo => $valor) {
+		if (!in_array($campo, $excluir)) {
+			if ($campo === 'nombre_materia') {
+				$valor = "<strong>$valor</strong>";
+			}
+			$txt .= $campo . ": " . $valor . "<br>";
+		}
 	}
+	$txt .= $accion;
+	return $txt;
+}
+
+	
+	
+	
+	
+
 
 }
 ?>

@@ -47,7 +47,7 @@ private $firma_dto_selec;
 private $firma_sac_selec;
 	
 
-function vista_pdf(toba_vista_pdf $salida)
+function vista_pdf_NO(toba_vista_pdf $salida)
 {
 	// Recuperar los datos del programa (se mantienen iguales)
 	$this->id_programa_seleccionado       = toba::memoria()->get_dato_operacion('id_programa_seleccionado');
@@ -170,7 +170,7 @@ function vista_pdf(toba_vista_pdf $salida)
 	foreach ($pdf->ezPages as $pageNum => $id) {
 		$pdf = $salida->get_pdf();
 		$pdf->reopenObject($id);
-		$pdf->addText(30, 30, 8, "Estado: " . $this->estado_selec . " - FALTAN FIRMAS");
+		$pdf->addText(30, 30, 8, "Estado: " . $this->estado_selec . " - PENDIENTE DE APROBACIÓN ");
 		$pdf->addText(30, 20, 8, "Id: " . $this->id_programa_seleccionado);
 		$imagen_header = toba::proyecto()->get_path().'/www/img/logo-unco-bariloche-azul-gris.jpeg';
 		$pdf->addJpegFromFile($imagen_header, 50, 780, 50, 20);    //imagen, x, y, ancho, alto
@@ -190,7 +190,7 @@ function vista_pdf(toba_vista_pdf $salida)
 	* @param string $titulo       Título de la sección
 	* @param string $html_content Contenido en HTML a procesar
 	*/
-private function procesar_html_para_pdf($pdf, $html_content)
+private function procesar_html_para_pdf_NO($pdf, $html_content)
 {
 	// Limpiar saltos de línea repetidos y espacios en blanco
 	$html_content = preg_replace('/(\r?\n){2,}/', "\n", $html_content);
@@ -212,7 +212,7 @@ private function procesar_html_para_pdf($pdf, $html_content)
 	* @param object $pdf  Objeto PDF (de EZPDF)
 	* @param string $html Cadena HTML a procesar
 	*/
-private function procesar_html($pdf, $html)
+private function procesar_html_NO($pdf, $html)
 {
 	$dom = new DOMDocument();
 	libxml_use_internal_errors(true);
@@ -284,6 +284,7 @@ private function tabla_desde_dom($table)
 	
 function vista_impresion(toba_impresion $salida)
 {
+	
 	// Recuperar los datos del programa seleccionado desde la memoria
 	$this->id_programa_seleccionado       = toba::memoria()->get_dato_operacion('id_programa_seleccionado');
 	$this->ano_academico_selec            = toba::memoria()->get_dato_operacion('ano_academico_selec');
@@ -327,10 +328,7 @@ function vista_impresion(toba_impresion $salida)
 	$this->firma_dto_selec                = toba::memoria()->get_dato_operacion('firma_dto_selec');
 	$this->firma_sac_selec                = toba::memoria()->get_dato_operacion('firma_sac_selec');
 	
-	// Verificar si se seleccionó un programa
-	if (isset($this->id_programa_seleccionado)) {
-
-	
+		
 		// Inyectar estilos para impresión
 $salida->mensaje('<style>
 	@page {
@@ -392,8 +390,9 @@ $salida->mensaje('<div class="print-container"><table>');
 	$salida->mensaje('<thead>');
 		$salida->mensaje('<tr>');
 			$salida->mensaje('<td style="text-align: left; padding: 0; margin: 0;">');
-				$salida->mensaje('<img src= "https://web.crub.uncoma.edu.ar/wp-content/uploads/2021/04/logo-unco-bariloche-azul-gris.png" alt="Logo UNCo" style="width: 150px; height: auto; margin: 0;">');
-			$salida->mensaje('</td>');
+				//$salida->mensaje('<img src= "https://web.crub.uncoma.edu.ar/wp-content/uploads/2021/04/logo-unco-bariloche-azul-gris.png" alt="Logo UNCo" style="width: 150px; height: auto; margin: 0;">');
+				// $salida->mensaje('</td>');
+		$salida->mensaje('PROGRAMA PENDIENTE DE APROBACIÓN');
 		$salida->mensaje('</tr>');
 	$salida->mensaje('</thead>');
 		
@@ -462,7 +461,7 @@ $salida->mensaje('<div class="print-container"><table>');
 			// Celda de la izquierda con el texto
 			$salida->mensaje('<td style="text-align: left; padding: 0; margin: 0;">');
 			$salida->mensaje(
-				'<span style="font-size:6px;">Estado: ' . $this->estado_selec . '  - <strong>FALTAN FIRMAS </strong> </span><br>' .
+				'<span style="font-size:6px;">Estado: ' . $this->estado_selec . '  - <strong> PENDIENTE DE APROBACIÓN </strong> </span><br>' .
 				'<span style="font-size:6px;">Número de Identificacion en <a href="https://huayca.crub.uncoma.edu.ar/catedras/1.0/">huayca.crub.uncoma.edu.ar</a> ' . $this->id_programa_seleccionado . '</span>'
 			);   
 			$salida->mensaje('</td>');
@@ -479,9 +478,7 @@ $salida->mensaje('<div class="print-container"><table>');
 		$salida->mensaje('</table>');
 		$salida->mensaje('</body>');
 		$salida->mensaje('</html>');
-	} else {
-		$salida->titulo('No se ha seleccionado un programa.');
-	}
+	
 }    
 
 
@@ -610,171 +607,163 @@ toba::memoria()->set_dato_operacion('firma_sac_selec', $this->firma_sac_selec);
 	}
 	
 toba::notificacion()->agregar("En esta sección usted puede completar los datos del Programa, guardar los cambios para seguir completando en otra ocasión y, cuando esté listo, firmar electrónicamente y enviar al Departamento",'info');
-
-
-
+	}
 	
-}
 	
-function evt__formulario_con_todo__modificacion($datos) {
+	
+	function evt__formulario_con_todo__modificacion($datos)
+{
+	// Guardar datos viejos antes de modificar
+	if ($this->dep('datos')->tabla('programas')->esta_cargada()) {
+		$datos_viejos = $this->dep('datos')->tabla('programas')->get();
+	} else {
+		$datos_viejos = $datos; // para un alta, los viejos son los mismos datos
+	}
 
 	// Manejo de comentarios
-	$estado= isset($datos['estado']) ? $datos['estado'] : "";
-	//$id_prog= isset($datos['id_programa']) ? $datos['id_programa'] : "";
-
 	$comentario = isset($datos['comentario']) ? $datos['comentario'] : '';
 	if (!empty($comentario)) {
-		// Obtener el timestamp y el nombre del usuario
 		$timestamp = date('Y-m-d H:i:s');
 		$usuario_id = toba::usuario()->get_id();
 		$nombre_completo = toba::usuario()->get_nombre();
-		
-		// Crear el HTML del comentario
+
 		$nuevo_comentario = "<div style='border: 1px solid #ccc; padding: 10px; margin-top: 10px;'>
 								<strong>$nombre_completo ($usuario_id) - $timestamp</strong><br>
 								<p style='margin: 5px 0;'>$comentario</p>
 								</div>";
 
-		// Obtener el contenido existente del campo comentarios
 		$comentarios = $this->dep('datos')->tabla('programas')->get_columna('comentarios');
-
-		// Concatenar el nuevo comentario al contenido existente
 		$nuevo_comentarios = $comentarios . $nuevo_comentario;
-
-		// Asignar el nuevo valor a la columna comentarios
 		$datos['comentarios'] = $nuevo_comentarios;
 	}
 
-	// *** Lógica para actualizar firma_dto y firma_sac según el estado ***
-	if (isset($datos['estado'])) {
-		// Obtener el estado actual
-		$estado_nuevo = $datos['estado'];
-
-		if ($estado_nuevo === 'depto') {
-			// Si el estado cambia a 'depto', actualizar 'docente' con la firma electrónica
-
-			// Obtener el nombre completo del usuario SAC
-			$nombre_completo = toba::usuario()->get_nombre();
-
-			// Crear un objeto DateTime con la zona horaria de Argentina
-			$timestamp_obj = new DateTime('now', new DateTimeZone('America/Argentina/Buenos_Aires'));
-			$formatted_timestamp = $timestamp_obj->format('Y-m-d H:i:s');
-
-			// Crear el contenido para 'firma_docente'
-			$datos['firma_doc'] = "Firmado electrónicamente por $nombre_completo - Responsable de Cátedra - $formatted_timestamp";
-		}
+	// Lógica de firma electrónica según estado
+	if (isset($datos['estado']) && $datos['estado'] === 'depto') {
+		$nombre_completo = toba::usuario()->get_nombre();
+		$timestamp_obj = new DateTime('now', new DateTimeZone('America/Argentina/Buenos_Aires'));
+		$formatted_timestamp = $timestamp_obj->format('Y-m-d H:i:s');
+		$datos['firma_doc'] = "Firmado electrónicamente por $nombre_completo - Responsable de Cátedra - $formatted_timestamp";
 	}
-	// *** Fin de la lógica para actualizar firma electrónica ***
-	$fundamentacion = isset($datos['fundamentacion']) ? $datos['fundamentacion'] : "";
-	$objetivos = isset($datos['objetivos']) ? $datos['objetivos'] : "";
-	$programa_analitico = isset($datos['programa_analitico']) ? $datos['programa_analitico'] : "";
-	$bibliografia = isset($datos['bibliografia']) ? $datos['bibliografia'] : "";
-	$propuesta_metodologica = isset($datos['propuesta_metodologica']) ? $datos['propuesta_metodologica'] : "";
-	$evaluacion_acreditacion = isset($datos['evaluacion_acreditacion']) ? $datos['evaluacion_acreditacion'] : "";
-	$distribucion_horaria = isset($datos['distribucion_horaria']) ? $datos['distribucion_horaria'] : "";
-	$cronograma_tentativo = isset($datos['cronograma_tentativo']) ? $datos['cronograma_tentativo'] : "";
 
-
-	// *** Control de horas: Validar que el subtotal de horas coincida con la carga horaria total ***
-	// Se obtienen los valores de horas enviados en el formulario (o se asigna 0 por defecto)
+	// Validación de horas y campos obligatorios
 	$horas_totales         = isset($datos['horas_totales']) ? $datos['horas_totales'] : 0;
 	$horas_practicas       = isset($datos['horas_practicas']) ? $datos['horas_practicas'] : 0;
 	$horas_teoricas        = isset($datos['horas_teoricas']) ? $datos['horas_teoricas'] : 0;
 	$horas_teoricopracticas= isset($datos['horas_teoricopracticas']) ? $datos['horas_teoricopracticas'] : 0;
 	$cod_carrera           = isset($datos['cod_carrera']) ? $datos['cod_carrera'] : 0;
 
-	// Definir las carreras que no contemplan horas teórico-prácticas
 	$carreras_coneau = array('LBIB', 'LENB', 'ICIB', 'IELB', 'IETB', 'IMEB', 'IPEB', 'IQUB');
-
 	if (in_array($cod_carrera, $carreras_coneau)) {
-			// Para estas carreras, el subtotal se calcula sin las horas teórico-prácticas
-			$subtotal_horas = $horas_practicas + $horas_teoricas;
-			// Se fuerza a cero el valor de horas teórico-prácticas
-			$datos['horas_teoricopracticas'] = 0;
+		$subtotal_horas = $horas_practicas + $horas_teoricas;
+		$datos['horas_teoricopracticas'] = 0;
 	} else {
-			// Para las demás, se suma todos los tipos de horas
-			$subtotal_horas = $horas_practicas + $horas_teoricas + $horas_teoricopracticas;
+		$subtotal_horas = $horas_practicas + $horas_teoricas + $horas_teoricopracticas;
 	}
 
-	// Validar que el subtotal de horas coincida con la carga horaria total
 	if ($subtotal_horas != $horas_totales) {
-			// Si no coinciden, se reinician los valores de horas
-			$datos['horas_teoricas'] = 0;
-			$datos['horas_practicas'] = 0;
-			$datos['horas_teoricopracticas'] = 0;
-			$datos['horas_totales'] = 0;
-
-			// Se cambia el estado a "docente"
-			$datos['estado'] = 'docente';
-			$datos['firma_doc'] = ''; // Se borra la firma electrónica
-
-			// Guardar los datos modificados antes de lanzar el error
-			$this->dep('datos')->tabla('programas')->set($datos);
-			$this->dep('datos')->tabla('programas')->sincronizar();
-
-			// Lanzar el error para que el usuario corrija la discrepancia en las horas
-			throw new toba_error("La suma de horas no coincide con la carga horaria total por plan de estudios, por favor corrija.");
+		$datos['horas_teoricas'] = 0;
+		$datos['horas_practicas'] = 0;
+		$datos['horas_teoricopracticas'] = 0;
+		$datos['horas_totales'] = 0;
+		$datos['estado'] = 'docente';
+		$datos['firma_doc'] = '';
+		$this->dep('datos')->tabla('programas')->set($datos);
+		$this->dep('datos')->tabla('programas')->sincronizar();
+		throw new toba_error("La suma de horas no coincide con la carga horaria total por plan de estudios, por favor corrija.");
 	}
-	// *** Fin del control de horas ***
-	
-		// Validar estado es depto y faltan cargar datos obligatorios
-if ($estado === "depto" && (
-	empty($fundamentacion) ||
-	empty($objetivos) ||
-	empty($programa_analitico) ||
-	empty($bibliografia) ||
-	empty($propuesta_metodologica) ||
-	empty($evaluacion_acreditacion) ||
-	empty($distribucion_horaria) ||
-	empty($cronograma_tentativo) ||
-	($horas_practicas == 0 && $horas_teoricas == 0 && $horas_teoricopracticas == 0)
-)) {
-	// Cambiar el estado a "docente"
-	$datos['estado'] = 'docente';
-	$datos['firma_doc'] = ''; // Se borra la firma electrónica
 
-	// Guardar los datos modificados antes del error
+	$campos_obligatorios = array('fundamentacion','objetivos','programa_analitico','bibliografia','propuesta_metodologica','evaluacion_acreditacion','distribucion_horaria','cronograma_tentativo');
+	foreach ($campos_obligatorios as $campo) {
+		if ($datos['estado'] === 'depto' && empty($datos[$campo])) {
+			$datos['estado'] = 'docente';
+			$datos['firma_doc'] = '';
+			$this->dep('datos')->tabla('programas')->set($datos);
+			$this->dep('datos')->sincronizar();
+			throw new toba_error("Falta cargar datos obligatorios, por favor corrija.");
+		}
+	}
+
+	if ($datos['estado'] === 'depto' && ($horas_practicas + $horas_teoricas + $horas_teoricopracticas) == 0) {
+		$datos['estado'] = 'docente';
+		$datos['firma_doc'] = '';
+		$this->dep('datos')->tabla('programas')->set($datos);
+		$this->dep('datos')->sincronizar();
+		throw new toba_error("Falta cargar datos de horas, por favor corrija.");
+	}
+
+	// Guardar finalmente los datos en programas
 	$this->dep('datos')->tabla('programas')->set($datos);
-	$this->dep('datos')->sincronizar();
-	throw new toba_error("Falta cargar datos obligatorios, por favor corrija.");
+	$this->dep('datos')->tabla('programas')->sincronizar();
+	toba::notificacion()->agregar("Su programa ha sido guardado correctamente", 'info');
+
+	// =====================================
+	// REGISTRAR MOVIMIENTO
+	// =====================================
+
+	$est_mov = isset($datos['estado']) ? $datos['estado'] : "";        
+	
+	$usuario_id = toba::usuario()->get_id();
+	$nombre_tabla = quote('programas');
+	$id_prog = isset($datos['id_programa']) ? $datos['id_programa'] : null;
+	$id_tabla = quote($id_prog);
+	date_default_timezone_set('America/Argentina/Buenos_Aires');
+	$fecha_movimiento = quote(date('Y-m-d H:i:s'));
+	$tipo_movimiento = quote($this->dep('datos')->tabla('programas')->esta_cargada() ? 'Actualización' : 'Alta');
+	$usuario_movimiento = quote($usuario_id);
+	$estado_mov = quote($est_mov);  
+
+	$observaciones_txt = $this->armar_observaciones($datos_viejos, $this->dep('datos')->tabla('programas')->esta_cargada() ? "Actualización desde formulario" : "Alta desde formulario");
+	$observaciones = quote($observaciones_txt);
+
+	$sql = "
+		INSERT INTO huayca.movimientos
+		(nombre_tabla, id_tabla, fecha_movimiento, tipo_movimiento, usuario_movimiento, observaciones, estado_mov)
+		VALUES ($nombre_tabla, $id_tabla, $fecha_movimiento, $tipo_movimiento, $usuario_movimiento, $observaciones, $estado_mov)
+	";
+	toba::db()->ejecutar($sql);
 }
 
+// Función auxiliar para armar observaciones
+	private function armar_observaciones($datos_programa, $accion)
+{
+	// Campos de programa que sí queremos guardar
+	$incluir = array(
+		'id_programa',
+		'id_materia_prog',
+		'estado',
+		'ano_academico',
+		'periodo_dictado',
+		'nombre_resp',
+		'apellido_resp'
+	);
+	$txt = "";
 
-	// Guardar los datos modificados en la tabla 'programas'
-	$this->dep('datos')->tabla('programas')->set($datos);
+	foreach ($datos_programa as $campo => $valor) {
+		if (in_array($campo, $incluir)) {
 
-		// Agregar una notificación para mostrar al usuario que se guardó correctamente
-	toba::notificacion()->agregar("Su programa ha sido guardado correctamente", 'info');
-	
-	
-// trae datos para registrar movimientos
-$usuario_id = toba::usuario()->get_id();
-$id_prog= isset($datos['id_programa']) ? $datos['id_programa'] : "";    
-$est_mov= isset($datos['estado']) ? $datos['estado'] : "";        
-	// Escapar valores
-$nombre_tabla       = quote('programas');
-$id_tabla           = quote($id_prog);
-date_default_timezone_set('America/Argentina/Buenos_Aires');
-$fecha_movimiento = quote(date('Y-m-d H:i:s'));
-$tipo_movimiento    = quote('Actualización');
-$usuario_movimiento = quote($usuario_id);
-$observaciones      = quote('Guardado desde formulario_con_todo DOCENTES');
-$estado_mov         = quote($est_mov);    
+			// Si es id_materia_prog, agregamos info de la materia relacionada
+			if ($campo == 'id_materia_prog' && !empty($valor)) {
+				$materia = toba::db('catedras')->consultar("
+					SELECT m.nombre_materia, m.cod_guarani, m.cod_carrera, m.plan_ordenanzas
+					FROM materias m
+					WHERE m.id_materia = " . quote($valor) . "
+				");
 
-$sql = "
-	INSERT INTO huayca.movimientos
-	(nombre_tabla, id_tabla, fecha_movimiento, tipo_movimiento, usuario_movimiento, observaciones, estado_mov)
-	VALUES ($nombre_tabla, $id_tabla, $fecha_movimiento, $tipo_movimiento, $usuario_movimiento, $observaciones, $estado_mov)
-";
+				if (!empty($materia)) {
+					$info_materia = "  nombre_materia: <strong>" . $materia[0]['nombre_materia'] . "</strong><br>"
+						. "  cod_guarani: <strong>" . $materia[0]['cod_guarani'] . "</strong><br>"
+						. "  cod_carrera: <strong>" . $materia[0]['cod_carrera'] . "</strong><br>"
+						. "  plan_ordenanzas: <strong>" . $materia[0]['plan_ordenanzas'] . "</strong>";
+					$valor .= "<br>" . $info_materia;
+				}
+			}
 
-toba::db()->ejecutar($sql);
+			$txt .= $campo . ": " . $valor . "<br>";
+		}
+	}
 
-	// $this->resetear();
-	
-	
-	
-	// Sincronizar los datos con la base de datos
-	$this->dep('datos')->tabla('programas')->sincronizar();
+	$txt .= $accion;
+	return $txt;
 }
 
 	
@@ -976,7 +965,7 @@ toba::notificacion()->agregar("En esta sección usted puede VER los datos del Pro
 		$excepciones = array('admin');
 		if (array_intersect($perfiles_funcionales, $excepciones)) {
 			// Si el usuario es una excepción, obtener todos los datos
-			$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_depto_sac_aprobado();
+			$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_depto_sac();
 		} else {
 				// Si no es una excepción, aplicar el filtro por legajo_resp y estado
 			$datos = $this->dep('datos')->tabla('programas')->get_listado_enviados($usuario_id);

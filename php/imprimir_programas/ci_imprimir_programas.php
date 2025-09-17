@@ -220,15 +220,6 @@ toba::memoria()->set_dato_operacion('firma_sac_selec', $this->firma_sac_selec);
 
 
 
-	function conf__formulario_viejo(toba_ei_formulario $form)
-	{
-		if ($this->dep('datos')->esta_cargada()) {
-			$form->set_datos($this->dep('datos')->tabla('programas')->get());
-		} else {
-			$this->pantalla()->eliminar_evento('eliminar');
-		}
-	}
-
 	function evt__formulario__modificacion($datos)
 	{
 		$this->dep('datos')->tabla('programas')->set($datos);

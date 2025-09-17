@@ -163,7 +163,7 @@ INSERT INTO apex_objeto_ut_formulario (objeto_ut_formulario_proyecto, objeto_ut_
 			<td>[ef id=id_tabla]</td>
 		</tr>
 		<tr>
-			<td>[ef id=fecha_movimiento]</td>
+			<td style="text-align: center;"><em>(dd/mm/aaaa)</em> [ef id=fecha_movimiento]</td>
 			<td>[ef id=tipo_movimiento]</td>
 			<td>[ef id=usuario_movimiento]</td>
 		</tr>
@@ -437,15 +437,15 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'Fecha Mov.', --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
-	NULL, --colapsado
-	NULL, --desactivado
+	'0', --colapsado
+	'0', --desactivado
 	NULL, --estilo
 	NULL, --total
 	NULL, --inicializacion
-	NULL, --permitir_html
-	NULL, --deshabilitar_rest_func
+	'0', --permitir_html
+	'0', --deshabilitar_rest_func
 	NULL, --estado_defecto
-	NULL, --solo_lectura
+	'0', --solo_lectura
 	'0', --solo_lectura_modificacion
 	NULL, --carga_metodo
 	NULL, --carga_clase

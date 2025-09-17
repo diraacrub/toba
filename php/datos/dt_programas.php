@@ -597,6 +597,23 @@ function get_listado_control_depto_excepciones($filtro=array())
 		return toba::db('catedras')->consultar($sql);   
 	}
 	
+	// todos los programas con estado depto o sac
+	function get_listado_estado_depto_sac()
+	{
+			$sql = "SELECT
+			t_p.*,
+			t_m.*
+		FROM
+			programas as t_p
+		JOIN
+			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
+		WHERE
+			t_p.estado IN ('depto', 'sac')
+			AND t_m.cod_carrera NOT LIKE 'I%'   
+		ORDER BY legajo_resp";
+		return toba::db('catedras')->consultar($sql);
+	}
+	
 	
 	// todos los programas con estado depto, sac o aprobado
 	function get_listado_estado_depto_sac_aprobado()
@@ -764,7 +781,7 @@ function get_listado_para_imprimir_publico($filtro = "")
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
 			t_p.legajo_resp = " . quote($usuario_id) . "
-			AND t_p.estado IN ('depto', 'sac', 'aprobado')
+			AND t_p.estado IN ('depto', 'sac')
 			AND t_m.cod_carrera NOT LIKE 'I%'
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);

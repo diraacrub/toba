@@ -1,10 +1,19 @@
 <?php
-class ci_depto_planificaciones extends catedras_ci
+class ci_planificaciones extends catedras_ci
 {
 	protected $s__datos_filtro;
 	protected $s__datos_viejos; // Para guardar los datos antes de modificar  
 	
 	private $id_planificacion_seleccionada;
+	private $tabla_ec_vacia; 
+	private $tabla_html_ec;
+	
+	private $tabla_dh_vacia;
+	private $tabla_html_dh;
+	
+	
+
+
 
 	//---- Filtro -----------------------------------------------------------------------
 
@@ -32,15 +41,14 @@ class ci_depto_planificaciones extends catedras_ci
 		
 		$usuario_id = toba::usuario()->get_id();
 		$nombre_usuario = toba::usuario()->get_nombre();
-		$perfil_usuario = toba::usuario()->get_perfiles_funcionales();
 
 		// Lista de usuarios que no requieren el filtro
 		$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
 		$excepciones = array('admin');
 		if (array_intersect($perfiles_funcionales, $excepciones)) {
-			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_depto();
+			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_docente();
 		} else {
-			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_filtrado_depto($usuario_id, $perfil_usuario);
+			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_filtrado($usuario_id);
 		}
 		
 		foreach ($datos as $key => $registro) {
@@ -87,18 +95,17 @@ class ci_depto_planificaciones extends catedras_ci
 		$usuario_id = toba::usuario()->get_id();
 		$nombre_usuario = toba::usuario()->get_nombre();
 		$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
-		$perfil_usuario = toba::usuario()->get_perfiles_funcionales();
 		toba::logger()->info("Perfiles funcionales del usuario ($usuario_id): " . implode(', ', $perfiles_funcionales));
 
 		// Lista de usuarios que no requieren el filtro
 		$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
 		$excepciones = array('admin');
-		if (array_intersect($perfiles_funcionales, $excepciones)) {
+		if (array_intersect($perfiles_funcionales, $excepciones)) {        
 			// Si el usuario es una excepción, obtener todos los datos
-			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_aprobado();
+			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_depto_aprobado();
 		} else {
 				// Si no es una excepción, aplicar el filtro por legajo_resp y estado
-			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_enviados_depto($usuario_id, $perfil_usuario);
+			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_enviados($usuario_id);
 		}
 		foreach ($datos as $key => $registro) {
 			if ($registro ['estado_planificacion'] === 'docente') {
@@ -118,7 +125,6 @@ class ci_depto_planificaciones extends catedras_ci
 		toba::logger()->info("Nombre del usuario: $nombre_usuario");
 	}
 
-	
 		function evt__enviados__seleccion($datos)
 	{
 		$this->id_planificacion_seleccionada = $datos['id_planificacion']; // Guardar el ID de la planif seleccionada
@@ -127,6 +133,8 @@ class ci_depto_planificaciones extends catedras_ci
 		$this->dep('datos')->cargar($datos);
 		$this->set_pantalla('pant_ver');
 		}
+	
+	
 	
 
 	//---- Formulario -------------------------------------------------------------------
@@ -139,23 +147,124 @@ class ci_depto_planificaciones extends catedras_ci
 			$this->pantalla()->eliminar_evento('eliminar');
 		}
 
-		toba::notificacion()->info("En este formulario usted puede comentar, enviar a SAC o devolver al Docente responsable.");
+		toba::notificacion()->info("Completar sin alterar la estructura de los cuadros.Gracias");
 	
 	}
 
-	function evt__formulario__modificacion($datos)
-	{
-		// Guardar datos viejos antes de modificar para guardar en movimientos
 	
-		if ($this->dep('datos')->tabla('planificaciones')->esta_cargada()) {
+	function evt__formulario__modificacion($datos)
+{
+	
+		// Guardar datos viejos antes de modificar
+	
+	if ($this->dep('datos')->tabla('planificaciones')->esta_cargada()) {
 		$this->s__datos_viejos = $this->dep('datos')->tabla('planificaciones')->get();
 		} else {
 		$this->s__datos_viejos = $datos;
 		}
-		
-		// Manejo de comentarios
-		$estado_planificacion= isset($datos['estado_planificacion']) ? $datos['estado_planificacion'] : "";
 
+	
+		
+	
+	// Definición forzada a UTF-8 para las tablas “vacías”
+$tabla_ec_vacia = utf8_encode("Apellido Nombre Legajo Cargo y Ded.");
+$tabla_dh_vacia = utf8_encode("hr. LUNES MARTES MIERCOLES JUEVES VIERNES SABADO T P TP L T P TP L T P TP L T P TP L T P TP L T P TP L 08 09 10 11 12 13 14 15 16 17 18 19 20 21");
+$tabla_hc_vacia = utf8_encode("Docente Legajo Día y Horas Lugar");
+$tabla_ot_vacia = utf8_encode("Docente INVESTIGACIÓN EXTENSIÓN GOBIERNO OTRAS (Especificar) Nombre y apellido Nombre del Proyecto Hs. sem Nombre del Proyecto Hs. sem TAREA Hs. sem TAREA Hs. sem");
+$tabla_bp_vacia = utf8_encode("Título Autores Editorial Edición Biblioteca (SI/NO) ISBN");
+	// Limpiar tablas vacías
+$texto_dh_vacia = html_entity_decode($tabla_dh_vacia, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+$texto_dh_vacia = preg_replace('/[\x00-\x1F\x7F\xA0]+/u', ' ', $texto_dh_vacia);
+$texto_dh_vacia = preg_replace('/\s+/u', ' ', $texto_dh_vacia);
+$texto_dh_vacia = trim($texto_dh_vacia);
+
+$texto_ec_vacia = html_entity_decode($tabla_ec_vacia, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+$texto_ec_vacia = preg_replace('/[\x00-\x1F\x7F\xA0]+/u', ' ', $texto_ec_vacia);
+$texto_ec_vacia = preg_replace('/\s+/u', ' ', $texto_ec_vacia);
+$texto_ec_vacia = trim($texto_ec_vacia);
+
+$texto_hc_vacia = html_entity_decode($tabla_hc_vacia, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+$texto_hc_vacia = preg_replace('/[\x00-\x1F\x7F\xA0]+/u', ' ', $texto_hc_vacia);
+$texto_hc_vacia = preg_replace('/\s+/u', ' ', $texto_hc_vacia);
+$texto_hc_vacia = trim($texto_hc_vacia);
+
+$texto_ot_vacia = html_entity_decode($tabla_ot_vacia, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+$texto_ot_vacia = preg_replace('/[\x00-\x1F\x7F\xA0]+/u', ' ', $texto_ot_vacia);
+$texto_ot_vacia = preg_replace('/\s+/u', ' ', $texto_ot_vacia);
+$texto_ot_vacia = trim($texto_ot_vacia);
+
+$texto_bp_vacia = html_entity_decode($tabla_bp_vacia, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+$texto_bp_vacia = preg_replace('/[\x00-\x1F\x7F\xA0]+/u', ' ', $texto_bp_vacia);
+$texto_bp_vacia = preg_replace('/\s+/u', ' ', $texto_bp_vacia);
+$texto_bp_vacia = trim($texto_bp_vacia);
+	// Procesar datos del formulario (suponiendo que ya vienen en la codificación original)
+$texto_dh_datos = strip_tags($datos['dist_horaria_planif']);
+$texto_dh_datos = html_entity_decode($texto_dh_datos, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+$texto_dh_datos = preg_replace('/[\x00-\x1F\x7F\xA0]+/u', ' ', $texto_dh_datos);
+$texto_dh_datos = preg_replace('/\s+/u', ' ', $texto_dh_datos);
+$texto_dh_datos = trim($texto_dh_datos);
+
+$texto_ec_datos = strip_tags($datos['equipo_catedra_planif']);
+$texto_ec_datos = html_entity_decode($texto_ec_datos, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+$texto_ec_datos = preg_replace('/[\x00-\x1F\x7F\xA0]+/u', ' ', $texto_ec_datos);
+$texto_ec_datos = preg_replace('/\s+/u', ' ', $texto_ec_datos);
+$texto_ec_datos = trim($texto_ec_datos);
+
+$texto_hc_datos = strip_tags($datos['horarios_consulta']);
+$texto_hc_datos = html_entity_decode($texto_hc_datos, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+$texto_hc_datos = preg_replace('/[\x00-\x1F\x7F\xA0]+/u', ' ', $texto_hc_datos);
+$texto_hc_datos = preg_replace('/\s+/u', ' ', $texto_hc_datos);
+$texto_hc_datos = trim($texto_hc_datos);
+
+$texto_ot_datos = strip_tags($datos['otras_tareas']);
+$texto_ot_datos = html_entity_decode($texto_ot_datos, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+$texto_ot_datos = preg_replace('/[\x00-\x1F\x7F\xA0]+/u', ' ', $texto_ot_datos);
+$texto_ot_datos = preg_replace('/\s+/u', ' ', $texto_ot_datos);
+$texto_ot_datos = trim($texto_ot_datos);
+
+$texto_bp_datos = strip_tags($datos['bibliografia_pedida']);
+$texto_bp_datos = html_entity_decode($texto_bp_datos, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+$texto_bp_datos = preg_replace('/[\x00-\x1F\x7F\xA0]+/u', ' ', $texto_bp_datos);
+$texto_bp_datos = preg_replace('/\s+/u', ' ', $texto_bp_datos);
+$texto_bp_datos = trim($texto_bp_datos);
+	
+	// Comparación para dist_horaria_planif
+if ($texto_dh_vacia == $texto_dh_datos) {
+	$datos['dist_horaria_planif'] = null;
+}
+	// Comparación para equipo_catedra_planif
+if ($texto_ec_vacia == $texto_ec_datos) {
+	$datos['equipo_catedra_planif'] = null;
+}
+	// Comparación para horarios_consulta
+if ($texto_hc_vacia == $texto_hc_datos) {
+	$datos['horarios_consulta'] = null;
+}
+	// Comparación para otras_tareas
+if ($texto_ot_vacia == $texto_ot_datos) {
+	$datos['otras_tareas'] = null;
+}
+	// Comparación para bibliografia_pedida
+if ($texto_bp_vacia == $texto_bp_datos) {
+	$datos['bibliografia_pedida'] = null;
+}
+
+	//si borraron la tabla pone null
+
+	$campos_a_null = array(
+	'dist_horaria_planif',
+	'equipo_catedra_planif',
+	'horarios_consulta',
+	'otras_tareas',
+	'bibliografia_pedida'
+		);
+	foreach ($campos_a_null as $campo) {
+		if (!isset($datos[$campo]) || trim($datos[$campo]) === '') {
+			$datos[$campo] = null;
+		}
+		}
+	
+	// Manejo de comentarios
 	$comentario = isset($datos['comentario']) ? $datos['comentario'] : '';
 	if (!empty($comentario)) {
 		// Obtener el timestamp y el nombre del usuario
@@ -178,36 +287,15 @@ class ci_depto_planificaciones extends catedras_ci
 		// Asignar el nuevo valor a la columna comentarios_planif
 		$datos['comentarios_planif'] = $nuevo_comentarios_planif;
 	}
-		
-		
-	// *** Lógica para actualizar firma_doc y firma_dto según el estado ***
-	if (isset($datos['estado_planificacion'])) {
-		// Obtener el estado actual
-		$estado_nuevo = $datos['estado_planificacion'];
-
-		if ($estado_nuevo === 'docente') {
-			// Si el estado cambia a 'docente', eliminar el contenido de 'firma_doc'
-			$datos['firma_doc_planif'] = '';
-		} elseif ($estado_nuevo === 'aprobado') {
-			// Si el estado cambia a 'aprobado', actualizar 'firma_dto' con la firma electrónica
-
-			// Obtener el nombre completo del usuario
-			$nombre_completo = toba::usuario()->get_nombre();
-
-			// Crear un objeto DateTime con la zona horaria de Argentina
-			$timestamp = new DateTime('now', new DateTimeZone('America/Argentina/Buenos_Aires'));
-			$formatted_timestamp = $timestamp->format('Y-m-d H:i:s');
-
-			// Crear el contenido para 'firma_dto'
-			
-			$datos['firma_dto_planif'] = "Conformidad del Departamento: Firmado electrónicamente por $nombre_completo - Responsable de Departamento/Delegación/Coordinación de Carrera - $formatted_timestamp";
+	
+	// Control de campos obligatorios si cambia a depto
+	$estado_planificacion = isset($datos['estado_planificacion']) ? $datos['estado_planificacion'] : "";
+	if ($estado_planificacion == "depto" && ($datos['dist_horaria_planif']==null||$datos['horarios_consulta']==null||$datos['otras_tareas']==null))
+		{
+			$datos['estado_planificacion'] = 'docente';
+			toba::notificacion()->info("FALTA COMPLETAR CAMPOS OBLIGATORIOS");
+			toba::notificacion()->info("Los datos se guardaron pero continúa en estado BORRADOR.");
 		}
-	}
-	// *** Fin de la lógica para actualizar firma_doc y firma_dto ***        
-		
-		
-		
-		
 
 	// ---- REGISTRO DE MOVIMIENTOS ----
 	$est_mov = isset($datos['estado_planificacion']) ? $datos['estado_planificacion'] : "";
@@ -234,13 +322,20 @@ class ci_depto_planificaciones extends catedras_ci
 	toba::db()->ejecutar($sql);
 	//----
 
-		
-		
-		
-		$this->dep('datos')->tabla('planificaciones')->set($datos);
-	}
-//----------------- ver form planif
-	function conf__ver_form_planif(toba_ei_formulario $form)
+	// Guardar los datos modificados
+	$this->dep('datos')->tabla('planificaciones')->set($datos);
+	// $this->resetear();
+	
+	
+	
+	
+	
+}
+
+
+///// funcion VER fromulario planif
+	
+		function conf__ver_form_planif(toba_ei_formulario $form)
 	{
 		if ($this->dep('datos')->esta_cargada()) {
 			$form->set_datos($this->dep('datos')->tabla('planificaciones')->get_datos_planificacion($this->id_planificacion_seleccionada));
@@ -248,14 +343,11 @@ class ci_depto_planificaciones extends catedras_ci
 			$this->pantalla()->eliminar_evento('eliminar');
 		}
 
-		toba::notificacion()->info("En esta sección usted puede VER las planificaciones enviadas a SAC.");
+		toba::notificacion()->info("En esta sección usted puede VER la planificación firmada y enviada.");
 	
 	}
+	//-------------------------
 	
-	
-//---------------------------------    
-	
-
 	
 	function resetear()
 	{
@@ -281,14 +373,15 @@ class ci_depto_planificaciones extends catedras_ci
 		$this->resetear();
 	}
 
+	
+	
 	function evt__guardar()
 	{
 		$this->dep('datos')->sincronizar();
 		$this->resetear();
 	}
-
 	
-// Función auxiliar para armar observaciones de planificaciones
+	// Función auxiliar para armar observaciones de planificaciones
 private function armar_observaciones_planif($datos, $accion)
 {
 	// Campos de planif que sí queremos guardar
@@ -328,6 +421,7 @@ private function armar_observaciones_planif($datos, $accion)
 	return $txt;
 }
 
+	
 	
 	
 	
