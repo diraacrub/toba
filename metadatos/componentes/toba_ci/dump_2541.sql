@@ -52,7 +52,7 @@ INSERT INTO apex_objeto_eventos (proyecto, evento_id, objeto, identificador, eti
 	'2541', --objeto
 	'agregar', --identificador
 	'Agregar', --etiqueta
-	'1', --maneja_datos
+	'0', --maneja_datos
 	'0', --sobre_fila
 	NULL, --confirmacion
 	NULL, --estilo
@@ -85,7 +85,7 @@ INSERT INTO apex_objeto_eventos (proyecto, evento_id, objeto, identificador, eti
 	'2541', --objeto
 	'volver', --identificador
 	'Volver', --etiqueta
-	'1', --maneja_datos
+	'0', --maneja_datos
 	'0', --sobre_fila
 	NULL, --confirmacion
 	'ei-boton-izq', --estilo
@@ -118,7 +118,7 @@ INSERT INTO apex_objeto_eventos (proyecto, evento_id, objeto, identificador, eti
 	'2541', --objeto
 	'eliminar', --identificador
 	'Eliminar', --etiqueta
-	'1', --maneja_datos
+	'0', --maneja_datos
 	'0', --sobre_fila
 	'¿Desea eliminar el registro?', --confirmacion
 	NULL, --estilo
@@ -151,7 +151,7 @@ INSERT INTO apex_objeto_eventos (proyecto, evento_id, objeto, identificador, eti
 	'2541', --objeto
 	'guardar', --identificador
 	'Guardar', --etiqueta
-	'1', --maneja_datos
+	'0', --maneja_datos
 	'0', --sobre_fila
 	NULL, --confirmacion
 	NULL, --estilo

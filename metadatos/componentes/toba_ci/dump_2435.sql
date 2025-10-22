@@ -37,7 +37,7 @@ INSERT INTO apex_objeto (proyecto, objeto, anterior, identificador, reflexivo, c
 	NULL, --parametro_f
 	NULL, --usuario
 	'2025-03-12 13:06:11', --creacion
-	'ambos'  --posicion_botonera
+	'abajo'  --posicion_botonera
 );
 --- FIN Grupo de desarrollo 0
 
@@ -85,10 +85,10 @@ INSERT INTO apex_objeto_eventos (proyecto, evento_id, objeto, identificador, eti
 	'2435', --objeto
 	'volver', --identificador
 	'Volver', --etiqueta
-	'1', --maneja_datos
+	'0', --maneja_datos
 	'0', --sobre_fila
 	NULL, --confirmacion
-	'ei-boton-izq', --estilo
+	'ei-boton-volver', --estilo
 	'apex', --imagen_recurso_origen
 	'deshacer.png', --imagen
 	'1', --en_botonera
@@ -100,11 +100,11 @@ INSERT INTO apex_objeto_eventos (proyecto, evento_id, objeto, identificador, eti
 	NULL, --display_datos_cargados
 	NULL, --grupo
 	NULL, --accion
-	NULL, --accion_imphtml_debug
+	'0', --accion_imphtml_debug
 	NULL, --accion_vinculo_carpeta
 	NULL, --accion_vinculo_item
 	NULL, --accion_vinculo_objeto
-	NULL, --accion_vinculo_popup
+	'0', --accion_vinculo_popup
 	NULL, --accion_vinculo_popup_param
 	NULL, --accion_vinculo_target
 	NULL, --accion_vinculo_celda
@@ -121,7 +121,7 @@ INSERT INTO apex_objeto_eventos (proyecto, evento_id, objeto, identificador, eti
 	'0', --maneja_datos
 	'0', --sobre_fila
 	'¿Desea eliminar el registro?', --confirmacion
-	NULL, --estilo
+	'ei-boton-eliminar', --estilo
 	'apex', --imagen_recurso_origen
 	'borrar.png', --imagen
 	'0', --en_botonera
@@ -133,11 +133,11 @@ INSERT INTO apex_objeto_eventos (proyecto, evento_id, objeto, identificador, eti
 	NULL, --display_datos_cargados
 	NULL, --grupo
 	NULL, --accion
-	NULL, --accion_imphtml_debug
+	'0', --accion_imphtml_debug
 	NULL, --accion_vinculo_carpeta
 	NULL, --accion_vinculo_item
 	NULL, --accion_vinculo_objeto
-	NULL, --accion_vinculo_popup
+	'0', --accion_vinculo_popup
 	NULL, --accion_vinculo_popup_param
 	NULL, --accion_vinculo_target
 	NULL, --accion_vinculo_celda
@@ -154,7 +154,7 @@ INSERT INTO apex_objeto_eventos (proyecto, evento_id, objeto, identificador, eti
 	'1', --maneja_datos
 	'0', --sobre_fila
 	NULL, --confirmacion
-	NULL, --estilo
+	'ei-boton-guardar', --estilo
 	'apex', --imagen_recurso_origen
 	'guardar.gif', --imagen
 	'1', --en_botonera
@@ -166,11 +166,11 @@ INSERT INTO apex_objeto_eventos (proyecto, evento_id, objeto, identificador, eti
 	NULL, --display_datos_cargados
 	NULL, --grupo
 	NULL, --accion
-	NULL, --accion_imphtml_debug
+	'0', --accion_imphtml_debug
 	NULL, --accion_vinculo_carpeta
 	NULL, --accion_vinculo_item
 	NULL, --accion_vinculo_objeto
-	NULL, --accion_vinculo_popup
+	'0', --accion_vinculo_popup
 	NULL, --accion_vinculo_popup_param
 	NULL, --accion_vinculo_target
 	NULL, --accion_vinculo_celda
@@ -344,14 +344,14 @@ INSERT INTO apex_objetos_pantalla (proyecto, pantalla, objeto_ci, orden, dep_id)
 	'catedras', --proyecto
 	'1231', --pantalla
 	'2435', --objeto_ci
-	'1', --orden
+	'0', --orden
 	'1308'  --dep_id
 );
 INSERT INTO apex_objetos_pantalla (proyecto, pantalla, objeto_ci, orden, dep_id) VALUES (
 	'catedras', --proyecto
 	'1231', --pantalla
 	'2435', --objeto_ci
-	'2', --orden
+	'1', --orden
 	'1322'  --dep_id
 );
 INSERT INTO apex_objetos_pantalla (proyecto, pantalla, objeto_ci, orden, dep_id) VALUES (
@@ -372,12 +372,6 @@ INSERT INTO apex_objetos_pantalla (proyecto, pantalla, objeto_ci, orden, dep_id)
 ------------------------------------------------------------
 -- apex_eventos_pantalla
 ------------------------------------------------------------
-INSERT INTO apex_eventos_pantalla (pantalla, objeto_ci, evento_id, proyecto) VALUES (
-	'1231', --pantalla
-	'2435', --objeto_ci
-	'1249', --evento_id
-	'catedras'  --proyecto
-);
 INSERT INTO apex_eventos_pantalla (pantalla, objeto_ci, evento_id, proyecto) VALUES (
 	'1232', --pantalla
 	'2435', --objeto_ci

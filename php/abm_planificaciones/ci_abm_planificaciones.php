@@ -1,5 +1,6 @@
 <?php
-class ci_abm_planificaciones extends catedras_ci
+require_once 'ci_base_operaciones.php';
+class ci_abm_planificaciones extends ci_base_operaciones
 {
 	protected $s__datos_filtro;
 	protected $s__datos_viejos; // Para guardar los datos antes de modificar    

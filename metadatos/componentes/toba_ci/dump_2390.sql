@@ -37,7 +37,7 @@ INSERT INTO apex_objeto (proyecto, objeto, anterior, identificador, reflexivo, c
 	NULL, --parametro_f
 	NULL, --usuario
 	'2024-09-27 11:14:58', --creacion
-	'ambos'  --posicion_botonera
+	'abajo'  --posicion_botonera
 );
 --- FIN Grupo de desarrollo 0
 
@@ -88,7 +88,7 @@ INSERT INTO apex_objeto_eventos (proyecto, evento_id, objeto, identificador, eti
 	'0', --maneja_datos
 	'0', --sobre_fila
 	NULL, --confirmacion
-	'ei-boton-izq', --estilo
+	'ei-boton-volver', --estilo
 	'apex', --imagen_recurso_origen
 	'deshacer.png', --imagen
 	'1', --en_botonera
@@ -118,13 +118,13 @@ INSERT INTO apex_objeto_eventos (proyecto, evento_id, objeto, identificador, eti
 	'2390', --objeto
 	'eliminar', --identificador
 	'Eliminar', --etiqueta
-	'1', --maneja_datos
+	'0', --maneja_datos
 	'0', --sobre_fila
 	'¿Desea eliminar el registro?', --confirmacion
-	NULL, --estilo
+	'ei-boton-eliminar', --estilo
 	'apex', --imagen_recurso_origen
 	'borrar.png', --imagen
-	'1', --en_botonera
+	'0', --en_botonera
 	NULL, --ayuda
 	'3', --orden
 	NULL, --ci_predep
@@ -133,11 +133,11 @@ INSERT INTO apex_objeto_eventos (proyecto, evento_id, objeto, identificador, eti
 	NULL, --display_datos_cargados
 	NULL, --grupo
 	NULL, --accion
-	NULL, --accion_imphtml_debug
+	'0', --accion_imphtml_debug
 	NULL, --accion_vinculo_carpeta
 	NULL, --accion_vinculo_item
 	NULL, --accion_vinculo_objeto
-	NULL, --accion_vinculo_popup
+	'0', --accion_vinculo_popup
 	NULL, --accion_vinculo_popup_param
 	NULL, --accion_vinculo_target
 	NULL, --accion_vinculo_celda
@@ -154,7 +154,7 @@ INSERT INTO apex_objeto_eventos (proyecto, evento_id, objeto, identificador, eti
 	'1', --maneja_datos
 	'0', --sobre_fila
 	NULL, --confirmacion
-	NULL, --estilo
+	'ei-boton-guardar', --estilo
 	'apex', --imagen_recurso_origen
 	'guardar.gif', --imagen
 	'1', --en_botonera
@@ -187,7 +187,7 @@ INSERT INTO apex_objeto_eventos (proyecto, evento_id, objeto, identificador, eti
 	'1', --maneja_datos
 	NULL, --sobre_fila
 	NULL, --confirmacion
-	NULL, --estilo
+	'ei-boton-imprimir', --estilo
 	'apex', --imagen_recurso_origen
 	'impresora.gif', --imagen
 	'1', --en_botonera

@@ -1,5 +1,6 @@
 <?php
-class ci_planificaciones_aprobadas extends catedras_ci
+require_once 'ci_base_operaciones.php';
+class ci_planificaciones_aprobadas extends ci_base_operaciones
 {
 	protected $s__datos_filtro;
 	

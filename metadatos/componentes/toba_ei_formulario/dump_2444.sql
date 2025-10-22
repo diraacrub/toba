@@ -122,7 +122,8 @@ INSERT INTO apex_objeto_ut_formulario (objeto_ut_formulario_proyecto, objeto_ut_
 	NULL, --analisis_cambios
 	'0', --no_imprimir_efs_sin_estado
 	'0', --resaltar_efs_con_estado
-	'<p style="text-align: center;"><strong>Programa de c&aacute;tedra</strong><br />
+	'<p style="text-align: center;"><strong>Informe de c&aacute;tedra</strong><br />
+<em>(Ordenanza N&deg; 485/91)</em><br />
 Centro Regional Universitario Bariloche<br />
 Universidad Nacional del Comahue</p><p>&nbsp;</p>
 <table align="center" border="4" cellpadding="0" cellspacing="0" style="width: 750px;" width="601">
@@ -171,7 +172,8 @@ Universidad Nacional del Comahue</p><p>&nbsp;</p>
 		</tr>
 		<tr>
 			<td style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128); white-space: nowrap;"><p>&nbsp;<strong> &nbsp;1- En relaci&oacute;n al<br />
-			&nbsp;n&uacute;mero de estudiantes:&nbsp;</strong></p></td>
+			&nbsp;n&uacute;mero de estudiantes:</strong><br />
+			&nbsp;<strong><span style="color:#c0392b;">(obligatorio)</span>&nbsp;</strong></p></td>
 			<td style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128); white-space: nowrap;"><strong>Inscriptos:</strong>[ef id=inscriptos]</td>
 			<td style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128); white-space: nowrap;"><strong>Comenzaron:</strong>[ef id=comenzaron]</td>
 			<td style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128); white-space: nowrap;"><strong>Aprobaron:</strong>[ef id=aprobaron]</td>
@@ -179,11 +181,11 @@ Universidad Nacional del Comahue</p><p>&nbsp;</p>
 			<td style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128); white-space: nowrap;"><strong>Abandonaron:</strong>[ef id=abandonaron]</td>
 		</tr>
 		<tr>
-			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><p>&nbsp; &nbsp;<strong>2- &iquest;Cu&aacute;les considera que fueron las causas de abandono o de no aprobaci&oacute;n de la cursada?</strong>&nbsp;[ef id=causas_abandono_desap]</p></td>
+			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><p>&nbsp; &nbsp;<strong>2- &iquest;Cu&aacute;les considera que fueron las causas de abandono o de no aprobaci&oacute;n de la cursada? <span style="color:#c0392b;">(obligatorio)</span></strong>[ef id=causas_abandono_desap]</p></td>
 		</tr>
 		<tr>
 			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><br />
-			<strong>&nbsp; &nbsp;3- &iquest;C&oacute;mo caracterizar&iacute;an al grupo de estudiantes que curs&oacute; la materia? C&oacute;mo grupo, &iquest;cu&aacute;les fueron las &nbsp;caracter&iacute;sticas &nbsp;positivas &nbsp;m&aacute;s &nbsp;relevantes &nbsp;y &nbsp;cu&aacute;les &nbsp;considera &nbsp;que &nbsp;son &nbsp;aspectos &nbsp;que &nbsp;deben trabajar?</strong>&nbsp;[ef id=caract_grupo]</td>
+			<strong>&nbsp; &nbsp;3- &iquest;C&oacute;mo caracterizar&iacute;an al grupo de estudiantes que curs&oacute; la materia? C&oacute;mo grupo, &iquest;cu&aacute;les fueron las &nbsp;caracter&iacute;sticas &nbsp;positivas &nbsp;m&aacute;s &nbsp;relevantes &nbsp;y &nbsp;cu&aacute;les &nbsp;considera &nbsp;que &nbsp;son &nbsp;aspectos &nbsp;que &nbsp;deben trabajar?</strong>[ef id=caract_grupo]</td>
 		</tr>
 		<tr>
 			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><br />
@@ -219,7 +221,7 @@ Universidad Nacional del Comahue</p><p>&nbsp;</p>
 		<tr>
 			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><p><strong>&nbsp; &nbsp;11- An&aacute;lisis por cargo</strong><br />
 			&nbsp;&nbsp;El presente cuadro debe ser completado, luego de analizar con toda la c&aacute;tedra cada cargo en particular.<br />
-			&nbsp; Es necesario completar una l&iacute;nea&nbsp;por cada docente que integra la c&aacute;tedra&nbsp;indicando los datos de cada docente en las primeras dos columnas y en las siguentes:<br />
+			&nbsp; Es necesario completar una l&iacute;nea&nbsp;por cada docente que integra la c&aacute;tedra, incluyendo al&nbsp;Responsable de c&aacute;tedra,&nbsp;indicando los datos de cada docente en las primeras dos columnas y en las siguentes:<br />
 			<strong>&nbsp; &nbsp; &nbsp; 1 = Muy bueno&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;2 = Bueno&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;3 = Malo&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;4 = No lo tiene en cuenta&nbsp;&nbsp;</strong><br />
 			[ef id=analisis_por_cargo]</p></td>
 		</tr>
@@ -236,7 +238,7 @@ Universidad Nacional del Comahue</p><p>&nbsp;</p>
 		</tr>
 		<tr>
 			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><br />
-			&nbsp; &nbsp;<strong>Estado: </strong>[ef id=estado_inf]</td>
+			&nbsp; &nbsp;<strong>Estado: </strong>[ef id=estado_informe]</td>
 		</tr>
 	</tbody>
 </table>
@@ -260,7 +262,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'id_prog_informe', --identificador
 	'ef_fijo', --elemento_formulario
 	'id_prog_informe', --columnas
-	'1', --obligatorio
+	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
 	'2', --orden
 	NULL, --etiqueta
@@ -347,15 +349,15 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
-	NULL, --colapsado
-	NULL, --desactivado
+	'0', --colapsado
+	'0', --desactivado
 	NULL, --estilo
 	NULL, --total
 	NULL, --inicializacion
-	NULL, --permitir_html
-	NULL, --deshabilitar_rest_func
+	'0', --permitir_html
+	'0', --deshabilitar_rest_func
 	NULL, --estado_defecto
-	NULL, --solo_lectura
+	'0', --solo_lectura
 	'0', --solo_lectura_modificacion
 	NULL, --carga_metodo
 	NULL, --carga_clase
@@ -428,15 +430,15 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
-	NULL, --colapsado
-	NULL, --desactivado
+	'0', --colapsado
+	'0', --desactivado
 	NULL, --estilo
 	NULL, --total
 	NULL, --inicializacion
-	NULL, --permitir_html
-	NULL, --deshabilitar_rest_func
-	NULL, --estado_defecto
-	NULL, --solo_lectura
+	'0', --permitir_html
+	'0', --deshabilitar_rest_func
+	'0', --estado_defecto
+	'0', --solo_lectura
 	'0', --solo_lectura_modificacion
 	NULL, --carga_metodo
 	NULL, --carga_clase
@@ -509,15 +511,15 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
-	NULL, --colapsado
-	NULL, --desactivado
+	'0', --colapsado
+	'0', --desactivado
 	NULL, --estilo
 	NULL, --total
 	NULL, --inicializacion
-	NULL, --permitir_html
-	NULL, --deshabilitar_rest_func
-	NULL, --estado_defecto
-	NULL, --solo_lectura
+	'0', --permitir_html
+	'0', --deshabilitar_rest_func
+	'0', --estado_defecto
+	'0', --solo_lectura
 	'0', --solo_lectura_modificacion
 	NULL, --carga_metodo
 	NULL, --carga_clase
@@ -590,15 +592,15 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
-	NULL, --colapsado
-	NULL, --desactivado
+	'0', --colapsado
+	'0', --desactivado
 	NULL, --estilo
 	NULL, --total
 	NULL, --inicializacion
-	NULL, --permitir_html
-	NULL, --deshabilitar_rest_func
-	NULL, --estado_defecto
-	NULL, --solo_lectura
+	'0', --permitir_html
+	'0', --deshabilitar_rest_func
+	'0', --estado_defecto
+	'0', --solo_lectura
 	'0', --solo_lectura_modificacion
 	NULL, --carga_metodo
 	NULL, --carga_clase
@@ -671,15 +673,15 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL, --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
-	NULL, --colapsado
-	NULL, --desactivado
+	'0', --colapsado
+	'0', --desactivado
 	NULL, --estilo
 	NULL, --total
 	NULL, --inicializacion
-	NULL, --permitir_html
-	NULL, --deshabilitar_rest_func
-	NULL, --estado_defecto
-	NULL, --solo_lectura
+	'0', --permitir_html
+	'0', --deshabilitar_rest_func
+	'0', --estado_defecto
+	'0', --solo_lectura
 	'0', --solo_lectura_modificacion
 	NULL, --carga_metodo
 	NULL, --carga_clase
@@ -3011,9 +3013,9 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'6813', --objeto_ei_formulario_fila
 	'2444', --objeto_ei_formulario
 	'catedras', --objeto_ei_formulario_proyecto
-	'estado_inf', --identificador
-	'ef_multi_seleccion_lista', --elemento_formulario
-	'estado_inf', --columnas
+	'estado_informe', --identificador
+	'ef_combo', --elemento_formulario
+	'estado_informe', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
 	'35', --orden
@@ -3082,7 +3084,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'0', --selec_utilidades
 	'2', --selec_tamano
 	'100%', --selec_ancho
-	'0', --selec_serializar
+	'1', --selec_serializar
 	NULL, --selec_cant_columnas
 	NULL, --upload_extensiones
 	'13', --punto_montaje

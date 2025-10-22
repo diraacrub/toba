@@ -1,0 +1,8 @@
+#menu-h {
+    background-color: #00bfff !important; /* menú principal celeste */
+}
+
+#menu-h li ul {
+    background-color: #f4f4f4 !important; /* submenú clarito */
+    color: #222 !important;
+}

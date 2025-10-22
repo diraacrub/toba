@@ -1,5 +1,6 @@
 <?php
-class ci_imprimir_programas extends catedras_ci
+require_once 'ci_base_operaciones.php';
+class ci_imprimir_programas extends ci_base_operaciones
 {
 	protected $s__filtro;
 	

@@ -4,6 +4,28 @@ class dt_materias extends catedras_datos_tabla
 	
 	
 ///////
+	
+	function get_optativas()
+{
+	$sql = "SELECT
+				t_m.*,
+				LEFT(t_m.nombre_materia, 50) 
+					|| CASE 
+						WHEN LENGTH(t_m.nombre_materia) > 50 THEN '...' 
+						ELSE '' 
+						END
+					|| ' (' || t_m.cod_carrera || ' - ' || t_m.cod_guarani || ')' AS desc_lista
+			FROM
+				materias AS t_m
+			WHERE
+				t_m.nombre_materia ILIKE '%optativa%'
+			ORDER BY t_m.nombre_materia";
+
+	return toba::db('catedras')->consultar($sql);
+}
+
+	
+	
 	function get_descripciones()
 	{
 		$sql = "SELECT
@@ -18,8 +40,7 @@ class dt_materias extends catedras_datos_tabla
 	}
 
 
-
-	function get_listado($filtro=array())
+		function get_listado($filtro=array())
 	{
 		$where = array();
 		if (isset($filtro['id_materia'])) {
@@ -31,20 +52,14 @@ class dt_materias extends catedras_datos_tabla
 		if (isset($filtro['nombre_materia'])) {
 			$where[] = "nombre_materia ILIKE ".quote("%{$filtro['nombre_materia']}%");
 		}
-		if (isset($filtro['depto'])) {
-			$where[] = "depto ILIKE ".quote("%{$filtro['depto']}%");
+		if (isset($filtro['ano_plan'])) {
+			$where[] = "ano_plan = ".quote($filtro['ano_plan']);
+		}
+		if (isset($filtro['depto_principal'])) {
+			$where[] = "depto_principal ILIKE ".quote("%{$filtro['depto_principal']}%");
 		}
 		if (isset($filtro['cod_carrera'])) {
 			$where[] = "cod_carrera ILIKE ".quote("%{$filtro['cod_carrera']}%");
-		}
-		if (isset($filtro['plan_guarani'])) {
-			$where[] = "plan_guarani ILIKE ".quote("%{$filtro['plan_guarani']}%");
-		}
-		if (isset($filtro['version_guarani'])) {
-			$where[] = "version_guarani ILIKE ".quote("%{$filtro['version_guarani']}%");
-		}
-		if (isset($filtro['cod_guarani'])) {
-			$where[] = "cod_guarani ILIKE ".quote("%{$filtro['cod_guarani']}%");
 		}
 		$sql = "SELECT
 			t_m.id_materia,
@@ -70,8 +85,7 @@ class dt_materias extends catedras_datos_tabla
 			t_m.plan_mocovi,
 			t_m.plan_ordenanzas,
 			t_m.cod_guarani,
-			t_m.observaciones,
-			LEFT(t_m.contenidos_minimos, 30) AS cont_min
+			t_m.observaciones
 		FROM
 			materias as t_m
 		ORDER BY nombre_carrera";
@@ -80,6 +94,11 @@ class dt_materias extends catedras_datos_tabla
 		}
 		return toba::db('catedras')->consultar($sql);
 	}
+	
+
+
+
+
 
 
 

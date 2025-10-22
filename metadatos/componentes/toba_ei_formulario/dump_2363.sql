@@ -2697,7 +2697,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'2363', --objeto_ei_formulario
 	'catedras', --objeto_ei_formulario_proyecto
 	'estado', --identificador
-	'ef_multi_seleccion_lista', --elemento_formulario
+	'ef_combo', --elemento_formulario
 	'estado', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio

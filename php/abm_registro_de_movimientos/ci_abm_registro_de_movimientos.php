@@ -24,7 +24,7 @@ class ci_abm_registro_de_movimientos extends catedras_ci
 	}
 
 	//---- Cuadro -----------------------------------------------------------------------
-
+	
 	function conf__cuadro(toba_ei_cuadro $cuadro)
 	{
 		if (isset($this->s__datos_filtro)) {
@@ -87,5 +87,4 @@ class ci_abm_registro_de_movimientos extends catedras_ci
 	}
 
 }
-
 ?>

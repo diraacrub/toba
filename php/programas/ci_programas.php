@@ -1,6 +1,9 @@
 <?php
-class ci_programas extends catedras_ci
+require_once 'ci_base_operaciones.php';
+class ci_programas extends ci_base_operaciones
 {
+	
+	
 	//esto es de operaciones docentes
 	
 	private $id_programa_seleccionado;
@@ -489,7 +492,7 @@ $salida->mensaje('<div class="print-container"><table>');
 	
 	function conf__formulario_con_todo(toba_ei_formulario $form)
 {
-
+	echo '<link rel="stylesheet" type="text/css" href="/toba/proyectos/catedras/www/skins/custom/custom.css">';
 	// Verificar si los datos están cargados
 	if ($this->dep('datos')->esta_cargada()) {
 		// Obtener los datos del programa
@@ -1090,6 +1093,456 @@ toba::notificacion()->agregar("En esta sección usted puede VER los datos del Pro
 	//---- Eventos ----------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------
 
+	
+	function ini_3()
+{
+	echo '<script type="text/javascript">
+	(function() {
+		var barraBotones = document.querySelector("#barra_superior .ei-botonera");
+		if (barraBotones) {
+			barraBotones.style.position = "fixed";
+			barraBotones.style.top = "38px";  // debajo de la barra de menú
+			barraBotones.style.left = "0";
+			barraBotones.style.right = "0";
+			barraBotones.style.zIndex = "9999";
+			barraBotones.style.background = "#fff";
+			barraBotones.style.borderBottom = "1px solid #ccc";
+			barraBotones.style.boxShadow = "0 2px 6px rgba(0,0,0,0.15)";
+
+			// Ajustar el contenido para que no quede tapado
+			var cuerpo = document.querySelector(".ci-cuerpo");
+			if (cuerpo) {
+				cuerpo.style.paddingTop = (barraBotones.offsetHeight + 38) + "px"; 
+				// 38 = altura barra menú, ajustá si es diferente
+			}
+		}
+	})();
+	</script>';
+}
+
+	
+	function ini_2()
+{
+	echo '<script type="text/javascript">
+	(function() {
+		var barra = document.getElementById("barra_superior");
+		if (barra) {
+			barra.style.position = "fixed";
+			barra.style.top = "0";
+			barra.style.left = "0";
+			barra.style.right = "0";
+			barra.style.zIndex = "9999";
+
+			// Ajuste del contenido
+			var cuerpo = document.querySelector(".ci-cuerpo");
+			if (cuerpo) {
+				// Si ya tiene padding-top, sumamos la altura de la barra superior
+				var alturaBarra = barra.offsetHeight;
+				var paddingActual = parseInt(window.getComputedStyle(cuerpo).paddingTop) || 0;
+				cuerpo.style.paddingTop = (paddingActual + alturaBarra) + "px";
+			}
+		}
+	})();
+	</script>';
+}
+	
+	function ini_mmmm()
+{
+	echo '<script type="text/javascript">
+	(function() {
+		var barra = document.querySelector(".ei-botonera");
+		if (barra) {
+			barra.style.position = "fixed";
+			barra.style.top = "0";         // fija arriba
+			barra.style.left = "0";
+			barra.style.right = "0";
+			barra.style.zIndex = "9999";
+			barra.style.background = "#fff"; // fondo de la barra
+			barra.style.borderBottom = "1px solid #ccc";
+			barra.style.boxShadow = "0 2px 6px rgba(0,0,0,0.15)";
+
+			// Ajuste del contenido para que no quede tapado
+			var cuerpo = document.querySelector(".ci-cuerpo");
+			if (cuerpo) {
+				cuerpo.style.paddingTop = barra.offsetHeight + "px";
+			}
+		}
+	})();
+	</script>';
+}
+
+	
+	function ini_nomecierra()
+{
+	echo '<script type="text/javascript">
+	(function() {
+		// Configuración
+		var posicion = "bottom"; // "top" o "bottom"
+		var transparencia = 0;   // 0 = totalmente transparente, 1 = opaco
+
+		// Crear CSS dinámico
+		var css = `
+		.ei-botonera {
+			position: fixed !important;
+			${posicion}: 0;
+			left: 0;
+			right: 0;
+			background: rgba(255,255,255,${transparencia});
+			padding: 8px 12px;
+			border-top: ${posicion === "bottom" ? "none" : "1px solid #ccc"};
+			border-bottom: ${posicion === "top" ? "none" : "1px solid #ccc"};
+			box-shadow: ${transparencia < 1 ? "none" : (posicion === "bottom" ? "0 -2px 6px rgba(0,0,0,0.15)" : "0 2px 6px rgba(0,0,0,0.15)")};
+			z-index: 9999;
+		}`;
+
+		// Inyectar CSS en la página
+		var style = document.createElement("style");
+		style.type = "text/css";
+		style.appendChild(document.createTextNode(css));
+		document.head.appendChild(style);
+	})();
+	</script>';
+}
+
+	
+	
+	
+	function ini_abajo_transp()
+{
+	echo '<script type="text/javascript">
+	var css = `
+	.ei-botonera {
+		position: fixed !important;
+		bottom: 0;               /* fijo abajo */
+		left: 0;
+		right: 0;
+		background: rgba(255,255,255,0);  /* transparente */
+		padding: 8px 12px;
+		border-top: none;        /* sin borde */
+		box-shadow: none;        /* sin sombra */
+		z-index: 9999;
+	}`;
+	var style = document.createElement("style");
+	style.type = "text/css";
+	style.appendChild(document.createTextNode(css));
+	document.head.appendChild(style);
+	</script>';
+}
+
+	
+	
+	
+function ini_abajo()
+{
+	echo '<script type="text/javascript">
+	var css = `
+	.ei-botonera {
+		position: fixed !important;
+		bottom: 0;  /* fijo abajo */
+		left: 0;
+		right: 0;
+		background: #fff;
+		padding: 8px 12px;
+		border-top: 1px solid #ccc;  /* borde arriba de la barra */
+		box-shadow: 0 -2px 6px rgba(0,0,0,0.15); /* sombra hacia arriba */
+		z-index: 9999;
+	}`;
+	var style = document.createElement("style");
+	style.type = "text/css";
+	style.appendChild(document.createTextNode(css));
+	document.head.appendChild(style);
+	</script>';
+}
+
+	
+	
+	
+	function ini_arriba()
+{
+	echo '<script type="text/javascript">
+	var css = `
+	.ei-botonera {
+		position: fixed !important;
+		top: 50px;
+		left: 0;
+		right: 0;
+		background: #fff;
+		padding: 8px 12px;
+		border-bottom: 1px solid #ccc;
+		box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+		z-index: 9999;
+	}`;
+	var style = document.createElement("style");
+	style.type = "text/css";
+	style.appendChild(document.createTextNode(css));
+	document.head.appendChild(style);
+	</script>';
+}
+
+	function ini_5()
+{
+	echo '<script type="text/javascript">
+	var css = `
+	.ei-botonera {
+		position: fixed !important;
+		top: 50px;           /* ajustá según altura del menú */
+		left: 0;
+		right: 0;
+		background: transparent;  /* transparente */
+		padding: 8px 12px;
+		border-bottom: 1px solid #ccc;  /* opcional, podés quitarlo */
+		z-index: 9999;
+	}`;
+	var style = document.createElement("style");
+	style.type = "text/css";
+	style.appendChild(document.createTextNode(css));
+	document.head.appendChild(style);
+	</script>';
+}
+	
+	function ini_ok()
+{
+
+	static $ejecutado = false;
+	if ($ejecutado) return;
+	$ejecutado = true;
+	
+	echo '<script type="text/javascript">
+	var css = `
+	/* Barra fija y transparente */
+	.ei-botonera {
+		position: fixed !important;
+		top: 80px;
+		left: 0;
+		right: 0;
+		background: transparent !important;
+		padding: 8px 12px;
+		border: none !important;
+		box-shadow: none !important;
+		z-index: 9999;
+	}
+
+	/* Contenedores internos de los botones */
+	.ei-botonera .zona-items, 
+	.ei-botonera .zona-items a {
+		background: transparent !important;
+		border: none !important;
+		box-shadow: none !important;
+	}
+	`;
+	var style = document.createElement("style");
+	style.type = "text/css";
+	style.appendChild(document.createTextNode(css));
+	document.head.appendChild(style);
+	</script>';
+}
+
+	
+	
+function ini_mejor()
+{
+	static $ejecutado = false;
+	if ($ejecutado) return;
+	$ejecutado = true;
+
+	echo '<script type="text/javascript">
+	(function() {
+		// --- CSS (mantenemos tu estilo) ---
+		var css = `
+		/* Barra fija y transparente */
+		.ei-botonera {
+			position: fixed !important;
+			top: 80px;
+			left: 0;
+			right: 0;
+			background: transparent !important;
+			padding: 8px 12px;
+			border: none !important;
+			box-shadow: none !important;
+			z-index: 9999;
+		}
+		.ei-botonera .zona-items,
+		.ei-botonera .zona-items a,
+		.ei-botonera .zona-items button {
+			background: transparent !important;
+			border: none !important;
+			box-shadow: none !important;
+		}
+		/* si hay varias .ei-botonera, ocultamos las que no son la primera */
+		.ei-botonera:not(:first-of-type) { display: none !important; }
+		`;
+		var style = document.createElement("style");
+		style.type = "text/css";
+		style.appendChild(document.createTextNode(css));
+		document.head.appendChild(style);
+
+		// --- Función que limpia duplicados ---
+		function cleanDupes() {
+			try {
+				// 1) ocultar todas las .ei-botonera excepto la primera en DOM
+				var botoneras = Array.from(document.querySelectorAll(".ei-botonera"));
+				if (botoneras.length > 1) {
+					for (var i = 1; i < botoneras.length; i++) {
+						botoneras[i].style.display = "none";
+					}
+				}
+
+				// elegir la botonera visible (primera no-oculta)
+				var visible = document.querySelector(".ei-botonera:not([style*=\"display: none\"])") || document.querySelector(".ei-botonera");
+				if (!visible) return;
+
+				// 2) lista de elementos accionables dentro de la botonera
+				var items = Array.from(visible.querySelectorAll(".zona-items a, .zona-items button, .zona-items [role=\"button\"]"));
+
+				// 3) detectar elementos que ocupan la misma posición (superpuestos) y eliminar el segundo
+				for (var i = 0; i < items.length; i++) {
+					var el1 = items[i];
+					if (!el1 || !el1.getBoundingClientRect) continue;
+					var r1 = el1.getBoundingClientRect();
+					// si el elemento está fuera del viewport o sin tamaño, ignorar
+					if (r1.width <= 0 || r1.height <= 0) continue;
+					for (var j = i + 1; j < items.length; j++) {
+						var el2 = items[j];
+						if (!el2 || !el2.getBoundingClientRect) continue;
+						var r2 = el2.getBoundingClientRect();
+						if (r2.width <= 0 || r2.height <= 0) continue;
+						// centros
+						var cx1 = r1.left + r1.width / 2, cy1 = r1.top + r1.height / 2;
+						var cx2 = r2.left + r2.width / 2, cy2 = r2.top + r2.height / 2;
+						var dx = cx1 - cx2, dy = cy1 - cy2;
+						var dist = Math.sqrt(dx * dx + dy * dy);
+						// umbral: centros muy próximos y tamaños similares => duplicado visual
+						if (dist < 6 && Math.abs(r1.width - r2.width) < 6 && Math.abs(r1.height - r2.height) < 6) {
+							// eliminamos el que aparece después en el DOM
+							el2.remove();
+							// actualizar array y ajustar índice
+							items.splice(j, 1);
+							j--;
+						}
+					}
+				}
+
+				// 4) si hay varias .zona-items (por las dudas), dejamos solo la primera
+				var zonas = visible.querySelectorAll(".zona-items");
+				if (zonas.length > 1) {
+					for (var k = 1; k < zonas.length; k++) zonas[k].remove();
+				}
+			} catch (e) {
+				// no cortamos ejecución por errores menores
+				console && console.error && console.error("cleanDupes error:", e);
+			}
+		}
+
+		// Ejecutar una vez (con pequeño delay para que Toba termine render)
+		if (document.readyState === "loading") {
+			document.addEventListener("DOMContentLoaded", function() { setTimeout(cleanDupes, 80); });
+		} else {
+			setTimeout(cleanDupes, 80);
+		}
+
+		// Observer para re-aplicar limpieza si Toba redibuja la interfaz
+		(function observeBody() {
+			var target = document.body;
+			if (!target) return;
+			var debounce;
+			var mo = new MutationObserver(function() {
+				if (debounce) clearTimeout(debounce);
+				debounce = setTimeout(cleanDupes, 60);
+			});
+			mo.observe(target, { childList: true, subtree: true, attributes: true });
+		})();
+
+	})();
+	</script>';
+}
+
+	
+//Esta función es la que pone los botones sobre banda gris, 
+// la desactivé porque uso los botones flotantes configurados en base_operaciones
+	function ini_desactivada()
+{
+	static $ejecutado = false;
+	if ($ejecutado) return;
+	$ejecutado = true;
+
+	echo '<script type="text/javascript">
+	(function() {
+		// --- 1) CSS para fijar y limpiar la botonera ---
+		var css = `
+		.ei-botonera {
+			position: fixed !important;
+			bottom: 40px;            /* ajustá según el fondo*/
+			/*left: 0;*/
+			right: 0;
+			background: rgba(0,0,0, 0.3) !important;
+			padding: 8px 12px;
+			border: none !important;
+			box-shadow: none !important;
+			z-index: 0,5;
+		}
+		.ei-botonera .zona-items,
+		.ei-botonera .zona-items a,
+		.ei-botonera .zona-items button {
+			background: transparent !important;
+			border: none !important;
+			box-shadow: none !important;
+		}
+		/* Si Toba genera varias barras, ocultamos todas menos la primera */
+		.ei-botonera:not(:first-of-type) { display: none !important; }
+		`;
+		var style = document.createElement("style");
+		style.type = "text/css";
+		style.appendChild(document.createTextNode(css));
+		document.head.appendChild(style);
+
+		// --- 2) Función que elimina botones duplicados superpuestos ---
+		function cleanDupes() {
+			var visible = document.querySelector(".ei-botonera");
+			if (!visible) return;
+
+			// Tomamos todos los botones/links dentro de la barra
+			var items = Array.from(
+				visible.querySelectorAll(".zona-items a, .zona-items button, .zona-items [role=\'button\']")
+			);
+
+			// Comparamos rectángulos para detectar superpuestos
+			for (var i = 0; i < items.length; i++) {
+				var r1 = items[i].getBoundingClientRect();
+				if (r1.width <= 0 || r1.height <= 0) continue;
+
+				for (var j = i + 1; j < items.length; j++) {
+					var r2 = items[j].getBoundingClientRect();
+					if (r2.width <= 0 || r2.height <= 0) continue;
+
+					var mismosTamanios = Math.abs(r1.width - r2.width) < 6 && Math.abs(r1.height - r2.height) < 6;
+					var cerca = Math.hypot((r1.left + r1.width/2) - (r2.left + r2.width/2),
+											(r1.top + r1.height/2) - (r2.top + r2.height/2)) < 6;
+
+					if (mismosTamanios && cerca) {
+						items[j].remove(); // borramos el duplicado
+						items.splice(j, 1);
+						j--;
+					}
+				}
+			}
+		}
+
+		// --- 3) Ejecutar la limpieza al cargar ---
+		window.addEventListener("load", function() {
+			setTimeout(cleanDupes, 100);
+		});
+
+		// --- 4) Reaplicar si Toba redibuja la interfaz ---
+		var mo = new MutationObserver(function() {
+			setTimeout(cleanDupes, 60);
+		});
+		mo.observe(document.body, { childList: true, subtree: true });
+	})();
+	</script>';
+}
+
+
+	
 
 
 }

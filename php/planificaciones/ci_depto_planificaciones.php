@@ -1,5 +1,6 @@
 <?php
-class ci_depto_planificaciones extends catedras_ci
+require_once 'ci_base_operaciones.php';
+class ci_depto_planificaciones extends ci_base_operaciones
 {
 	protected $s__datos_filtro;
 	protected $s__datos_viejos; // Para guardar los datos antes de modificar  
@@ -200,7 +201,7 @@ class ci_depto_planificaciones extends catedras_ci
 
 			// Crear el contenido para 'firma_dto'
 			
-			$datos['firma_dto_planif'] = "Conformidad del Departamento: Firmado electrónicamente por $nombre_completo - Responsable de Departamento/Delegación/Coordinación de Carrera - $formatted_timestamp";
+			$datos['firma_dto_planif'] = "Firmado electrónicamente por $nombre_completo - Responsable de Departamento/Delegación/Coordinación de Carrera - $formatted_timestamp";
 		}
 	}
 	// *** Fin de la lógica para actualizar firma_doc y firma_dto ***        

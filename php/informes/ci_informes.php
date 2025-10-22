@@ -1,5 +1,6 @@
 <?php
-class ci_informes extends catedras_ci
+require_once 'ci_base_operaciones.php';
+class ci_informes extends ci_base_operaciones
 {
 	
 	protected $s__datos_filtro;
@@ -8,6 +9,8 @@ class ci_informes extends catedras_ci
 	private $id_informe_seleccionado;
 	private $tabla_vacia;
 	private $tabla_html;
+	private $contador_mensajes=0;
+	
 	
 	
 
@@ -36,7 +39,8 @@ class ci_informes extends catedras_ci
 
 	function conf__cuadro(toba_ei_cuadro $cuadro)
 	{
-		
+
+        
 		$usuario_id = toba::usuario()->get_id();
 		$nombre_usuario = toba::usuario()->get_nombre();
 
@@ -97,6 +101,7 @@ class ci_informes extends catedras_ci
 				// Si no es una excepción, aplicar el filtro por legajo_resp y estado
 			$datos = $this->dep('datos')->tabla('informes')->get_listado_enviados($usuario_id);
 		}
+		
 		foreach ($datos as $key => $registro) {
 			if ($registro ['estado_informe'] === 'docente') {
 				$datos[$key]['estado_informe'] = 'Borrador';        
@@ -129,23 +134,20 @@ class ci_informes extends catedras_ci
 
 	//---- Formulario -------------------------------------------------------------------
 
+	
+	function conf__formulario(toba_ei_formulario $form)
+	{
+		
+		if ($this->dep('datos')->esta_cargada()) {
+			$form->set_datos($this->dep('datos')->tabla('informes')->get_datos_informe($this->id_informe_seleccionado));
+		} else {
+			$this->pantalla()->eliminar_evento('eliminar');
+		}
 
-function conf__formulario(toba_ei_formulario $form)
-{
-	$datos = array();
-
-	if ($this->dep('datos')->esta_cargada()) {
-		$datos = $this->dep('datos')->tabla('informes')->get_datos_informe($this->id_informe_seleccionado);
-	} else {
-		$this->pantalla()->eliminar_evento('eliminar');
+		toba::notificacion()->info("Completar sin alterar la estructura del cuadro en el punto 11.Gracias");
+	
 	}
-
-	$form->set_datos($datos);
-
-	$valor_analisis = isset($datos['analisis_por_cargo']) ? $datos['analisis_por_cargo'] : null;
-	toba::notificacion()->info("Valor recibido en analisis_por_cargo: [" . var_export($valor_analisis, true) . "]"."  ".$datos['comentarios_inf']);
-
-	}
+	
 	
 	
 	function evt__formulario__modificacion($datos)
@@ -159,6 +161,15 @@ function conf__formulario(toba_ei_formulario $form)
 		$this->s__datos_viejos = $datos;
 		}
 
+			// Lógica de firma electrónica según estado
+	if (isset($datos['estado_informe']) && $datos['estado_informe'] === 'depto') {
+		$nombre_completo = toba::usuario()->get_nombre();
+		$timestamp_obj = new DateTime('now', new DateTimeZone('America/Argentina/Buenos_Aires'));
+		$formatted_timestamp = $timestamp_obj->format('Y-m-d H:i:s');
+		$datos['firma_doc_inf'] = "Firmado electrónicamente por $nombre_completo - Responsable de Cátedra - $formatted_timestamp";
+	}
+		
+		
 	
 	// Manejo de comentarios
 	$comentario = isset($datos['comentario']) ? $datos['comentario'] : '';
@@ -188,28 +199,45 @@ function conf__formulario(toba_ei_formulario $form)
 		
 		
 	// Validación de cantidad de estudiantes campos obligatorios
-	$insc         = isset($datos['inscriptos']) ? $datos['inscriptos'] : 0;
-	$apr          = isset($datos['aprobaron']) ? $datos['aprobaron'] : 0;
-	$des          = isset($datos['desaprobaron']) ? $datos['desaprobaron'] : 0;
-	$aban         = isset($datos['abandonaron']) ? $datos['abandonaron'] : 0;
-	$suma_est = $apr + $des + $aban;
 
-
-	if ($insc != $suma_est) {
 		
-		$this->dep('datos')->tabla('informes')->set($datos);
-		$this->dep('datos')->tabla('informes')->sincronizar();
-		throw new toba_error("La suma de estudiantes no coincide, por favor corrija.");
-	}
-	// quedé acá y se cortó la luz
-	$campos_obligatorios = array('inscriptos','analisis_actividades');
+$inscriptos   = isset($datos['inscriptos']) ? $datos['inscriptos'] : 0;
+$comenzaron   = isset($datos['comenzaron']) ? $datos['comenzaron'] : 0;
+$aprobaron    = isset($datos['aprobaron']) ? $datos['aprobaron'] : 0;
+$desaprobaron = isset($datos['desaprobaron']) ? $datos['desaprobaron'] : 0;
+$abandonaron  = isset($datos['abandonaron']) ? $datos['abandonaron'] : 0;
+
+$suma_resultados = $aprobaron + $desaprobaron + $abandonaron;
+
+// Validaciones
+if ($comenzaron > $inscriptos) {
+	throw new toba_error("El número de estudiantes que comenzaron no puede ser mayor que los inscriptos.");
+	toba::notificacion()->info(" "); 
+}
+
+if ($suma_resultados != $comenzaron) {
+	throw new toba_error("La suma de aprobaron, desaprobaron y abandonaron debe ser igual a los que comenzaron.");
+	toba::notificacion()->info(" ");
+}
+		
+		
+		
+		
+		
+	// Validación de campos obligatorios
+	$campos_obligatorios = array('inscriptos','causas_abandono_desap','caract_grupo',
+									'estrategias','consideraciones_interior','analisis_actividades',
+									'suficiencia_adecuacion','evaluacion_ays','articulacion','capacitacion',
+									'analisis_por_cargo');
+
 	foreach ($campos_obligatorios as $campo) {
-		if ($datos['estado_inf'] === 'depto' && empty($datos[$campo])) {
-			$datos['estado_inf'] = 'docente';
-			$datos['firma_doc'] = '';
+		if ($datos['estado_informe'] === 'depto' && empty($datos[$campo])) {
+			$datos['estado_informe'] = 'docente';
+			$datos['firma_doc_inf'] = '';
 			$this->dep('datos')->tabla('informes')->set($datos);
 			$this->dep('datos')->sincronizar();
 			throw new toba_error("Falta cargar datos obligatorios, por favor corrija.");
+			toba::notificacion()->info(" ");
 		}
 	}
 
@@ -256,7 +284,25 @@ function conf__formulario(toba_ei_formulario $form)
 
 ///// funcion VER fromulario planif
 	
-		function conf__ver_form_inf(toba_ei_formulario $form)
+	
+	
+	function conf__ver_form_inf(toba_ei_formulario $form)
+	{
+		
+		if ($this->dep('datos')->esta_cargada()) {
+			$form->set_datos($this->dep('datos')->tabla('informes')->get_datos_informe($this->id_informe_seleccionado));
+		} else {
+			$this->pantalla()->eliminar_evento('eliminar');
+		}
+		
+		toba::notificacion()->info("En esta pantalla solo podrá VER el informe seleccionado.");
+	
+	}
+	
+	
+	
+	
+		function conf__ver_form_inf_viejo(toba_ei_formulario $form)
 	{
 		if ($this->dep('datos')->esta_cargada()) {
 			$form->set_datos($this->dep('datos')->tabla('informes')->get_datos_informe($this->id_informe_seleccionado));
