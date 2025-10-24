@@ -6,7 +6,7 @@ class ci_base_operaciones extends catedras_ci
 //***********************************************************************************************
 	
 	// botones flotantes a la derecha y volver a la izquierda
-	function ini()
+	function ini_en_suspenso()
 {
 	static $ejecutado = false;
 	if ($ejecutado) return;

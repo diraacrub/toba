@@ -229,10 +229,6 @@ INSERT INTO apex_objeto_ut_formulario (objeto_ut_formulario_proyecto, objeto_ut_
 			[ef id=publicaciones_periodicas]</span></p></td>
 		</tr>
 		<tr>
-			<td colspan="14" style="text-align: left; background-color: rgb(235, 237, 239); border-color: rgb(235, 237, 239); width: 700px;"><span style="font-size:12px;"><strong>&nbsp;Estado:</strong><br />
-			[ef id=estado_planificacion]&nbsp;</span></td>
-		</tr>
-		<tr>
 			<td colspan="14" style="text-align: left; background-color: rgb(235, 237, 239); border-color: rgb(235, 237, 239); width: 700px;"><br />
 			<span style="font-size:12px;"><strong>&nbsp;Comentarios:</strong><br />
 			[ef id=comentarios_planif]&nbsp;&nbsp;</span></td>
@@ -250,7 +246,24 @@ INSERT INTO apex_objeto_ut_formulario (objeto_ut_formulario_proyecto, objeto_ut_
 			[ef id=id_prog_planif]</span></td>
 		</tr>
 	</tbody>
-</table>', --template
+</table>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<table align="right" border="2" cellpadding="0" cellspacing="0" style="width: 260px; height: 15px;">
+	<tbody>
+		<tr>
+			<td colspan="14" style="text-align: left; background-color: rgb(235, 237, 239); border-color: rgb(235, 237, 239); width: 700px;"><span style="font-size:12px;"><strong>&nbsp;Estado:</strong><br />
+			[ef id=estado_planificacion]&nbsp;</span></td>
+		</tr>
+	</tbody>
+</table>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>', --template
 	NULL  --template_impresion
 );
 
@@ -2370,7 +2383,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'2433', --objeto_ei_formulario
 	'catedras', --objeto_ei_formulario_proyecto
 	'estado_planificacion', --identificador
-	'ef_multi_seleccion_lista', --elemento_formulario
+	'ef_combo', --elemento_formulario
 	'estado_planificacion', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio

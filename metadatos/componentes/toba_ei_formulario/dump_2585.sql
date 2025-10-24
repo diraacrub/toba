@@ -236,10 +236,6 @@ Universidad Nacional del Comahue</p><p>&nbsp;</p>
 			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><br />
 			<strong>&nbsp; &nbsp;Nuevo comentario:</strong> [ef id=comentario]</td>
 		</tr>
-		<tr>
-			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><br />
-			&nbsp; &nbsp;<strong>Estado: </strong>[ef id=estado_informe]</td>
-		</tr>
 	</tbody>
 </table>
 
@@ -249,6 +245,16 @@ Control:&nbsp;<br />
 id programa:&nbsp; &nbsp;[ef id=id_prog_informe]</span><br />
 <br />
 [ef id=firma_doc_inf]</p>
+
+<table align="right" border="4" cellpadding="0" cellspacing="0" style="width: 260px; height: 15px;" width="601">
+	<tbody>
+		<tr>
+			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><br />
+			&nbsp; &nbsp;<strong>Estado: </strong>[ef id=estado_informe]</td>
+		</tr>
+	</tbody>
+</table>
+
 <p>&nbsp;</p>', --template
 	NULL  --template_impresion
 );

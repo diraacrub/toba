@@ -126,7 +126,7 @@ INSERT INTO apex_objeto_ut_formulario (objeto_ut_formulario_proyecto, objeto_ut_
 <em>(Ordenanza N&deg; 485/91)</em><br />
 Centro Regional Universitario Bariloche<br />
 Universidad Nacional del Comahue</p><p>&nbsp;</p>
-<table align="center" border="4" cellpadding="0" cellspacing="0" style="width: 750px;" width="601">
+<table align="center" border="2" cellpadding="0" cellspacing="0" style="width: 750px;" width="601">
 	<colgroup>
 		<col width="116" />
 		<col width="126" />
@@ -173,7 +173,7 @@ Universidad Nacional del Comahue</p><p>&nbsp;</p>
 		<tr>
 			<td style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128); white-space: nowrap;"><p>&nbsp;<strong> &nbsp;1- En relaci&oacute;n al<br />
 			&nbsp;n&uacute;mero de estudiantes:</strong><br />
-			&nbsp;<strong><span style="color:#c0392b;">(obligatorio)</span>&nbsp;</strong></p></td>
+			&nbsp;<em><strong><span style="color:#c0392b;">(obligatorio)</span>&nbsp;</strong></em></p></td>
 			<td style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128); white-space: nowrap;"><strong>Inscriptos:</strong>[ef id=inscriptos]</td>
 			<td style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128); white-space: nowrap;"><strong>Comenzaron:</strong>[ef id=comenzaron]</td>
 			<td style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128); white-space: nowrap;"><strong>Aprobaron:</strong>[ef id=aprobaron]</td>
@@ -181,45 +181,45 @@ Universidad Nacional del Comahue</p><p>&nbsp;</p>
 			<td style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128); white-space: nowrap;"><strong>Abandonaron:</strong>[ef id=abandonaron]</td>
 		</tr>
 		<tr>
-			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><p>&nbsp; &nbsp;<strong>2- &iquest;Cu&aacute;les considera que fueron las causas de abandono o de no aprobaci&oacute;n de la cursada? <span style="color:#c0392b;">(obligatorio)</span></strong>[ef id=causas_abandono_desap]</p></td>
+			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><p>&nbsp; &nbsp;<strong>2- &iquest;Cu&aacute;les considera que fueron las causas de abandono o de no aprobaci&oacute;n de la cursada? <span style="color:#c0392b;"><em>(obligatorio</em>)</span></strong>[ef id=causas_abandono_desap]</p></td>
 		</tr>
 		<tr>
 			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><br />
-			<strong>&nbsp; &nbsp;3- &iquest;C&oacute;mo caracterizar&iacute;an al grupo de estudiantes que curs&oacute; la materia? C&oacute;mo grupo, &iquest;cu&aacute;les fueron las &nbsp;caracter&iacute;sticas &nbsp;positivas &nbsp;m&aacute;s &nbsp;relevantes &nbsp;y &nbsp;cu&aacute;les &nbsp;considera &nbsp;que &nbsp;son &nbsp;aspectos &nbsp;que &nbsp;deben trabajar?</strong>[ef id=caract_grupo]</td>
+			<strong>&nbsp; &nbsp;3- &iquest;C&oacute;mo caracterizar&iacute;an al grupo de estudiantes que curs&oacute; la materia? C&oacute;mo grupo, &iquest;cu&aacute;les fueron las &nbsp;caracter&iacute;sticas &nbsp;positivas &nbsp;m&aacute;s &nbsp;relevantes &nbsp;y &nbsp;cu&aacute;les &nbsp;considera &nbsp;que &nbsp;son &nbsp;aspectos &nbsp;que &nbsp;deben trabajar?&nbsp;</strong><em><strong><span style="color:#c0392b;">(obligatorio)</span>&nbsp;</strong></em>[ef id=caract_grupo]</td>
 		</tr>
 		<tr>
 			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><br />
-			<strong>&nbsp; &nbsp;4- &iquest;Qu&eacute; estrategias ha implementado el equipo de c&aacute;tedra para sortear las dificultades que fueron surgiendo? &iquest;Cu&aacute;les de ellas podr&iacute;an ser incorporadas el pr&oacute;ximo a&ntilde;o a la propuesta de ense&ntilde;anza, priorizando los procesos de aprendizaje dentro de la asignatura? </strong>[ef id=estrategias]</td>
+			<strong>&nbsp; &nbsp;4- &iquest;Qu&eacute; estrategias ha implementado el equipo de c&aacute;tedra para sortear las dificultades que fueron surgiendo? &iquest;Cu&aacute;les de ellas podr&iacute;an ser incorporadas el pr&oacute;ximo a&ntilde;o a la propuesta de ense&ntilde;anza, priorizando los procesos de aprendizaje dentro de la asignatura?&nbsp;</strong><em><strong><span style="color:#c0392b;">(obligatorio)</span>&nbsp;</strong></em><strong>&nbsp;</strong>[ef id=estrategias]</td>
 		</tr>
 		<tr>
 			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><br />
-			<strong>&nbsp; &nbsp;5- &iquest;Qu&eacute; aspectos se deber&iacute;an considerar hacia el interior del equipo de c&aacute;tedra, para mejorar la calidad educativa brindada? &iquest;C&oacute;mo proponen trabajar estos aspectos?</strong>[ef id=consideraciones_interior]</td>
+			<strong>&nbsp; &nbsp;5- &iquest;Qu&eacute; aspectos se deber&iacute;an considerar hacia el interior del equipo de c&aacute;tedra, para mejorar la calidad educativa brindada? &iquest;C&oacute;mo proponen trabajar estos aspectos?&nbsp;</strong><em><strong><span style="color:#c0392b;">(obligatorio)</span>&nbsp;</strong></em>[ef id=consideraciones_interior]</td>
 		</tr>
 		<tr>
 			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><br />
-			<strong>&nbsp; &nbsp;6- En funci&oacute;n de la conformaci&oacute;n del equipo de c&aacute;tedra y de las dedicaciones de sus cargos, analizar y evaluar las actividades de docencia, investigaci&oacute;n, extensi&oacute;n y vinculaci&oacute;n que se han realizado:</strong>[ef id=analisis_actividades]</td>
+			<strong>&nbsp; &nbsp;6- En funci&oacute;n de la conformaci&oacute;n del equipo de c&aacute;tedra y de las dedicaciones de sus cargos, analizar y evaluar las actividades de docencia, investigaci&oacute;n, extensi&oacute;n y vinculaci&oacute;n que se han realizado:&nbsp;</strong><em><strong><span style="color:#c0392b;">(obligatorio)</span>&nbsp;</strong></em>[ef id=analisis_actividades]</td>
 		</tr>
 		<tr>
 			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><br />
-			<strong>&nbsp; &nbsp;7- Analizar &nbsp;y &nbsp;evaluar &nbsp;la &nbsp;suficiencia &nbsp;y &nbsp;adecuaci&oacute;n &nbsp;de &nbsp;los &nbsp;&aacute;mbitos &nbsp;donde &nbsp; &nbsp;se &nbsp;desarrollaron &nbsp;las actividades: aulas, equipamiento did&aacute;ctico, equipamiento inform&aacute;tico, otros; y su disponibilidad para todos los alumnos:</strong>[ef id=suficiencia_adecuacion]</td>
+			<strong>&nbsp; &nbsp;7- Analizar &nbsp;y &nbsp;evaluar &nbsp;la &nbsp;suficiencia &nbsp;y &nbsp;adecuaci&oacute;n &nbsp;de &nbsp;los &nbsp;&aacute;mbitos &nbsp;donde &nbsp; &nbsp;se &nbsp;desarrollaron &nbsp;las actividades: aulas, equipamiento did&aacute;ctico, equipamiento inform&aacute;tico, otros; y su disponibilidad para todos los alumnos:&nbsp;</strong><em><strong><span style="color:#c0392b;">(obligatorio)</span>&nbsp;</strong></em>[ef id=suficiencia_adecuacion]</td>
 		</tr>
 		<tr>
-			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><p><strong>&nbsp; &nbsp;8- En caso de haber tenido, &iquest;C&oacute;mo eval&uacute;an el trabajo de Ayudantes de Segunda (AYS)? (Detallar actividades realizadas, sus principales fortalezas y aspectos a mejorar):</strong>&nbsp;[ef id=evaluacion_ays]</p></td>
+			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><p><strong>&nbsp; &nbsp;8- En caso de haber tenido, &iquest;C&oacute;mo eval&uacute;an el trabajo de Ayudantes de Segunda (AYS)? (Detallar actividades realizadas, sus principales fortalezas y aspectos a mejorar):&nbsp;</strong><em><strong><span style="color:#c0392b;">(obligatorio)</span>&nbsp;</strong></em>[ef id=evaluacion_ays]</p></td>
 		</tr>
 		<tr>
 			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><br />
-			<strong>&nbsp; &nbsp;9- &iquest;El &nbsp;equipo &nbsp;de &nbsp;c&aacute;tedra &nbsp;ha &nbsp;participado &nbsp;de &nbsp;instancias &nbsp;de &nbsp;articulaci&oacute;n &nbsp;vertical &nbsp;u &nbsp;horizontal &nbsp;de contenidos y formaci&oacute;n? Detallar en qu&eacute; consistieron estos encuentros y c&oacute;mo interpelaron la pr&aacute;ctica profesional:</strong>&nbsp;[ef id=articulacion]</td>
+			<strong>&nbsp; &nbsp;9- &iquest;El &nbsp;equipo &nbsp;de &nbsp;c&aacute;tedra &nbsp;ha &nbsp;participado &nbsp;de &nbsp;instancias &nbsp;de &nbsp;articulaci&oacute;n &nbsp;vertical &nbsp;u &nbsp;horizontal &nbsp;de contenidos y formaci&oacute;n? Detallar en qu&eacute; consistieron estos encuentros y c&oacute;mo interpelaron la pr&aacute;ctica profesional:</strong>&nbsp;<em><strong><span style="color:#c0392b;">(obligatorio)</span>&nbsp;</strong></em>[ef id=articulacion]</td>
 		</tr>
 		<tr>
 			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><br />
 			<strong>&nbsp; &nbsp;10- &iquest;El equipo de c&aacute;tedra ha participado de instancias de capacitaci&oacute;n y formaci&oacute;n permanente?<br />
-			Detallar en qu&eacute; consistieron estos encuentros y c&oacute;mo interpelaron la pr&aacute;ctica profesional:</strong>&nbsp;[ef id=capacitacion]</td>
+			Detallar en qu&eacute; consistieron estos encuentros y c&oacute;mo interpelaron la pr&aacute;ctica profesional:&nbsp;</strong><em><strong><span style="color:#c0392b;">(obligatorio)</span>&nbsp;</strong></em>&nbsp;[ef id=capacitacion]</td>
 		</tr>
 		<tr>
 			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><em>&nbsp; &nbsp;Equipo de c&aacute;tedra informado en el programa: </em>[ef id=equipo_catedra]</td>
 		</tr>
 		<tr>
-			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><p><strong>&nbsp; &nbsp;11- An&aacute;lisis por cargo</strong><br />
+			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><p><strong>&nbsp; &nbsp;11- An&aacute;lisis por cargo:&nbsp;</strong><em><strong><span style="color:#c0392b;">(obligatorio)</span>&nbsp;</strong></em><br />
 			&nbsp;&nbsp;El presente cuadro debe ser completado, luego de analizar con toda la c&aacute;tedra cada cargo en particular.<br />
 			&nbsp; Es necesario completar una l&iacute;nea&nbsp;por cada docente que integra la c&aacute;tedra, incluyendo al&nbsp;Responsable de c&aacute;tedra,&nbsp;indicando los datos de cada docente en las primeras dos columnas y en las siguentes:<br />
 			<strong>&nbsp; &nbsp; &nbsp; 1 = Muy bueno&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;2 = Bueno&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;3 = Malo&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;4 = No lo tiene en cuenta&nbsp;&nbsp;</strong><br />
@@ -236,6 +236,16 @@ Universidad Nacional del Comahue</p><p>&nbsp;</p>
 			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><br />
 			<strong>&nbsp; &nbsp;Nuevo comentario:</strong> [ef id=comentario]</td>
 		</tr>
+	</tbody>
+</table>
+
+<p>Control:&nbsp;<br />
+<span style="font-size:11px;">id informe:[ef id=id_informe]<br />
+id programa:&nbsp; &nbsp;[ef id=id_prog_informe]</span></p>
+<p>&nbsp;</p>
+
+<table align="right" border="2" cellpadding="0" cellspacing="0" style="width: 260px; height: 15px;" width="601">
+	<tbody>
 		<tr>
 			<td colspan="11" style="text-align: left; vertical-align: middle; background-color: rgb(235, 237, 239); border-color: rgb(128, 128, 128);"><br />
 			&nbsp; &nbsp;<strong>Estado: </strong>[ef id=estado_informe]</td>
@@ -243,9 +253,6 @@ Universidad Nacional del Comahue</p><p>&nbsp;</p>
 	</tbody>
 </table>
 
-<p>Control:&nbsp;<br />
-<span style="font-size:11px;">id informe:[ef id=id_informe]<br />
-id programa:&nbsp; &nbsp;[ef id=id_prog_informe]</span></p>
 <p>&nbsp;</p>', --template
 	NULL  --template_impresion
 );

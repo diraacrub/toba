@@ -230,10 +230,6 @@ INSERT INTO apex_objeto_ut_formulario (objeto_ut_formulario_proyecto, objeto_ut_
 			[ef id=publicaciones_periodicas]</span></p></td>
 		</tr>
 		<tr>
-			<td colspan="14" style="text-align: left; background-color: rgb(235, 237, 239); border-color: rgb(235, 237, 239); width: 700px;"><span style="font-size:12px;"><strong>&nbsp;Estado:</strong><br />
-			[ef id=estado_planificacion]&nbsp;</span></td>
-		</tr>
-		<tr>
 			<td colspan="14" style="text-align: left; background-color: rgb(235, 237, 239); border-color: rgb(235, 237, 239); width: 700px;"><br />
 			<span style="font-size:12px;"><strong>&nbsp;Comentarios:</strong><br />
 			[ef id=comentarios_planif]&nbsp;&nbsp;</span></td>
@@ -254,7 +250,17 @@ INSERT INTO apex_objeto_ut_formulario (objeto_ut_formulario_proyecto, objeto_ut_
 </table>
 
 <p>&nbsp;</p>
-<p>[ef id=firma_doc_planif]</p>', --template
+<p>[ef id=firma_doc_planif]</p>
+<p>&nbsp;</p>
+
+<table align="right" border="2" cellpadding="0" cellspacing="0" style="width: 260px; height: 15px;">
+	<tbody>
+		<tr>
+			<td colspan="14" style="text-align: left; background-color: rgb(235, 237, 239); border-color: rgb(235, 237, 239); width: 700px;"><span style="font-size:12px;"><strong>&nbsp;Estado:</strong><br />
+			[ef id=estado_planificacion]&nbsp;</span></td>
+		</tr>
+	</tbody>
+</table>', --template
 	NULL  --template_impresion
 );
 

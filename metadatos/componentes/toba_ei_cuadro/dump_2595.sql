@@ -51,7 +51,7 @@ INSERT INTO apex_objeto_eventos (proyecto, evento_id, objeto, identificador, eti
 	'1446', --evento_id
 	'2595', --objeto
 	'seleccion', --identificador
-	NULL, --etiqueta
+	'Ver', --etiqueta
 	'1', --maneja_datos
 	'1', --sobre_fila
 	NULL, --confirmacion
@@ -60,7 +60,7 @@ INSERT INTO apex_objeto_eventos (proyecto, evento_id, objeto, identificador, eti
 	'doc.gif', --imagen
 	'0', --en_botonera
 	NULL, --ayuda
-	'0', --orden
+	'1', --orden
 	NULL, --ci_predep
 	NULL, --implicito
 	NULL, --defecto

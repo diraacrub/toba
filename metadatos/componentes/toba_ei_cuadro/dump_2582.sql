@@ -21,7 +21,7 @@ INSERT INTO apex_objeto (proyecto, objeto, anterior, identificador, reflexivo, c
 	NULL, --objeto_categoria_proyecto
 	NULL, --objeto_categoria
 	'AvalInformes - Cuadro.', --nombre
-	'Informes para avalarrrrr', --titulo
+	'Informes para avalar', --titulo
 	'0', --colapsable
 	NULL, --descripcion
 	NULL, --fuente_datos_proyecto
@@ -51,16 +51,16 @@ INSERT INTO apex_objeto_eventos (proyecto, evento_id, objeto, identificador, eti
 	'1429', --evento_id
 	'2582', --objeto
 	'seleccion', --identificador
-	NULL, --etiqueta
+	'Revisar', --etiqueta
 	'1', --maneja_datos
 	'1', --sobre_fila
 	NULL, --confirmacion
 	NULL, --estilo
 	'apex', --imagen_recurso_origen
-	'doc.gif', --imagen
+	'editar.gif', --imagen
 	'0', --en_botonera
 	NULL, --ayuda
-	'0', --orden
+	'1', --orden
 	NULL, --ci_predep
 	NULL, --implicito
 	NULL, --defecto
