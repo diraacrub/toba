@@ -84,8 +84,9 @@ class dt_programas extends catedras_datos_tabla
 		return toba::db('catedras')->consultar($sql);
 	}
 	
-	
-	function get_listado_abm_programas_filtrado($filtro=array())
+
+
+function get_listado_abm_programas_filtrado($filtro=array())
 	{
 		$where = array();
 		if (isset($filtro['nombre_materia'])) {
@@ -1071,5 +1072,98 @@ function get_listado_enviados_sac($usuario_id, $deptos_principales)
 		return toba::db('catedras')->consultar($sql);
 	}
 
+	
+function get_listado_datos_docentes($filtro=array())
+	{
+		$where = array();
+		if (isset($filtro['id_programa'])) {
+			$where[] = "id_programa = ".quote($filtro['id_programa']);
+		}
+		if (isset($filtro['id_designacion'])) {
+			$where[] = "id_designacion = ".quote($filtro['id_designacion']);
+		}
+		if (isset($filtro['legajo_resp'])) {
+			$where[] = "legajo_resp = ".quote($filtro['legajo_resp']);
+		}
+		if (isset($filtro['apellido_resp'])) {
+			$where[] = "apellido_resp ILIKE ".quote("%{$filtro['apellido_resp']}%");
+		}
+		if (isset($filtro['id_materia_prog'])) {
+			$where[] = "id_materia_prog = ".quote($filtro['id_materia_prog']);
+		}
+		if (isset($filtro['periodo_dictado'])) {
+			$where[] = "periodo_dictado ILIKE ".quote("%{$filtro['periodo_dictado']}%");
+		}
+		if (isset($filtro['ano_academico'])) {
+			$where[] = "ano_academico ILIKE ".quote("%{$filtro['ano_academico']}%");
+		}
+		if (isset($filtro['estado'])) {
+			$where[] = "estado ILIKE ".quote("%{$filtro['estado']}%");
+		}
+		
+		
+		$sql = "
+SELECT
+	-- datos del usuario responsable
+	u.nombre AS nombre_usuario,
+	u.email AS mail_usuario,
+	-- información de la materia
+	m.nombre_materia,
+	m.cod_carrera,
+	m.cod_guarani,
+	-- datos del programa
+	t_p.id_programa,
+	t_p.id_designacion,
+	t_p.id_asignacion,
+	t_p.legajo_resp,
+	t_p.dni_resp,
+	t_p.apellido_resp,
+	t_p.nombre_resp,
+	t_p.cargo_resp,
+	t_p.equipo_catedra,
+	t_p.id_materia_prog,
+	t_p.periodo_dictado,
+	t_p.ano_academico,
+	t_p.fundamentacion,
+	t_p.objetivos,
+	t_p.programa_analitico,
+	t_p.bibliografia,
+	t_p.propuesta_metodologica,
+	t_p.evaluacion_acreditacion,
+	t_p.distribucion_horaria,
+	t_p.cronograma_tentativo,
+	t_p.estado,
+	t_p.observaciones,
+	t_p.comentarios,
+	t_p.firma_doc,
+	t_p.firma_dto,
+	t_p.firma_sac,
+	t_p.horas_teoricas,
+	t_p.horas_practicas,
+	t_p.horas_teoricopracticas
+FROM
+	programas AS t_p
+LEFT JOIN materias AS m
+	ON m.id_materia = t_p.id_materia_prog
+LEFT JOIN desarrollo.apex_usuario AS u
+	ON u.usuario = t_p.legajo_resp::text            
+ORDER BY
+	t_p.apellido_resp
+";
+
+		
+		
+		
+		if (count($where)>0) {
+			$sql = sql_concatenar_where($sql, $where);
+		}
+		return toba::db('catedras')->consultar($sql);
+	}
+	
+	
+	
+	
+	
+	
 }
 ?>
