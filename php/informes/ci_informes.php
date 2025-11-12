@@ -40,7 +40,7 @@ class ci_informes extends ci_base_operaciones
 	function conf__cuadro(toba_ei_cuadro $cuadro)
 	{
 
-        
+		
 		$usuario_id = toba::usuario()->get_id();
 		$nombre_usuario = toba::usuario()->get_nombre();
 
@@ -222,25 +222,50 @@ if ($suma_resultados != $comenzaron) {
 		
 		
 		
-		
-		
-	// Validación de campos obligatorios
-	$campos_obligatorios = array('inscriptos','causas_abandono_desap','caract_grupo',
-									'estrategias','consideraciones_interior','analisis_actividades',
-									'suficiencia_adecuacion','evaluacion_ays','articulacion','capacitacion',
-									'analisis_por_cargo');
+		// Validación de campos obligatorios
+$campos_obligatorios = array(
+	'inscriptos', 'causas_abandono_desap', 'caract_grupo',
+	'estrategias', 'consideraciones_interior', 'analisis_actividades',
+	'suficiencia_adecuacion', 'evaluacion_ays', 'articulacion', 'capacitacion',
+	'analisis_por_cargo'
+);
 
-	foreach ($campos_obligatorios as $campo) {
-		if ($datos['estado_informe'] === 'depto' && empty($datos[$campo])) {
+foreach ($campos_obligatorios as $campo) {
+	if ($datos['estado_informe'] === 'depto') {
+
+		// Caso especial: "inscriptos"
+		if ($campo === 'inscriptos') {
+			$valor_inscriptos = isset($datos['inscriptos']) ? $datos['inscriptos'] : null;
+			$sin_inscriptos   = isset($datos['sin_inscriptos']) ? $datos['sin_inscriptos'] : 0;
+
+			// Si inscriptos es 0 o vacío y no marcó sin_inscriptos &#8594; falta completar
+			if (($valor_inscriptos === '' || $valor_inscriptos === null || $valor_inscriptos == 0) && !$sin_inscriptos) {
+				$datos['estado_informe'] = 'docente';
+				$datos['firma_doc_inf'] = '';
+				$this->dep('datos')->tabla('informes')->set($datos);
+				$this->dep('datos')->sincronizar();
+				throw new toba_error("Debe indicar cantidad de inscriptos o marcar 'sin inscriptos'.");
+			}
+
+			continue; // ya validamos este campo, pasamos al siguiente
+		}
+
+		// Validación general para los demás campos
+		if (empty($datos[$campo]) && $datos[$campo] !== '0') {
 			$datos['estado_informe'] = 'docente';
 			$datos['firma_doc_inf'] = '';
 			$this->dep('datos')->tabla('informes')->set($datos);
 			$this->dep('datos')->sincronizar();
 			throw new toba_error("Falta cargar datos obligatorios, por favor corrija.");
-			toba::notificacion()->info(" ");
 		}
 	}
+}
 
+		
+		
+		
+		
+		
 	// Guardar finalmente los datos en programas
 	$this->dep('datos')->tabla('informes')->set($datos);
 	$this->dep('datos')->tabla('informes')->sincronizar();
