@@ -1,6 +1,6 @@
 <?php
 require_once 'ci_base_operaciones.php';
-class ci_informes extends ci_base_operaciones
+class ci_informes_sac extends ci_base_operaciones
 {
 	
 	protected $s__datos_filtro;
@@ -311,10 +311,44 @@ class ci_informes extends ci_base_operaciones
 
 
 ///// funcion VER fromulario informe
-	
-	
-	
+
 	function conf__ver_form_inf(toba_ei_formulario $form)
+{
+	if ($this->dep('datos')->esta_cargada()) {
+		
+		$usuario_id    = toba::usuario()->get_id();
+		$nombre_usuario= toba::usuario()->get_nombre();
+		$valor_firma = 'visto - ' .$usuario_id." - ".$nombre_usuario." - ". date('Y-m-d H:i:s');
+
+		$this->dep('datos')->tabla('informes')->set(
+			array(
+				'firma_sac_inf' => $valor_firma
+			)
+		);
+
+		$this->dep('datos')->sincronizar();
+
+		$form->set_datos(
+			$this->dep('datos')->tabla('informes')->get_datos_informe(
+				$this->id_informe_seleccionado
+			)
+		);
+
+	} else {
+		$this->pantalla()->eliminar_evento('eliminar');
+	}
+
+	toba::notificacion()->info(
+		"En esta pantalla solo podrá VER el informe seleccionado."
+	);
+}
+
+	
+	
+	
+	
+	
+	function conf__ver_form_inf_original(toba_ei_formulario $form)
 	{
 		
 		if ($this->dep('datos')->esta_cargada()) {
@@ -324,6 +358,7 @@ class ci_informes extends ci_base_operaciones
 		}
 		
 		toba::notificacion()->info("En esta pantalla solo podrá VER el informe seleccionado.");
+		
 	
 	}
 	

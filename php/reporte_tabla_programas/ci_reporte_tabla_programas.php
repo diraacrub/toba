@@ -28,9 +28,9 @@ class ci_reporte_tabla_programas extends catedras_ci
 	function conf__cuadro(toba_ei_cuadro $cuadro)
 	{
 		if (isset($this->s__datos_filtro)) {
-			$cuadro->set_datos($this->dep('datos')->tabla('programas')->get_listado($this->s__datos_filtro));
+			$cuadro->set_datos($this->dep('datos')->tabla('programas')->get_listado_reporte($this->s__datos_filtro));
 		} else {
-			$cuadro->set_datos($this->dep('datos')->tabla('programas')->get_listado());
+			$cuadro->set_datos($this->dep('datos')->tabla('programas')->get_listado_reporte());
 		}
 	}
 
@@ -79,5 +79,4 @@ class ci_reporte_tabla_programas extends catedras_ci
 	}
 
 }
-
 ?>

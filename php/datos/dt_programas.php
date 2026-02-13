@@ -61,6 +61,147 @@ class dt_programas extends catedras_datos_tabla
 			t_p.horas_teoricopracticas
 		FROM
 			programas as t_p
+		WHERE
+			t_p.observaciones IS NULL
+			OR t_p.observaciones NOT ILIKE '%[ocultar]%'
+		ORDER BY apellido_resp";
+		if (count($where)>0) {
+			$sql = sql_concatenar_where($sql, $where);
+		}
+		return toba::db('catedras')->consultar($sql);
+	}
+
+
+		function get_listado_repuesto2026($filtro=array())
+	{
+		$where = array();
+		if (isset($filtro['id_programa'])) {
+			$where[] = "id_programa = ".quote($filtro['id_programa']);
+		}
+		if (isset($filtro['id_designacion'])) {
+			$where[] = "id_designacion = ".quote($filtro['id_designacion']);
+		}
+		if (isset($filtro['legajo_resp'])) {
+			$where[] = "legajo_resp = ".quote($filtro['legajo_resp']);
+		}
+		if (isset($filtro['apellido_resp'])) {
+			$where[] = "apellido_resp ILIKE ".quote("%{$filtro['apellido_resp']}%");
+		}
+		if (isset($filtro['id_materia_prog'])) {
+			$where[] = "id_materia_prog = ".quote($filtro['id_materia_prog']);
+		}
+		if (isset($filtro['periodo_dictado'])) {
+			$where[] = "periodo_dictado ILIKE ".quote("%{$filtro['periodo_dictado']}%");
+		}
+		if (isset($filtro['ano_academico'])) {
+			$where[] = "ano_academico ILIKE ".quote("%{$filtro['ano_academico']}%");
+		}
+		if (isset($filtro['estado'])) {
+			$where[] = "estado ILIKE ".quote("%{$filtro['estado']}%");
+		}
+		$sql = "SELECT
+			t_p.id_programa,
+			t_p.id_designacion,
+			t_p.id_asignacion,
+			t_p.legajo_resp,
+			t_p.dni_resp,
+			t_p.apellido_resp,
+			t_p.nombre_resp,
+			t_p.cargo_resp,
+			t_p.equipo_catedra,
+			t_p.id_materia_prog,
+			t_p.periodo_dictado,
+			t_p.ano_academico,
+			t_p.fundamentacion,
+			t_p.objetivos,
+			t_p.programa_analitico,
+			t_p.bibliografia,
+			t_p.propuesta_metodologica,
+			t_p.evaluacion_acreditacion,
+			t_p.distribucion_horaria,
+			t_p.cronograma_tentativo,
+			t_p.estado,
+			t_p.observaciones,
+			t_p.comentarios,
+			t_p.firma_doc,
+			t_p.firma_dto,
+			t_p.firma_sac,
+			t_p.horas_teoricas,
+			t_p.horas_practicas,
+			t_p.horas_teoricopracticas
+		FROM
+			programas as t_p
+		WHERE
+			t_p.observaciones IS NULL
+			OR t_p.observaciones NOT ILIKE '%[ocultar]%'
+		ORDER BY apellido_resp";
+		if (count($where)>0) {
+			$sql = sql_concatenar_where($sql, $where);
+		}
+		return toba::db('catedras')->consultar($sql);
+	}
+	
+	
+	
+	function get_listado_reporte($filtro=array())
+	{
+		$where = array();
+		if (isset($filtro['id_programa'])) {
+			$where[] = "id_programa = ".quote($filtro['id_programa']);
+		}
+		if (isset($filtro['id_designacion'])) {
+			$where[] = "id_designacion = ".quote($filtro['id_designacion']);
+		}
+		if (isset($filtro['legajo_resp'])) {
+			$where[] = "legajo_resp = ".quote($filtro['legajo_resp']);
+		}
+		if (isset($filtro['apellido_resp'])) {
+			$where[] = "apellido_resp ILIKE ".quote("%{$filtro['apellido_resp']}%");
+		}
+		if (isset($filtro['id_materia_prog'])) {
+			$where[] = "id_materia_prog = ".quote($filtro['id_materia_prog']);
+		}
+		if (isset($filtro['periodo_dictado'])) {
+			$where[] = "periodo_dictado ILIKE ".quote("%{$filtro['periodo_dictado']}%");
+		}
+		if (isset($filtro['ano_academico'])) {
+			$where[] = "ano_academico ILIKE ".quote("%{$filtro['ano_academico']}%");
+		}
+		if (isset($filtro['estado'])) {
+			$where[] = "estado ILIKE ".quote("%{$filtro['estado']}%");
+		}
+		$sql = "SELECT
+			t_p.id_programa,
+			t_p.id_designacion,
+			t_p.id_asignacion,
+			t_p.legajo_resp,
+			t_p.dni_resp,
+			t_p.apellido_resp,
+			t_p.nombre_resp,
+			t_p.cargo_resp,
+			t_p.equipo_catedra,
+			t_p.id_materia_prog,
+			t_p.periodo_dictado,
+			t_p.ano_academico,
+			t_p.fundamentacion,
+			t_p.objetivos,
+			t_p.programa_analitico,
+			t_p.bibliografia,
+			t_p.propuesta_metodologica,
+			t_p.evaluacion_acreditacion,
+			t_p.distribucion_horaria,
+			t_p.cronograma_tentativo,
+			t_p.estado,
+			t_p.observaciones,
+			t_p.comentarios,
+			t_p.firma_doc,
+			t_p.firma_dto,
+			t_p.firma_sac,
+			t_p.horas_teoricas,
+			t_p.horas_practicas,
+			t_p.horas_teoricopracticas
+		FROM
+			programas as t_p
 		ORDER BY apellido_resp";
 		if (count($where)>0) {
 			$sql = sql_concatenar_where($sql, $where);
@@ -79,7 +220,11 @@ class dt_programas extends catedras_datos_tabla
 			programas as t_p,
 			materias as t_m
 		WHERE
-				t_p.id_materia_prog = t_m.id_materia
+			t_p.id_materia_prog = t_m.id_materia
+			AND (       
+			t_p.observaciones IS NULL
+			OR t_p.observaciones NOT ILIKE '%[ocultar]%'            
+				)
 		ORDER BY dni_resp";
 		return toba::db('catedras')->consultar($sql);
 	}
@@ -249,6 +394,8 @@ END AS f_sac
 				t_p.id_materia_prog = t_m.id_materia  
 				AND t_p.estado IN ('docente', 'depto')
 				AND t_m.cod_carrera NOT LIKE 'I%'
+				AND (t_p.observaciones IS NULL
+				OR t_p.observaciones NOT ILIKE '%[ocultar]%')
 		ORDER BY nombre_materia";
 		if (count($where)>0) {
 			$sql = sql_concatenar_where($sql, $where);
@@ -329,6 +476,8 @@ END AS f_sac
 				t_p.estado IN ('docente','depto')
 				AND $filtro_deptos
 				AND t_m.cod_carrera NOT LIKE 'I%'
+				AND (t_p.observaciones IS NULL
+					OR t_p.observaciones NOT ILIKE '%[ocultar]%')
 			ORDER BY nombre_materia";
 		
 		if (count($where)>0) {
@@ -441,6 +590,8 @@ END AS f_sac
 				replace(translate(lower(t_m.depto_principal), 'áéíóúÁÉÍÓÚ', 'aeiouaeiou'), ' ', '')
 				ILIKE replace(translate(lower($perfilLiteral), 'áéíóúÁÉÍÓÚ', 'aeiouaeiou'), ' ', '')
 				AND t_m.cod_carrera NOT LIKE 'I%'
+				AND (t_p.observaciones IS NULL
+					OR t_p.observaciones NOT ILIKE '%[ocultar]%')
 			ORDER BY
 				nombre_materia";
 		
@@ -502,6 +653,9 @@ function get_listado_control_depto_excepciones($filtro=array())
 		WHERE
 				t_p.id_materia_prog = t_m.id_materia  
 				AND t_m.cod_carrera NOT LIKE 'I%'
+				AND (t_p.observaciones IS NULL
+					OR t_p.observaciones NOT ILIKE '%[ocultar]%')
+			
 		ORDER BY nombre_materia";
 		if (count($where)>0) {
 			$sql = sql_concatenar_where($sql, $where);
@@ -525,6 +679,8 @@ function get_listado_control_depto_excepciones($filtro=array())
 			materias as t_m
 		WHERE
 				t_p.id_materia_prog = t_m.id_materia
+			AND (t_p.observaciones IS NULL
+				OR t_p.observaciones NOT ILIKE '%[ocultar]%')
 		ORDER BY dni_resp";
 		return toba::db('catedras')->consultar($sql);
 	}
@@ -542,6 +698,8 @@ function get_listado_control_depto_excepciones($filtro=array())
 		WHERE
 			t_p.estado = 'docente'
 			AND t_m.cod_carrera NOT LIKE 'I%'                
+			AND (t_p.observaciones IS NULL
+				OR t_p.observaciones NOT ILIKE '%[ocultar]%')
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 		
@@ -560,6 +718,8 @@ function get_listado_control_depto_excepciones($filtro=array())
 		WHERE
 			t_p.estado = 'depto'
 			AND t_m.cod_carrera NOT LIKE 'I%'    
+			AND (t_p.observaciones IS NULL
+				OR t_p.observaciones NOT ILIKE '%[ocultar]%')
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 	}
@@ -577,6 +737,8 @@ function get_listado_control_depto_excepciones($filtro=array())
 		WHERE
 			t_p.estado = 'sac'
 			AND t_m.cod_carrera NOT LIKE 'I%'    
+			AND (t_p.observaciones IS NULL
+				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 		
@@ -594,6 +756,8 @@ function get_listado_control_depto_excepciones($filtro=array())
 		WHERE
 			t_p.estado = 'aprobado'
 			AND t_m.cod_carrera NOT LIKE 'I%'
+			AND (t_p.observaciones IS NULL
+				OR t_p.observaciones NOT ILIKE '%[ocultar]%')
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);   
 	}
@@ -611,6 +775,8 @@ function get_listado_control_depto_excepciones($filtro=array())
 		WHERE
 			t_p.estado IN ('depto', 'sac')
 			AND t_m.cod_carrera NOT LIKE 'I%'   
+			AND (t_p.observaciones IS NULL
+				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 	}
@@ -629,6 +795,9 @@ function get_listado_control_depto_excepciones($filtro=array())
 		WHERE
 			t_p.estado IN ('depto', 'sac', 'aprobado')
 			AND t_m.cod_carrera NOT LIKE 'I%'   
+			AND (t_p.observaciones IS NULL
+				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
+				
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 	}
@@ -646,6 +815,9 @@ function get_listado_control_depto_excepciones($filtro=array())
 		WHERE
 			t_p.estado IN ('sac', 'aprobado')
 			AND t_m.cod_carrera NOT LIKE 'I%'    
+			AND (t_p.observaciones IS NULL
+				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
+				
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 	}
@@ -663,6 +835,9 @@ function get_listado_control_depto_excepciones($filtro=array())
 		WHERE
 			t_p.estado IN ('docente', 'depto')
 			AND t_m.cod_carrera NOT LIKE 'I%'    
+			AND (t_p.observaciones IS NULL
+				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
+				
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 	}
@@ -684,7 +859,10 @@ function get_listado_para_imprimir_publico($filtro = "")
 			WHERE
 				t_p.id_materia_prog = t_m.id_materia
 				AND t_p.estado = 'aprobado'
-				AND t_m.cod_carrera NOT LIKE 'I%' ";
+				AND t_m.cod_carrera NOT LIKE 'I%' 
+				AND (t_p.observaciones IS NULL
+				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
+					";
 
 	// Verifica si se ha proporcionado algún filtro válido
 	if (is_array($filtro) && !empty($filtro)) {
@@ -722,6 +900,9 @@ function get_listado_para_imprimir_publico($filtro = "")
 			t_p.id_materia_prog = t_m.id_materia
 			AND t_p.estado = 'aprobado'
 			AND t_m.cod_carrera NOT LIKE 'I%'
+			AND (t_p.observaciones IS NULL
+				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
+
 		ORDER BY dni_resp";
 		return toba::db('catedras')->consultar($sql);
 		
@@ -741,9 +922,11 @@ function get_listado_para_imprimir_publico($filtro = "")
 	JOIN
 		materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 	WHERE
+		(t_p.observaciones IS NULL OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
+		AND
 		t_m.cod_carrera NOT LIKE 'I%'
 		AND t_p.id_programa = " . quote($id_programa);
-	
+		
 	return toba::db('catedras')->consultar_fila($sql);
 }
 
@@ -764,7 +947,10 @@ function get_listado_para_imprimir_publico($filtro = "")
 			t_p.legajo_resp = " . quote($usuario_id) . " 
 			AND t_p.estado = 'docente'
 			AND t_m.cod_carrera NOT LIKE 'I%'
-		ORDER BY legajo_resp";
+			AND (t_p.observaciones IS NULL
+				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
+
+			ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 	}
 	
@@ -784,6 +970,9 @@ function get_listado_para_imprimir_publico($filtro = "")
 			t_p.legajo_resp = " . quote($usuario_id) . "
 			AND t_p.estado IN ('depto', 'sac')
 			AND t_m.cod_carrera NOT LIKE 'I%'
+			AND (t_p.observaciones IS NULL
+				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
+						
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 	}
@@ -854,6 +1043,9 @@ $perfiles_validos = array(
 				ILIKE replace(translate(lower($perfilLiteral), 'áéíóúÁÉÍÓÚ', 'aeiouaeiou'), ' ', '')
 				AND t_p.estado = 'depto'
 				AND t_m.cod_carrera NOT LIKE 'I%'
+			AND (t_p.observaciones IS NULL
+				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
+		
 			ORDER BY
 				nombre_materia";
 	
@@ -923,6 +1115,9 @@ function get_listado_enviados_depto($usuario_id, $perfil_usuario)
 				ILIKE replace(translate(lower($perfilLiteral), 'áéíóúÁÉÍÓÚ', 'aeiouaeiou'), ' ', '')
 				AND t_p.estado = 'sac'
 				AND t_m.cod_carrera NOT LIKE 'I%'  
+				AND (t_p.observaciones IS NULL
+					OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
+
 			ORDER BY
 				nombre_materia";
 
@@ -967,6 +1162,9 @@ function get_listado_filtrado_sac($usuario_id, $deptos_principales)
 				t_p.estado = 'sac'
 				AND $filtro_deptos
 				AND t_m.cod_carrera NOT LIKE 'I%'
+				AND (t_p.observaciones IS NULL
+					OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
+
 			ORDER BY nombre_materia";
 	return toba::db('catedras')->consultar($sql);
 }
@@ -1006,6 +1204,9 @@ function get_listado_filtrado_control_sac($usuario_id, $deptos_principales)
 				t_p.estado IN = ('docente', 'depto')
 				AND $filtro_deptos
 				AND t_m.cod_carrera NOT LIKE 'I%'
+				AND (t_p.observaciones IS NULL
+					OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
+
 			ORDER BY nombre_materia";
 	return toba::db('catedras')->consultar($sql);
 }
@@ -1046,6 +1247,9 @@ function get_listado_enviados_sac($usuario_id, $deptos_principales)
 				t_p.estado IN ('aprobado')
 				AND $filtro_deptos
 				AND t_m.cod_carrera NOT LIKE 'I%'
+				AND (t_p.observaciones IS NULL
+					OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
+
 			ORDER BY nombre_materia";
 
 	return toba::db('catedras')->consultar($sql);

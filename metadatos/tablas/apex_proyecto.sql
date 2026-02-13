@@ -28,8 +28,8 @@ INSERT INTO apex_proyecto (proyecto, descripcion, descripcion_corta, estilo, con
 	NULL, --validacion_intentos
 	'5', --validacion_intentos_min
 	'1', --validacion_bloquear_usuario
-	NULL, --validacion_debug
-	'30', --sesion_tiempo_no_interac_min
+	'0', --validacion_debug
+	'720', --sesion_tiempo_no_interac_min
 	NULL, --sesion_tiempo_maximo_min
 	'13', --pm_sesion
 	NULL, --sesion_subclase
@@ -45,7 +45,7 @@ INSERT INTO apex_proyecto (proyecto, descripcion, descripcion_corta, estilo, con
 	NULL, --registrar_cronometro
 	'2', --item_inicio_sesion
 	'3464', --item_pre_sesion
-	NULL, --item_pre_sesion_popup
+	'0', --item_pre_sesion_popup
 	NULL, --item_set_sesion
 	'1', --log_archivo
 	'7', --log_archivo_nivel
