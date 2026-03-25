@@ -1,5 +1,5 @@
 ------------------------------------------------------------
---[2610]--  DT - personas 
+--[2620]--  personas 
 ------------------------------------------------------------
 
 ------------------------------------------------------------
@@ -9,7 +9,7 @@
 --- INICIO Grupo de desarrollo 0
 INSERT INTO apex_objeto (proyecto, objeto, anterior, identificador, reflexivo, clase_proyecto, clase, punto_montaje, subclase, subclase_archivo, objeto_categoria_proyecto, objeto_categoria, nombre, titulo, colapsable, descripcion, fuente_datos_proyecto, fuente_datos, solicitud_registrar, solicitud_obj_obs_tipo, solicitud_obj_observacion, parametro_a, parametro_b, parametro_c, parametro_d, parametro_e, parametro_f, usuario, creacion, posicion_botonera) VALUES (
 	'catedras', --proyecto
-	'2610', --objeto
+	'2620', --objeto
 	NULL, --anterior
 	NULL, --identificador
 	NULL, --reflexivo
@@ -20,7 +20,7 @@ INSERT INTO apex_objeto (proyecto, objeto, anterior, identificador, reflexivo, c
 	'datos/dt_personas.php', --subclase_archivo
 	NULL, --objeto_categoria_proyecto
 	NULL, --objeto_categoria
-	'DT - personas', --nombre
+	'personas', --nombre
 	NULL, --titulo
 	NULL, --colapsable
 	NULL, --descripcion
@@ -36,7 +36,7 @@ INSERT INTO apex_objeto (proyecto, objeto, anterior, identificador, reflexivo, c
 	NULL, --parametro_e
 	NULL, --parametro_f
 	NULL, --usuario
-	'2026-02-13 13:01:07', --creacion
+	'2026-02-18 14:05:31', --creacion
 	NULL  --posicion_botonera
 );
 --- FIN Grupo de desarrollo 0
@@ -46,22 +46,22 @@ INSERT INTO apex_objeto (proyecto, objeto, anterior, identificador, reflexivo, c
 ------------------------------------------------------------
 INSERT INTO apex_objeto_db_registros (objeto_proyecto, objeto, max_registros, min_registros, punto_montaje, ap, ap_clase, ap_archivo, tabla, tabla_ext, alias, modificar_claves, fuente_datos_proyecto, fuente_datos, permite_actualizacion_automatica, esquema, esquema_ext) VALUES (
 	'catedras', --objeto_proyecto
-	'2610', --objeto
+	'2620', --objeto
 	NULL, --max_registros
 	NULL, --min_registros
-	'13', --punto_montaje
+	NULL, --punto_montaje
 	'1', --ap
 	NULL, --ap_clase
 	NULL, --ap_archivo
 	'personas', --tabla
 	NULL, --tabla_ext
 	NULL, --alias
-	'0', --modificar_claves
+	NULL, --modificar_claves
 	'catedras', --fuente_datos_proyecto
 	'catedras', --fuente_datos
 	'1', --permite_actualizacion_automatica
 	NULL, --esquema
-	'public'  --esquema_ext
+	NULL  --esquema_ext
 );
 
 ------------------------------------------------------------
@@ -71,72 +71,72 @@ INSERT INTO apex_objeto_db_registros (objeto_proyecto, objeto, max_registros, mi
 --- INICIO Grupo de desarrollo 0
 INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
 	'catedras', --objeto_proyecto
-	'2610', --objeto
-	'1021', --col_id
+	'2620', --objeto
+	'1036', --col_id
 	'id_persona', --columna
 	'E', --tipo
 	'1', --pk
 	'personas_id_persona_seq', --secuencia
 	NULL, --largo
 	NULL, --no_nulo
-	'1', --no_nulo_db
-	'0', --externa
-	'personas'  --tabla
+	NULL, --no_nulo_db
+	NULL, --externa
+	NULL  --tabla
 );
 INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
 	'catedras', --objeto_proyecto
-	'2610', --objeto
-	'1022', --col_id
+	'2620', --objeto
+	'1037', --col_id
 	'apellido', --columna
 	'C', --tipo
-	'0', --pk
+	NULL, --pk
 	NULL, --secuencia
-	'100', --largo
+	NULL, --largo
 	NULL, --no_nulo
-	'0', --no_nulo_db
-	'0', --externa
-	'personas'  --tabla
+	NULL, --no_nulo_db
+	NULL, --externa
+	NULL  --tabla
 );
 INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
 	'catedras', --objeto_proyecto
-	'2610', --objeto
-	'1023', --col_id
+	'2620', --objeto
+	'1038', --col_id
 	'nombre', --columna
 	'C', --tipo
-	'0', --pk
+	NULL, --pk
 	NULL, --secuencia
-	'100', --largo
+	NULL, --largo
 	NULL, --no_nulo
-	'0', --no_nulo_db
-	'0', --externa
-	'personas'  --tabla
+	NULL, --no_nulo_db
+	NULL, --externa
+	NULL  --tabla
 );
 INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
 	'catedras', --objeto_proyecto
-	'2610', --objeto
-	'1024', --col_id
+	'2620', --objeto
+	'1039', --col_id
 	'fecha_nac', --columna
 	'F', --tipo
-	'0', --pk
+	NULL, --pk
 	NULL, --secuencia
 	NULL, --largo
 	NULL, --no_nulo
-	'0', --no_nulo_db
-	'0', --externa
-	'personas'  --tabla
+	NULL, --no_nulo_db
+	NULL, --externa
+	NULL  --tabla
 );
 INSERT INTO apex_objeto_db_registros_col (objeto_proyecto, objeto, col_id, columna, tipo, pk, secuencia, largo, no_nulo, no_nulo_db, externa, tabla) VALUES (
 	'catedras', --objeto_proyecto
-	'2610', --objeto
-	'1025', --col_id
+	'2620', --objeto
+	'1040', --col_id
 	'hijos', --columna
 	'X', --tipo
-	'0', --pk
+	NULL, --pk
 	NULL, --secuencia
 	NULL, --largo
 	NULL, --no_nulo
-	'0', --no_nulo_db
-	'0', --externa
-	'personas'  --tabla
+	NULL, --no_nulo_db
+	NULL, --externa
+	NULL  --tabla
 );
 --- FIN Grupo de desarrollo 0

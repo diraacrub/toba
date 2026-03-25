@@ -34,6 +34,12 @@ class ci_depto_planificaciones extends ci_base_operaciones
 		$usuario_id = toba::usuario()->get_id();
 		$nombre_usuario = toba::usuario()->get_nombre();
 		$perfil_usuario = toba::usuario()->get_perfiles_funcionales();
+		// transformando el perfil para ingles
+	$perfil_usuario = str_replace(
+	'idiomasextranjeros',
+	'idiomasextranjerosconpropositosespecificos',
+	$perfil_usuario
+);
 
 		// Lista de usuarios que no requieren el filtro
 		$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
@@ -89,6 +95,12 @@ class ci_depto_planificaciones extends ci_base_operaciones
 		$nombre_usuario = toba::usuario()->get_nombre();
 		$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
 		$perfil_usuario = toba::usuario()->get_perfiles_funcionales();
+	// transformando el perfil para ingles
+	$perfil_usuario = str_replace(
+	'idiomasextranjeros',
+	'idiomasextranjerosconpropositosespecificos',
+	$perfil_usuario
+	);
 		toba::logger()->info("Perfiles funcionales del usuario ($usuario_id): " . implode(', ', $perfiles_funcionales));
 
 		// Lista de usuarios que no requieren el filtro
