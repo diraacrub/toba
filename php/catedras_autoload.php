@@ -69,6 +69,7 @@ class catedras_autoload
 		'pant_login' => 'login/pant_login.php',
 		'modelo_materia' => 'modelos/modelo_materia.php',
 		'modelo_programa' => 'modelos/modelo_programa.php',
+		'ci_reporte_tabla_informes' => 'para_meli/ci_reporte_tabla_informes.php',
 		'ci_planificaciones_aprobadas' => 'planif_aprobadas/ci_planificaciones_aprobadas.php',
 		'ci_sac_planificaciones' => 'planif_aprobadas/ci_planificaciones_aprobadas.php',
 		'ci_depto_planificaciones' => 'planificaciones/ci_depto_planificaciones.php',

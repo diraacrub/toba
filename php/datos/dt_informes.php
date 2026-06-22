@@ -2,7 +2,8 @@
 class dt_informes extends catedras_datos_tabla
 {
 	
-	function get_listado($filtro=array())
+	
+		function get_listado ($filtro=array())
 	{
 		$where = array();
 		if (isset($filtro['id_informe'])) {
@@ -27,6 +28,113 @@ class dt_informes extends catedras_datos_tabla
 		return toba::db('catedras')->consultar($sql);
 	}
 
+	
+		function get_listado_meli ($filtro=array())
+	{
+		$where = array();
+		if (isset($filtro['id_informe'])) {
+			$where[] = "id_informe = ".quote($filtro['id_informe']);
+		}
+		if (isset($filtro['id_prog_informe'])) {
+			$where[] = "id_prog_informe = ".quote($filtro['id_prog_informe']);
+		}
+		if (isset($filtro['ano_academico'])) {
+			$where[] = "ano_academico = ".quote($filtro['ano_academico']);
+		}
+		$sql =
+		"SELECT  
+			t_i.*,  
+			t_p.*,  
+			t_m.*  
+		FROM  
+			informes AS t_i  
+		JOIN programas AS t_p ON t_i.id_prog_informe = t_p.id_programa  
+		JOIN materias AS t_m ON t_p.id_materia_prog = t_m.id_materia 
+		WHERE t_i.estado_informe IN ('aprobado')      
+		ORDER BY t_m.nombre_materia";
+		if (count($where)>0) {
+			$sql = sql_concatenar_where($sql, $where);
+		}
+		return toba::db('catedras')->consultar($sql);
+	}
+	
+	
+	
+	
+	
+	function get_listado_reporte($filtro=array())
+	{
+		$where = array();
+		if (isset($filtro['id_prog_informe'])) {
+			$where[] = "id_prog_informe = ".quote($filtro['id_prog_informe']);
+		}
+		$sql = "SELECT
+			t_i.id_informe,
+			t_i.id_prog_informe,
+			t_i.inscriptos,
+			t_i.comenzaron,
+			t_i.aprobaron,
+			t_i.abandonaron,
+			t_i.desaprobaron,
+			t_i.causas_abandono_desap,
+			t_i.caract_grupo,
+			t_i.estrategias,
+			t_i.consideraciones_interior,
+			t_i.analisis_actividades,
+			t_i.suficiencia_adecuacion,
+			t_i.evaluacion_ays,
+			t_i.articulacion,
+			t_i.capacitacion,
+			t_i.analisis_por_cargo,
+			t_i.estado_informe,
+			t_i.comentarios_inf,
+			t_i.otro_analisis,
+			t_i.firma_doc_inf,
+			t_i.firma_dto_inf,
+			t_i.firma_sac_inf
+		FROM
+			informes as t_i
+		ORDER BY causas_abandono_desap";
+		if (count($where)>0) {
+			$sql = sql_concatenar_where($sql, $where);
+		}
+		return toba::db('catedras')->consultar($sql);
+	}
+
+
+	
+
+		function get_listado_repuesto($filtro=array())
+	{
+		$where = array();
+		if (isset($filtro['id_informe'])) {
+			$where[] = "id_informe = ".quote($filtro['id_informe']);
+		}
+		if (isset($filtro['id_prog_informe'])) {
+			$where[] = "id_prog_informe = ".quote($filtro['id_prog_informe']);
+		}
+		$sql =
+		"SELECT  
+			t_i.*,  
+			t_p.*,  
+			t_m.*  
+		FROM  
+			informes AS t_i  
+		JOIN programas AS t_p ON t_i.id_prog_informe = t_p.id_programa  
+		JOIN materias AS t_m ON t_p.id_materia_prog = t_m.id_materia  
+		ORDER BY t_m.nombre_materia";
+		if (count($where)>0) {
+			$sql = sql_concatenar_where($sql, $where);
+		}
+		return toba::db('catedras')->consultar($sql);
+	}
+
+	
+	
+	
+	
+	
+	
 	
 	
 	function get_listado_magis($filtro=array())
@@ -72,7 +180,7 @@ class dt_informes extends catedras_datos_tabla
 	}
 
 
-	function get_listado_repuesto($filtro=array())
+	function get_listado_repuesto1($filtro=array())
 	{
 		$where = array();
 		if (isset($filtro['id_informe'])) {

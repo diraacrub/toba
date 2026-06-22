@@ -32,6 +32,12 @@ INSERT INTO apex_usuario_grupo_acc_item (proyecto, usuario_grupo_acc, item_id, i
 	'catedras', --proyecto
 	'idiomasextranjeros', --usuario_grupo_acc
 	NULL, --item_id
+	'2'  --item
+);
+INSERT INTO apex_usuario_grupo_acc_item (proyecto, usuario_grupo_acc, item_id, item) VALUES (
+	'catedras', --proyecto
+	'idiomasextranjeros', --usuario_grupo_acc
+	NULL, --item_id
 	'3471'  --item
 );
 INSERT INTO apex_usuario_grupo_acc_item (proyecto, usuario_grupo_acc, item_id, item) VALUES (
