@@ -805,3 +805,58 @@ button.hy-boton-primario { border: 0; cursor: pointer; font-family: var(--hy-fue
 
 /* Selector de proyecto mas angosto, para dejarle lugar al menu */
 .enc-cambio-proy select, .enc-cambio-proy select.ef-combo { max-width: 120px; }
+
+/* ==========================================================================
+   Encuadre: titulo de la operacion y contenido con el mismo margen
+   - El titulo (Toba lo flota) queda adentro de su banda, sin salirse.
+   - El contenido se alinea a la izquierda con el mismo margen que el titulo,
+     en vez de centrar cada cosa por su lado.
+   ========================================================================== */
+
+:root { --hy-margen: 32px; }
+
+#barra_superior {
+	display: block !important;
+	min-height: 0 !important;
+	padding: 18px var(--hy-margen) 16px !important;
+}
+#barra_superior .item-barra {
+	float: none !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	width: auto !important;
+}
+#barra_superior .item-barra-tit {
+	margin: 0 !important;
+	padding: 0 !important;
+	font-size: 22px;
+	line-height: 28px;
+	font-weight: 600;
+	letter-spacing: -.2px;
+}
+
+.cuerpo {
+	text-align: left !important;
+	padding: 24px var(--hy-margen) 32px !important;
+}
+.cuerpo > form > table.ci-base,
+.cuerpo > form > table.ei-base,
+.cuerpo > form > div > table.ci-base {
+	margin-left: 0 !important;
+	margin-right: auto !important;
+}
+/* Paginas propias (Inicio, Importar usuarios): mismo margen que el resto */
+.hy-inicio { margin: 0 0 24px !important; }
+.hy-inicio-saludo { margin-top: 0; }
+
+@media (max-width: 760px) {
+	:root { --hy-margen: 16px; }
+}
+
+/* Textos de solo lectura: el alto de su contenido, no el de las filas fijas */
+.ei-form-cuerpo textarea[readonly], .ei-form-cuerpo textarea.ef-input-solo-lectura, .ei-form-cuerpo textarea[disabled] {
+	field-sizing: content;
+	height: auto;
+	min-height: 38px;
+	max-height: 240px;
+}

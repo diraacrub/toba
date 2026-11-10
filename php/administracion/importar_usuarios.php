@@ -264,9 +264,8 @@ class catedras_importar_usuarios
 	static function cabecera()
 	{
 		echo '<div class="hy-inicio hy-import">';
+		// El titulo ya lo pone la barra de la operacion: aca solo la explicacion
 		echo '<header class="hy-inicio-saludo">';
-		echo '<p class="hy-inicio-sistema">Administraci&oacute;n</p>';
-		echo '<h1>Importar usuarios</h1>';
 		echo '<p class="hy-inicio-bajada">Cargar o actualizar responsables de c&aacute;tedra desde un CSV. Primero se ve qu&eacute; va a pasar; no se guarda nada hasta confirmar.</p>';
 		echo '</header>';
 	}
