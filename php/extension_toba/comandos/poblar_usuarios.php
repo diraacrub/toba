@@ -42,6 +42,16 @@ class poblar_usuarios_comando extends toba_aplicacion_comando_base
                 $nombre     = trim($usuario_data['nombre']);
                 $email      = trim($usuario_data['email']);
 
+                // El CSV viene en UTF-8 y la base es LATIN1: sin convertir, la Ñ y las
+                // tildes quedan rotas en apex_usuario.nombre (y de ahi pasan a cada firma
+                // y comentario de esa persona). Ver deploy/sql/arreglar_nombres_utf8.sql.
+                if (mb_check_encoding($nombre, 'UTF-8')) {
+                    $nombre = mb_convert_encoding($nombre, 'ISO-8859-1', 'UTF-8');
+                }
+                if (mb_check_encoding($email, 'UTF-8')) {
+                    $email = mb_convert_encoding($email, 'ISO-8859-1', 'UTF-8');
+                }
+
                 if (empty($usuario_id) || empty($dni)) {
                     $this->consola->advertencia("Saltando fila por datos incompletos (usuario o dni vacíos).");
                     continue;
