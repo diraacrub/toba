@@ -10,6 +10,10 @@
  * Usuarios sin DNI cargado (por ejemplo el admin "toba") entran con la clave de
  * Toba si keycloak.ini tiene permite_login_toba = 1.
  *
+ * Transicion: hasta el dia anterior a exclusivo_desde (keycloak.ini, AAAA-MM-DD)
+ * tambien vale el usuario y la clave de Toba de siempre; la pantalla lo avisa.
+ * Desde esa fecha solo la cuenta Huayca, sin tocar nada.
+ *
  * Se activa con instalacion/keycloak.ini (ver deploy/keycloak.ini.dist); sin ese
  * archivo catedras usa el login comun de Toba. La instala
  * catedras_contexto_ejecucion.
@@ -56,17 +60,48 @@ class catedras_autenticacion_keycloak extends toba_autenticacion_basica
 		return self::param('permite_login_toba', '0') == '1';
 	}
 
+	/** Fecha (DateTimeImmutable) desde la que solo vale la cuenta Huayca, o null si no hay transicion. */
+	static function exclusivo_desde()
+	{
+		$f = self::param('exclusivo_desde');
+		if (! $f) {
+			return null;
+		}
+		$d = DateTimeImmutable::createFromFormat('!Y-m-d', $f);
+		return $d ?: null;
+	}
+
+	/** true mientras todavia vale tambien el usuario y la clave de Toba de siempre. */
+	static function en_transicion()
+	{
+		$desde = self::exclusivo_desde();
+		return $desde !== null && new DateTimeImmutable('today') < $desde;
+	}
+
 	function autenticar($id_usuario, $clave, $datos_iniciales = null)
 	{
 		$dni = catedras_usuarios::dni_de_usuario($id_usuario);
-		if ($dni === null) {
-			if (self::permite_login_toba_local()) {
+		if ($dni !== null) {
+			try {
+				if (self::validar_en_keycloak($dni, $clave)) {
+					return true;
+				}
+			} catch (toba_error_autenticacion $e) {
+				// Keycloak no contesto: en la transicion se sigue con la clave de Toba.
+				if (! self::en_transicion()) {
+					throw $e;
+				}
+			}
+			if (self::en_transicion()) {
 				return parent::autenticar($id_usuario, $clave, $datos_iniciales);
 			}
-			toba::logger()->notice("LOGIN: el usuario '$id_usuario' no tiene DNI cargado y no se permite el login de Toba");
 			return false;
 		}
-		return self::validar_en_keycloak($dni, $clave);
+		if (self::permite_login_toba_local() || self::en_transicion()) {
+			return parent::autenticar($id_usuario, $clave, $datos_iniciales);
+		}
+		toba::logger()->notice("LOGIN: el usuario '$id_usuario' no tiene DNI cargado y no se permite el login de Toba");
+		return false;
 	}
 
 	function verificar_clave_vencida($id_usuario)

@@ -41,7 +41,20 @@ Nada de esto toca `vendor/`: sobrevive a `composer install`.
 Toba guarda la config de la instalación en la sesión: después de cambiarla,
 probar con una sesión nueva (borrar la cookie `TOBA_SESSID`).
 
-## Comportamiento
+## Transición (hasta el 30/01/2027)
+
+`exclusivo_desde = "2027-01-31"` en `keycloak.ini`. Hasta el día anterior:
+
+- el mismo formulario acepta **DNI o usuario** y prueba primero la clave CRUB
+  (Keycloak) y, si no, la clave de Toba de siempre;
+- si Keycloak no contesta, se sigue con la clave de Toba;
+- la tarjeta muestra un aviso con las dos fechas.
+
+Desde el 31/01/2027 el aviso desaparece, la etiqueta pasa a "DNI" y solo vale
+la cuenta Huayca, sin tocar nada. Para correr la fecha, se cambia en
+`keycloak.ini`; vacío = solo cuenta Huayca desde ya.
+
+## Comportamiento (después de la transición)
 
 - DNI con usuario en Toba → se valida en Keycloak y entra con su legajo.
 - DNI válido en Keycloak pero sin usuario en catedras → "Tu cuenta Huayca es

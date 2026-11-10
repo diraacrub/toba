@@ -14,6 +14,11 @@ verify_ssl = 1
 ; 1 = los usuarios sin DNI cargado (ej. el admin "toba") entran con la clave de Toba
 permite_login_toba = 1
 
+; Transicion: hasta el dia anterior a esta fecha (AAAA-MM-DD) tambien vale el
+; usuario y la clave de Toba de siempre, y la pantalla lo avisa. Desde esta
+; fecha, solo la cuenta Huayca. Vacio = solo la cuenta Huayca desde ya.
+exclusivo_desde = "2027-01-31"
+
 ; Pantallas de cuenta Huayca (Quintral). ?app=catedras dice "para entrar a Catedras".
 url_activar = "https://huayca.crub.uncoma.edu.ar/quintral/activate?app=catedras"
 url_reset = "https://huayca.crub.uncoma.edu.ar/quintral/reset-password?app=catedras"

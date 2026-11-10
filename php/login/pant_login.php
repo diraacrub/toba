@@ -44,6 +44,14 @@ class pant_login extends toba_ei_pantalla
 		echo "<h1 class='hc-titulo'>Iniciar sesi&oacute;n</h1>";
 		echo "<p class='hc-destino'>para entrar a <strong>C&aacute;tedras</strong></p>";
 		echo "<p class='hc-intro'>Con tu DNI y la contrase&ntilde;a de tu cuenta Huayca.</p>";
+		if (catedras_autenticacion_keycloak::en_transicion()) {
+			$desde = catedras_autenticacion_keycloak::exclusivo_desde();
+			$hasta = $desde->modify('-1 day');
+			echo "<div class='hc-aviso' role='note'><strong>Cambia el acceso.</strong> "
+				. "Hasta el " . $hasta->format('d/m/Y') . " tambi&eacute;n pod&eacute;s entrar con tu usuario y clave de siempre. "
+				. "Desde el " . $desde->format('d/m/Y') . " se entra <strong>solo con tu DNI y la clave de tu cuenta Huayca (CRUB)</strong>. "
+				. "Si todav&iacute;a no la ten&eacute;s, activala con el enlace de abajo.</div>";
+		}
 		echo "</div>";
 		$this->dep('datos')->generar_html();
 		echo "</main>";
@@ -117,6 +125,8 @@ body { font-family: system-ui, Avenir, Helvetica, Arial, sans-serif !important; 
 .hc-titulo { margin: 0; font-size: 22px; font-weight: 600; color: var(--hc-texto); }
 .hc-destino { margin: 2px 0 0; font-size: 15px; color: var(--hc-tenue); }
 .hc-intro { margin: 12px 0 0; font-size: 15px; color: var(--hc-tenue); }
+.hc-aviso { margin: 16px 0 0; padding: 12px 14px; font-size: 14px; line-height: 1.45; color: #78350f; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; }
+.hc-aviso strong { color: #78350f; }
 
 /* El formulario de Toba, adentro de la tarjeta */
 .hc-tarjeta table.ei-base, .hc-tarjeta table.ei-base > tbody > tr > td { width: 100% !important; border: 0 !important; background: none !important; padding: 0 !important; }
