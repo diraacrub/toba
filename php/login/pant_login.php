@@ -135,10 +135,11 @@ body { font-family: system-ui, Avenir, Helvetica, Arial, sans-serif !important; 
 .hc-tarjeta .ei-form-fila { display: block; margin: 0 0 16px; padding: 0; border: 0; background: none; }
 .hc-tarjeta .ei-form-fila label { display: block; width: auto !important; float: none !important; text-align: left !important; margin: 0 0 6px; padding: 0; font-size: 15px; font-weight: 600; color: var(--hc-texto); }
 .hc-tarjeta .ei-form-fila label + div { margin-left: 0 !important; }
-.hc-tarjeta .ef-input, .hc-tarjeta input[type=text], .hc-tarjeta input[type=password] { width: 100% !important; box-sizing: border-box; min-height: 44px; padding: 10px 12px; font: inherit; font-size: 16px; color: var(--hc-texto); background: #fff; border: 1px solid var(--hc-borde); border-radius: 8px; box-shadow: none; }
+.hc-tarjeta .ef-input, .hc-tarjeta input[type=text], .hc-tarjeta input[type=password] { width: 100% !important; box-sizing: border-box; min-height: 44px !important; padding: 10px 12px !important; font: inherit; font-size: 16px !important; color: var(--hc-texto); background: #fff; border: 1px solid var(--hc-borde); border-radius: 8px; box-shadow: none; }
 .hc-tarjeta .ef-input:focus { outline: 2px solid var(--hc-azul); outline-offset: 1px; border-color: var(--hc-azul); }
 .hc-tarjeta .ei-botonera { padding: 0 !important; margin: 8px 0 0; background: none !important; border: 0 !important; text-align: left; }
-.hc-tarjeta .ei-boton { width: 100%; min-height: 44px; margin: 0; padding: 0 16px; font: inherit; font-size: 16px; font-weight: 600; color: #fff !important; background: var(--hc-azul) !important; border: 0 !important; border-radius: 8px; cursor: pointer; box-shadow: none !important; text-shadow: none !important; }
+.hc-tarjeta .ei-boton { width: 100%; min-height: 44px !important; margin: 0; padding: 0 16px !important; font: inherit; font-size: 16px !important; font-weight: 600; color: #fff !important; background: var(--hc-azul) !important; border: 0 !important; border-radius: 8px; cursor: pointer; box-shadow: none !important; text-shadow: none !important; }
+.hc-tarjeta .ei-boton { justify-content: center; }
 .hc-tarjeta .ei-boton:hover { background: var(--hc-azul-fuerte) !important; }
 .hc-tarjeta .ei-boton u { text-decoration: none; }
 .hc-tarjeta [id\$='_notificacion'] { color: var(--hc-peligro); font-size: 15px; }

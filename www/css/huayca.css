@@ -1,0 +1,766 @@
+/*
+ * Tema Huayca para catedras (SIU Toba).
+ *
+ * La misma identidad que la pantalla de entrar y que las pantallas de cuenta
+ * Huayca (Quintral): azul CRUB, el sello, "/huayca", tipografia del sistema,
+ * superficies blancas sobre gris claro, bordes finos y radios suaves. Nada de
+ * degradados ni sombras pesadas.
+ *
+ * Funciona porque todas las operaciones de Toba se arman con los mismos
+ * componentes (ei-*, ci-*, ef-*): este archivo los reestila a todos a la vez,
+ * sin tocar operaciones ni metadatos. Lo importa www/css/toba.css (que Toba
+ * carga despues de su skin v2_azul). Para volver al aspecto anterior alcanza
+ * con quitar el @import.
+ *
+ * La pantalla de login tiene su propio estilo (php/login/pant_login.php) y
+ * pisa a este donde hace falta.
+ */
+
+:root {
+	--hy-azul: #2563eb;
+	--hy-azul-fuerte: #1d4ed8;
+	--hy-azul-tinta: #1e3a8a;
+	--hy-azul-suave: #eff6ff;
+	--hy-azul-borde: #bfdbfe;
+	--hy-fondo: #f3f5f8;
+	--hy-superficie: #ffffff;
+	--hy-superficie-2: #f8fafc;
+	--hy-borde: #e2e8f0;
+	--hy-borde-fuerte: #cbd5e1;
+	--hy-texto: #0f172a;
+	--hy-texto-2: #334155;
+	--hy-tenue: #64748b;
+	--hy-peligro: #b91c1c;
+	--hy-radio: 10px;
+	--hy-radio-chico: 6px;
+	--hy-alto-barra: 56px;
+	--hy-fuente: system-ui, -apple-system, "Segoe UI", Ubuntu, Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ---------- Base ---------- */
+
+html, body {
+	background: var(--hy-fondo);
+}
+body, td, th, input, select, textarea, button {
+	font-family: var(--hy-fuente);
+}
+body {
+	color: var(--hy-texto);
+	font-size: 13px;
+}
+a { color: var(--hy-azul-fuerte); }
+
+/* ---------- Barra superior: sello, /huayca, menu, usuario ---------- */
+
+/* Bloque comun (no flex): asi el fondo azul pasa por debajo de los elementos
+   flotantes de la derecha (proyecto, usuario, salir) en vez de esquivarlos. */
+#enc-logo {
+	height: var(--hy-alto-barra) !important;
+	background: var(--hy-azul);
+	box-sizing: border-box;
+	padding: 10px 0 0 20px;
+}
+#enc-logo img { display: none; }
+#enc-logo::before {
+	content: "/huayca";
+	display: inline-flex;
+	align-items: center;
+	height: 36px;
+	padding-left: 44px;
+	background: url("../img/huayca-sello.png") no-repeat left center / 36px 36px;
+	color: #fff;
+	font-size: 22px;
+	letter-spacing: .2px;
+	white-space: nowrap;
+}
+
+/* Menu: arriba, sobre la barra azul, a continuacion de la marca */
+ul#menu-h {
+	top: 0;
+	left: 160px;
+	right: 300px;
+	flex-wrap: nowrap;
+	height: var(--hy-alto-barra);
+	display: flex;
+	align-items: center;
+}
+ul#menu-h > li {
+	left: 0;
+	margin: 0 2px 0 0;
+}
+ul#menu-h a.nivel-0, ul#menu-h a.nivel-0:visited {
+	color: #fff !important;
+	font-family: var(--hy-fuente);
+	font-size: 13.5px;
+	font-weight: 500;
+	line-height: 20px;
+	padding: 8px 9px;
+	border-radius: var(--hy-radio-chico);
+	background: transparent !important;
+	border: 0 !important;
+}
+ul#menu-h a.nivel-0:hover, ul#menu-h a.nivel-0:focus, ul#menu-h a.nivel-0.rollover {
+	background: rgba(255, 255, 255, .16) !important;
+	border: 0 !important;
+	color: #fff !important;
+}
+ul#menu-h .carpeta { background-image: none !important; }
+
+/* Submenus: tarjeta blanca */
+ul#menu-h ul {
+	background: var(--hy-superficie);
+	border: 1px solid var(--hy-borde);
+	border-radius: var(--hy-radio);
+	box-shadow: 0 10px 24px rgba(15, 23, 42, .12);
+	padding: 6px;
+	min-width: 220px;
+}
+ul#menu-h ul li { margin: 0; }
+ul#menu-h ul a, ul#menu-h ul a:visited {
+	background: transparent !important;
+	border: 0 !important;
+	color: var(--hy-texto) !important;
+	font-family: var(--hy-fuente);
+	font-size: 14px;
+	padding: 8px 12px;
+	border-radius: var(--hy-radio-chico);
+}
+ul#menu-h ul a:hover, ul#menu-h ul a:focus, ul#menu-h ul a.rollover {
+	background: var(--hy-azul-suave) !important;
+	color: var(--hy-azul-tinta) !important;
+}
+ul#menu-h img.menu-link-nueva-ventana { opacity: .45; }
+
+/* A la derecha: proyecto, usuario y salir, en blanco sobre la barra */
+.enc-salir, .enc-usuario, .enc-cambio-proy {
+	position: relative;
+	z-index: 6;
+	height: var(--hy-alto-barra);
+	margin: 0 !important;
+	display: flex;
+	align-items: center;
+	color: #fff;
+}
+.enc-salir { padding: 0 16px 0 8px; }
+.enc-salir img { filter: brightness(0) invert(1); opacity: .8; }
+.enc-salir:hover img { opacity: 1; }
+.enc-usuario { flex-direction: column; justify-content: center; align-items: flex-end; padding-left: 12px; }
+.enc-usuario-nom { font-size: 13px; font-weight: 600; color: #fff; }
+.enc-usuario-id { font-size: 12px; color: rgba(255, 255, 255, .8); }
+.enc-cambio-proy { padding: 0 8px; }
+.enc-cambio-proy img { display: none; }
+.enc-cambio-proy select {
+	height: 32px;
+	padding: 0 8px;
+	border-radius: var(--hy-radio-chico);
+	border: 1px solid rgba(255, 255, 255, .35);
+	background: rgba(255, 255, 255, .12);
+	color: #fff;
+	font-size: 13px;
+}
+.enc-cambio-proy select option { color: var(--hy-texto); }
+
+/* ---------- Titulo de la operacion ---------- */
+
+.encabezado {
+	background: var(--hy-superficie);
+	border-bottom: 1px solid var(--hy-borde);
+	padding: 0;
+	margin: 0;
+}
+#barra_superior {
+	background: var(--hy-superficie) !important;
+	border: 0 !important;
+	color: var(--hy-texto);
+	min-height: 0;
+	padding: 16px 24px;
+}
+#barra_superior { display: flow-root; }	/* contiene el titulo flotado: si no, el contenido lo esquiva y se corre */
+#barra_superior .item-barra { margin: 0; }
+#barra_superior .item-barra-tit {
+	font-size: 20px;
+	font-weight: 600;
+	color: var(--hy-texto);
+	letter-spacing: -.1px;
+}
+.zona-items {
+	background: transparent !important;
+	border: 0 !important;
+	margin: 0;
+}
+.zona-items a { border: 0; color: var(--hy-texto-2); border-radius: var(--hy-radio-chico); }
+.zona-items a:hover { background: var(--hy-superficie-2); }
+
+/* ---------- Cuerpo y contenedores ---------- */
+
+.cuerpo {
+	clear: both;
+	padding: 20px 24px !important;
+	margin: 0 !important;
+	overflow-x: auto;	/* un listado muy ancho se desplaza aca, no la pagina entera */
+}
+
+/* El contenedor principal de cada operacion: una tarjeta */
+.cuerpo > form > .ci-base,
+.cuerpo > form > table.ei-base,
+.cuerpo .ci-base {
+	background: var(--hy-superficie);
+	border: 1px solid var(--hy-borde) !important;
+	border-radius: var(--hy-radio);
+	box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+}
+.ci-base .ci-base,
+.ci-base .ei-base { border: 0 !important; box-shadow: none; background: transparent; }
+.ci-cuerpo, .ci-simple-cont { background: transparent !important; }
+
+/* Barras de titulo de cada componente */
+.ei-barra-sup, .ci-barra-sup {
+	background: transparent !important;
+	background-image: none !important;
+	border: 0 !important;
+	border-bottom: 1px solid var(--hy-borde) !important;
+	color: var(--hy-texto) !important;
+	padding: 10px 14px !important;
+	min-height: 0;
+}
+.ei-barra-sup-tit {
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--hy-texto);
+}
+.ei-barra-sup-desc-info, .ci-wiz-enc {
+	background: var(--hy-azul-suave);
+	border: 1px solid var(--hy-azul-borde);
+	color: var(--hy-azul-tinta);
+	border-radius: var(--hy-radio-chico);
+}
+
+/* Separadores entre componentes */
+.ci-pant-sep-ei, .ci-pant-sep { border-color: var(--hy-borde) !important; }
+
+/* Solapas */
+.ci-tabs-h-lista { border-bottom: 1px solid var(--hy-borde); background: transparent; }
+.ci-tabs-h-solapa, .ci-tabs-h-solapa-sel {
+	background: transparent !important;
+	border: 0 !important;
+	border-bottom: 2px solid transparent !important;
+	border-radius: 0 !important;
+	margin: 0 4px -1px 0 !important;
+}
+.ci-tabs-h-solapa a, .ci-tabs-h-solapa-sel a {
+	color: var(--hy-texto-2) !important;
+	font-size: 14px;
+	padding: 10px 12px !important;
+}
+.ci-tabs-h-solapa-sel { border-bottom-color: var(--hy-azul) !important; }
+.ci-tabs-h-solapa-sel a { color: var(--hy-azul-tinta) !important; font-weight: 600; }
+
+/* ---------- Formularios y filtros ---------- */
+
+.ei-form-cuerpo, .ei-filtro-grilla { background: transparent !important; border: 0 !important; }
+.ei-form-fila { padding: 4px 0; }
+.ei-form-etiq, .ei-form-etiq-oblig, .ei-filtro-columna, .ei-ml-columna {
+	color: var(--hy-texto-2);
+	font-size: 13px;
+	font-weight: 500;
+}
+.ei-form-etiq-oblig { font-weight: 600; }
+
+.ef-input, .ef-textarea, .ef-combo, .ef-numero, .ef-fecha input, .ef-popup input,
+input.ef-input, select.ef-combo, textarea.ef-textarea {
+	font-family: var(--hy-fuente);
+	font-size: 13px;
+	color: var(--hy-texto);
+	background: var(--hy-superficie);
+	border: 1px solid var(--hy-borde-fuerte);
+	border-radius: var(--hy-radio-chico);
+	padding: 6px 8px;
+	box-shadow: none;
+	box-sizing: border-box;
+	min-height: 32px;
+}
+.ef-input:focus, .ef-textarea:focus, .ef-combo:focus, input:focus, select:focus, textarea:focus {
+	outline: 2px solid var(--hy-azul-borde);
+	outline-offset: 0;
+	border-color: var(--hy-azul);
+}
+input[disabled], textarea[disabled], select[disabled], .ef-input[readonly] {
+	background: var(--hy-superficie-2);
+	color: var(--hy-tenue);
+}
+.ef-fijo { color: var(--hy-texto); }
+
+/* ---------- Botones ---------- */
+
+.ei-botonera, .ci-botonera {
+	background: transparent !important;
+	border: 0 !important;
+	padding: 10px 0 0 !important;
+}
+.ci-botonera { padding: 12px 14px !important; border-top: 1px solid var(--hy-borde) !important; }
+
+/* Toba usa ei-boton, ei-boton-izq/der y tambien ei-boton-<evento> (volver, eliminar...) */
+.ei-boton, .ei-boton-izq, .ei-boton-der, button[class^="ei-boton-"], button[class*=" ei-boton-"] {
+	font-family: var(--hy-fuente) !important;
+	font-size: 13px !important;
+	font-weight: 500;
+	color: var(--hy-texto) !important;
+	background: var(--hy-superficie) !important;
+	background-image: none !important;
+	border: 1px solid var(--hy-borde-fuerte) !important;
+	border-radius: var(--hy-radio-chico) !important;
+	padding: 6px 12px !important;
+	min-height: 32px;
+	box-shadow: none !important;
+	text-shadow: none !important;
+	cursor: pointer;
+}
+.ei-boton:hover, .ei-boton-izq:hover, .ei-boton-der:hover,
+button[class^="ei-boton-"]:hover, button[class*=" ei-boton-"]:hover {
+	background: var(--hy-superficie-2) !important;
+	border-color: var(--hy-tenue) !important;
+}
+button[class*="ei-boton"] u { text-decoration: none; }
+button[class*="ei-boton"] img { vertical-align: -3px; margin-right: 4px; }
+
+/* Acciones principales: azul lleno (por clase o por el id del evento) */
+.ei-boton-guardar, .ei-boton-agregar, .ei-boton-filtrar, .ei-boton-procesar, .ei-boton-aceptar,
+button[id$="_filtrar"], button[id$="_guardar"], button[id$="_agregar"], button[id$="_alta"],
+button[id$="_procesar"], button[id$="_ingresar"] {
+	background: var(--hy-azul) !important;
+	border-color: var(--hy-azul) !important;
+	color: #fff !important;
+}
+.ei-boton-guardar:hover, .ei-boton-agregar:hover, .ei-boton-filtrar:hover,
+.ei-boton-procesar:hover, .ei-boton-aceptar:hover,
+button[id$="_filtrar"]:hover, button[id$="_guardar"]:hover, button[id$="_agregar"]:hover,
+button[id$="_alta"]:hover, button[id$="_procesar"]:hover, button[id$="_ingresar"]:hover {
+	background: var(--hy-azul-fuerte) !important;
+	border-color: var(--hy-azul-fuerte) !important;
+}
+/* Sus iconos de colores no se leen sobre el azul: alcanza con el texto */
+.ei-boton-guardar img, .ei-boton-agregar img, .ei-boton-filtrar img,
+.ei-boton-procesar img, .ei-boton-aceptar img,
+button[id$="_filtrar"] img, button[id$="_guardar"] img, button[id$="_agregar"] img,
+button[id$="_alta"] img, button[id$="_procesar"] img { display: none; }
+
+/* Botones de cada fila de un listado (Editar, la lupa): chicos y discretos */
+.ei-boton-fila {
+	font-family: var(--hy-fuente) !important;
+	font-size: 12.5px !important;
+	font-weight: 500;
+	color: var(--hy-azul-tinta) !important;
+	background: var(--hy-superficie) !important;
+	background-image: none !important;
+	border: 1px solid var(--hy-borde-fuerte) !important;
+	border-radius: var(--hy-radio-chico) !important;
+	padding: 4px 8px !important;
+	box-shadow: none !important;
+	text-shadow: none !important;
+	white-space: nowrap;
+	cursor: pointer;
+}
+.ei-boton-fila:hover { background: var(--hy-azul-suave) !important; border-color: var(--hy-azul-borde) !important; }
+.ei-boton-fila img { vertical-align: -3px; }
+.ei-cuadro-fila-evt { padding: 4px 8px !important; text-align: right; }
+
+/* Eliminar: contorno rojo */
+button.ei-boton-eliminar, button.ei-boton-borrar {
+	color: var(--hy-peligro) !important;
+	border-color: #fecaca !important;
+}
+button.ei-boton-eliminar:hover, button.ei-boton-borrar:hover { background: #fef2f2 !important; border-color: #fca5a5 !important; }
+
+/* ---------- Cuadros (listados) ---------- */
+
+.ei-cuadro-cc-fondo, .ei-cuadro-cuerpo, .ei-ml-grilla {
+	background: var(--hy-superficie) !important;
+	border-collapse: collapse;
+}
+.ei-cuadro-col-tit, .ei-ml-columna, .ei-cuadro-col-tit-grupo {
+	background: var(--hy-superficie-2) !important;
+	background-image: none !important;
+	color: var(--hy-texto-2) !important;
+	font-size: 11.5px !important;
+	font-weight: 600 !important;
+	text-align: left;
+	border: 0 !important;
+	border-bottom: 1px solid var(--hy-borde) !important;
+	padding: 6px 8px !important;
+}
+.ei-cuadro-col-tit a { color: var(--hy-texto-2) !important; }
+.ei-cuadro-celda-par, .ei-cuadro-celda-impar, .ei-cuadro-fila, .ei-ml-fila {
+	background: var(--hy-superficie) !important;
+	color: var(--hy-texto);
+	font-size: 12.5px;
+	border: 0 !important;
+	border-bottom: 1px solid var(--hy-borde) !important;
+	padding: 6px 8px !important;
+}
+.ei-cuadro-celda-impar { background: #fcfdfe !important; }
+.ei-cuadro-fila:hover td, tr:hover > .ei-cuadro-celda-par, tr:hover > .ei-cuadro-celda-impar {
+	background: var(--hy-azul-suave) !important;
+}
+.ei-cuadro-fila-sel, .ei-cuadro-fila-sel td, .ei-ml-fila-selec, .ei-filtro-fila-selec {
+	background: #dbeafe !important;
+}
+.ei-cuadro-totales, .ei-cuadro-total {
+	background: var(--hy-superficie-2) !important;
+	font-weight: 600;
+}
+.ei-cuadro-pag { padding: 8px 10px; color: var(--hy-tenue); }
+
+/* El boton de la lupa en cada fila: discreto */
+.ei-cuadro-cuerpo .ei-boton, .ei-cuadro-cc-fondo .ei-boton {
+	padding: 4px 6px !important;
+	min-height: 0;
+}
+
+/* ---------- Mensajes (notificaciones de Toba) ---------- */
+
+#overlay_contenido {
+	background: var(--hy-superficie) !important;
+	border: 1px solid var(--hy-borde) !important;
+	border-radius: var(--hy-radio) !important;
+	box-shadow: 0 20px 40px rgba(15, 23, 42, .18) !important;
+	color: var(--hy-texto);
+	font-size: 14px;
+}
+.overlay-titulo { font-size: 15px; font-weight: 600; color: var(--hy-texto); }
+.overlay-botonera { border-top: 1px solid var(--hy-borde) !important; }
+
+/* ---------- Ajustes de detalle ---------- */
+
+/* Toba fija Tahoma/Verdana en varios lugares: todo con la fuente del sistema */
+.ei-cuadro-col-tit, .ei-cuadro-col-tit *, .ei-ml-columna, .ei-filtro-columna,
+.ef-numero, .ef-input, .ei-cuadro-pag, .ei-cuadro-pag *, .ei-boton span {
+	font-family: var(--hy-fuente) !important;
+}
+.ei-cuadro-col-tit { vertical-align: bottom; }
+
+/* El borde del listado, fino y redondeado */
+table.ei-cuadro-cuerpo {
+	border: 1px solid var(--hy-borde) !important;
+	border-radius: var(--hy-radio-chico);
+	overflow: hidden;
+}
+
+/* Paginado */
+.ei-cuadro-pag { padding: 10px; color: var(--hy-tenue); font-size: 13px; }
+.ei-cuadro-pag input.ef-numero {
+	width: 52px !important;
+	min-height: 28px;
+	padding: 3px 6px;
+	text-align: center;
+	border: 1px solid var(--hy-borde-fuerte) !important;
+	border-radius: var(--hy-radio-chico);
+}
+.ei-cuadro-pag img { vertical-align: middle; opacity: .7; }
+.ei-cuadro-pag img:hover { opacity: 1; }
+
+/* Selector de proyecto, sobre la barra azul */
+.enc-cambio-proy select, .enc-cambio-proy select.ef-combo {
+	min-height: 32px !important;
+	padding: 0 8px !important;
+	border: 1px solid rgba(255, 255, 255, .35) !important;
+	background: rgba(255, 255, 255, .12) !important;
+	color: #fff !important;
+}
+
+
+/* ==========================================================================
+   Formularios: etiqueta arriba, campos grandes, textos largos comodos
+   ========================================================================== */
+
+/* El cuerpo del formulario usa el ancho disponible (hasta una medida de lectura) */
+.ei-form-cuerpo { width: auto !important; max-width: 880px; margin: 0 auto; padding: 8px 4px !important; }
+
+/* Etiqueta arriba del campo (Toba la pone a la izquierda con un ancho fijo) */
+.ei-form-fila { padding: 0 !important; margin: 0 0 16px; }
+.ei-form-fila > label.ei-form-etiq, .ei-form-fila > label.ei-form-etiq-oblig {
+	float: none !important;
+	display: block;
+	width: auto !important;
+	text-align: left !important;
+	margin: 0 0 6px;
+	padding: 0;
+	font-size: 13.5px;
+	font-weight: 600;
+	color: var(--hy-texto);
+}
+.ei-form-fila > label + div { margin-left: 0 !important; }
+.ei-form-fila-desc { display: block; margin-top: 4px; color: var(--hy-tenue); font-size: 12.5px; }
+
+/* Campos mas grandes y faciles de tocar */
+.ei-form-cuerpo .ef-input, .ei-form-cuerpo .ef-combo, .ei-form-cuerpo .ef-numero,
+.ei-form-cuerpo .ef-textarea, .ei-form-cuerpo input[type=text], .ei-form-cuerpo select, .ei-form-cuerpo textarea {
+	font-size: 14px;
+	min-height: 38px;
+	padding: 8px 10px;
+	border-radius: 8px;
+}
+.ei-form-cuerpo input[type=text].ef-input, .ei-form-cuerpo select.ef-combo { width: 100%; max-width: 560px; }
+.ei-form-cuerpo input.ef-numero, .ei-form-cuerpo .ef-fecha input { width: 160px; max-width: 100%; }
+.ei-form-cuerpo textarea, .ei-form-cuerpo .ef-textarea {
+	width: 100% !important;
+	min-height: 120px;
+	line-height: 1.55;
+	resize: vertical;
+}
+
+/* Solo lectura: se nota que no se edita */
+.ef-input-solo-lectura, .ei-form-cuerpo [readonly], .ei-form-cuerpo [disabled] {
+	background: var(--hy-superficie-2) !important;
+	border-color: var(--hy-borde) !important;
+	color: var(--hy-texto-2) !important;
+}
+
+/* ---------- Formularios con plantilla (ej. el Programa): la tabla de la plantilla ---------- */
+
+.ei-form-cuerpo table[border] {
+	width: 100% !important;
+	border-collapse: separate !important;
+	border-spacing: 0;
+	border: 1px solid var(--hy-borde) !important;
+	border-radius: var(--hy-radio);
+	overflow: hidden;
+	background: var(--hy-superficie);
+}
+.ei-form-cuerpo table[border] > tbody > tr > td {
+	border: 0 !important;
+	border-bottom: 1px solid var(--hy-borde) !important;
+	border-right: 1px solid var(--hy-borde) !important;
+	background: var(--hy-superficie) !important;
+	padding: 14px 16px !important;
+	vertical-align: top;
+	font-family: var(--hy-fuente) !important;
+}
+.ei-form-cuerpo table[border] > tbody > tr > td:last-child { border-right: 0 !important; }
+.ei-form-cuerpo table[border] > tbody > tr:last-child > td { border-bottom: 0 !important; }
+/* Celdas de datos fijos (fondo gris en la plantilla): gris muy suave */
+.ei-form-cuerpo table[border] > tbody > tr > td[bgcolor],
+.ei-form-cuerpo table[border] > tbody > tr > td[style*="background"] { background: var(--hy-superficie-2) !important; }
+.ei-form-cuerpo table[border] td *:not(textarea):not(input):not(select):not(iframe) { font-family: var(--hy-fuente) !important; }
+.ei-form-cuerpo table[border] td b, .ei-form-cuerpo table[border] td strong {
+	font-size: 13.5px;
+	font-weight: 600;
+	color: var(--hy-texto);
+}
+.ei-form-cuerpo table[border] .ei-form-fila { margin: 6px 0 0; }
+
+/* ==========================================================================
+   Iconos: de linea (SVG), del color del texto del boton
+   Toba trae GIFs de 16px por evento; se reemplazan los de eventos conocidos.
+   ========================================================================== */
+
+button[class*="ei-boton"] { display: inline-flex !important; align-items: center; gap: 6px; vertical-align: middle; }
+/* El texto va de corrido: la letra del atajo (<u>I</u>mprimir) no se separa del resto */
+button[class*="ei-boton"] > span { display: inline; }
+
+/* volver */
+button[id$="_volver"] { --hy-icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m12 19-7-7 7-7'/%3E%3Cpath d='M19 12H5'/%3E%3C/svg%3E"); }
+/* guardar */
+button[id$="_guardar"],
+button[id$="_modificacion"],
+button[id$="_aceptar"],
+button[id$="_procesar"] { --hy-icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E"); }
+/* eliminar */
+button[id$="_eliminar"],
+button[id$="_baja"],
+button[id$="_borrar"] { --hy-icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 6h18'/%3E%3Cpath d='M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6'/%3E%3Cpath d='M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'/%3E%3C/svg%3E"); }
+/* filtrar */
+button[id$="_filtrar"] { --hy-icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 3H2l8 9.46V19l4 2v-8.54L22 3z'/%3E%3C/svg%3E"); }
+/* limpiar */
+button[id$="_cancelar"],
+button[id$="_limpiar"] { --hy-icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E"); }
+/* agregar */
+button[id$="_agregar"],
+button[id$="_alta"],
+button[id$="_nuevo"] { --hy-icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14'/%3E%3Cpath d='M12 5v14'/%3E%3C/svg%3E"); }
+/* imprimir */
+button[id$="_imprimir"] { --hy-icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9V2h12v7'/%3E%3Cpath d='M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2'/%3E%3Crect width='12' height='8' x='6' y='14'/%3E%3C/svg%3E"); }
+/* enviar */
+button[id$="_enviar"],
+button[id$="_firmar"],
+button[id$="_aprobar"] { --hy-icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m22 2-7 20-4-9-9-4Z'/%3E%3Cpath d='M22 2 11 13'/%3E%3C/svg%3E"); }
+/* editar */
+button[id$="_seleccion"],
+button[id$="_editar"] { --hy-icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z'/%3E%3C/svg%3E"); }
+/* descargar */
+button[id$="_descargar"],
+button[id$="_exportar"],
+button[id$="_pdf"],
+button[id$="_ver_pdf"] { --hy-icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3Cpath d='M12 15V3'/%3E%3C/svg%3E"); }
+
+/* Los botones con icono propio: se oculta el GIF y se dibuja el SVG */
+button[id$="_volver"] img,
+button[id$="_guardar"] img,
+button[id$="_modificacion"] img,
+button[id$="_aceptar"] img,
+button[id$="_procesar"] img,
+button[id$="_eliminar"] img,
+button[id$="_baja"] img,
+button[id$="_borrar"] img,
+button[id$="_filtrar"] img,
+button[id$="_cancelar"] img,
+button[id$="_limpiar"] img,
+button[id$="_agregar"] img,
+button[id$="_alta"] img,
+button[id$="_nuevo"] img,
+button[id$="_imprimir"] img,
+button[id$="_enviar"] img,
+button[id$="_firmar"] img,
+button[id$="_aprobar"] img,
+button[id$="_seleccion"] img,
+button[id$="_editar"] img,
+button[id$="_descargar"] img,
+button[id$="_exportar"] img,
+button[id$="_pdf"] img,
+button[id$="_ver_pdf"] img { display: none !important; }
+button[id$="_volver"]::before,
+button[id$="_guardar"]::before,
+button[id$="_modificacion"]::before,
+button[id$="_aceptar"]::before,
+button[id$="_procesar"]::before,
+button[id$="_eliminar"]::before,
+button[id$="_baja"]::before,
+button[id$="_borrar"]::before,
+button[id$="_filtrar"]::before,
+button[id$="_cancelar"]::before,
+button[id$="_limpiar"]::before,
+button[id$="_agregar"]::before,
+button[id$="_alta"]::before,
+button[id$="_nuevo"]::before,
+button[id$="_imprimir"]::before,
+button[id$="_enviar"]::before,
+button[id$="_firmar"]::before,
+button[id$="_aprobar"]::before,
+button[id$="_seleccion"]::before,
+button[id$="_editar"]::before,
+button[id$="_descargar"]::before,
+button[id$="_exportar"]::before,
+button[id$="_pdf"]::before,
+button[id$="_ver_pdf"]::before {
+	content: "";
+	flex: none;
+	width: 16px;
+	height: 16px;
+	background-color: currentColor;
+	-webkit-mask: var(--hy-icono) no-repeat center / contain;
+	mask: var(--hy-icono) no-repeat center / contain;
+}
+/* En los botones de fila (Editar, la lupa) el icono va un poco mas chico */
+.ei-boton-fila::before { width: 14px !important; height: 14px !important; }
+
+/* Un texto largo de solo lectura (ej. el nombre de la materia) no necesita el alto de uno editable */
+.ei-form-cuerpo textarea[readonly], .ei-form-cuerpo textarea.ef-input-solo-lectura,
+.ei-form-cuerpo textarea[disabled] { min-height: 0; resize: none; }
+
+/* ==========================================================================
+   Editor enriquecido (CKEditor 4): marco y barras planas, como los demas campos
+   ========================================================================== */
+
+.cke_chrome {
+	border: 1px solid var(--hy-borde-fuerte) !important;
+	border-radius: 8px !important;
+	box-shadow: none !important;
+	padding: 0 !important;
+	overflow: hidden;
+}
+.cke_chrome.cke_focus, .cke_chrome:focus-within { border-color: var(--hy-azul) !important; outline: 2px solid var(--hy-azul-borde); }
+.cke_inner { background: var(--hy-superficie) !important; background-image: none !important; }
+.cke_top {
+	background: var(--hy-superficie-2) !important;
+	background-image: none !important;
+	border-bottom: 1px solid var(--hy-borde) !important;
+	box-shadow: none !important;
+	padding: 6px 8px 2px !important;
+}
+.cke_bottom {
+	background: var(--hy-superficie-2) !important;
+	background-image: none !important;
+	border-top: 1px solid var(--hy-borde) !important;
+	box-shadow: none !important;
+}
+.cke_toolgroup, .cke_combo_button {
+	background: transparent !important;
+	background-image: none !important;
+	border: 0 !important;
+	box-shadow: none !important;
+	border-radius: 6px !important;
+}
+a.cke_button, .cke_combo_button { border-radius: 6px !important; }
+a.cke_button:hover, a.cke_button:focus, .cke_combo_button:hover, .cke_combo_on .cke_combo_button {
+	background: var(--hy-azul-suave) !important;
+	box-shadow: none !important;
+	border: 0 !important;
+}
+a.cke_button_on { background: #dbeafe !important; box-shadow: none !important; border: 0 !important; }
+.cke_toolbar_separator { background: var(--hy-borde) !important; box-shadow: none !important; }
+.cke_combo_text { font-family: var(--hy-fuente) !important; color: var(--hy-texto-2) !important; }
+
+/* Formularios en varias columnas (plantilla sin bordes, ej. filtros): aire entre columnas */
+.ei-form-cuerpo table:not([border]) > tbody > tr > td { padding: 0 16px 0 0; vertical-align: top; }
+
+/* ==========================================================================
+   Inicio (php/item_inicial.php)
+   ========================================================================== */
+
+.hy-inicio { max-width: 760px; margin: 8px auto 24px; text-align: left; color: var(--hy-texto); }
+.hy-inicio-saludo { margin: 8px 0 20px; }
+.hy-inicio-sistema { margin: 0 0 4px; font-size: 13px; font-weight: 600; color: var(--hy-azul); letter-spacing: .2px; }
+.hy-inicio-saludo h1 { margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -.2px; color: var(--hy-texto); }
+.hy-inicio-bajada { margin: 6px 0 0; font-size: 15px; color: var(--hy-tenue); }
+
+.hy-tarjeta {
+	background: var(--hy-superficie);
+	border: 1px solid var(--hy-borde);
+	border-radius: var(--hy-radio);
+	box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+	padding: 20px 24px;
+	margin: 0 0 16px;
+}
+.hy-tarjeta h2 { margin: 0; font-size: 17px; font-weight: 600; color: var(--hy-texto); }
+.hy-tarjeta p { margin: 8px 0 0; font-size: 14px; line-height: 1.55; color: var(--hy-texto-2); }
+
+.hy-instructivo { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.hy-instructivo p { margin-top: 4px; }
+
+.hy-boton-primario, .hy-boton-primario:visited {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 9px 16px;
+	border-radius: 8px;
+	background: var(--hy-azul);
+	color: #fff !important;
+	font-size: 14px;
+	font-weight: 600;
+	text-decoration: none;
+	white-space: nowrap;
+}
+.hy-boton-primario:hover { background: var(--hy-azul-fuerte); }
+
+.hy-fuente { font-size: 13px !important; color: var(--hy-tenue) !important; margin-top: 2px !important; }
+
+.hy-fechas { list-style: none; margin: 16px 0 0; padding: 0; border: 1px solid var(--hy-borde); border-radius: 8px; overflow: hidden; }
+.hy-fechas li {
+	display: grid;
+	grid-template-columns: 200px 1fr;
+	gap: 16px;
+	align-items: baseline;
+	padding: 12px 16px;
+	border-bottom: 1px solid var(--hy-borde);
+	font-size: 14px;
+}
+.hy-fechas li:last-child { border-bottom: 0; }
+.hy-fecha { font-weight: 600; color: var(--hy-azul-tinta); white-space: nowrap; }
+.hy-que { color: var(--hy-texto-2); line-height: 1.45; }
+.hy-que strong { color: var(--hy-texto); font-weight: 600; }
+.hy-nota { font-size: 13px !important; color: var(--hy-tenue) !important; margin-top: 12px !important; }
+
+@media (max-width: 640px) {
+	.hy-fechas li { grid-template-columns: 1fr; gap: 2px; }
+}
+.hy-guias { display: flex; flex-wrap: wrap; gap: 8px; }

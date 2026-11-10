@@ -1,107 +1,83 @@
 <?php
-    // We use HTML Entities (e.g., &eacute;) to guarantee compatibility with SIU-Toba encoding
-    
-    echo '<style>
-        .container {
-            width: 100%;
-            max-width: 750px;
-            margin: 0 auto;
-            padding: 20px;
-            box-sizing: border-box;
-            font-family: Arial, Helvetica, sans-serif;
-            text-align: left; /* Ensures everything starts from the left */
-        }
-        .card {
-            background-color: #ffffff;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            text-align: left; /* Fixes centering */
-        }
-        .card h2 {
-            color: #001f3f;
-            font-size: 20px;
-            margin-top: 0;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-        .card h3 {
-            color: #004080;
-            font-size: 16px;
-            margin: 15px 0 5px 0;
-        }
-        .card p, .card li {
-            color: #333;
-            font-size: 14px;
-            line-height: 1.5;
-            text-align: left;
-        }
-        .logo {
-            text-align: center; /* Logo remains centered */
-            margin-bottom: 20px;
-        }
-        .link-button {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 8px 15px;
-            background-color: #001f3f;
-            color: white !important;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-        ul {
-            margin: 10px 0;
-            padding-left: 25px;
-        }
-    </style>';
+/**
+ * Pantalla de inicio de catedras.
+ *
+ * Saludo, la guia de uso que corresponde a cada perfil (www/ayuda/: docentes,
+ * departamentos, Secretaria Academica; admin ve las tres) y las fechas de las
+ * Obligaciones Docentes (Anexo I del Calendario Academico CRUB 1719/25).
+ *
+ * Los estilos estan en www/css/huayca.css (seccion "Inicio"), con el resto del
+ * tema. Archivo en ASCII: los acentos van como entidades HTML.
+ */
 
-echo '<div class="container">';
+$perfil_usuario = toba::usuario()->get_perfiles_funcionales();
+$nombre_completo = texto_plano(toba::usuario()->get_nombre());
 
+$perfil_usuario_lower = array_map('strtolower', $perfil_usuario);
+$perfiles_deptos = array('biologiageneral','botanica','didactica','ecologia','educacionfisica','enfermeria','estadistica','explotacionderecursosacuaticos','fisica','geologiaypetroleo','idiomasextranjerosconpropositosespecificos','ingenieriacivil','matematica','politicaeducacional','psicologia','quimica','zoologia');
 
-    $perfil_usuario = toba::usuario()->get_perfiles_funcionales();
-    $nombre_completo = toba::usuario()->get_nombre();
-    $url_instructivo = "https://docs.google.com/document/d/e/2PACX-1vTryfOO8lS7F6OgRxtef33SBe59Mz_pvmH8vXMCQt5t6GxhMQDWGbwwnUg3fZhzn2DbOyf_QOKXFLqx/pub";
+$es_admin = in_array("admin", $perfil_usuario_lower);
+$es_docente = in_array("docente", $perfil_usuario_lower) || in_array("docentefadel", $perfil_usuario_lower);
+$es_depto = count(array_intersect($perfil_usuario_lower, $perfiles_deptos)) > 0;
+$es_sac = count(array_intersect($perfil_usuario_lower, array('sac', 'saccrub', 'sacfadel'))) > 0;
+$ve_obligaciones = $es_admin || $es_docente || $es_depto || $es_sac;
 
-    $perfil_usuario_lower = array_map('strtolower', $perfil_usuario);
-    $perfiles_deptos = array('biologiageneral','botanica','didactica','ecologia','educacionfisica','enfermeria','estadistica','explotacionderecursosacuaticos','fisica','geologiaypetroleo','idiomasextranjerosconpropositosespecificos','ingenieriacivil','matematica','politicaeducacional','psicologia','quimica','zoologia');
+// Guias de uso (www/ayuda/), segun el perfil
+$guias = array();
+if ($es_admin || $es_docente) { $guias['docentes.html'] = 'Gu&iacute;a para docentes'; }
+if ($es_admin || $es_depto) { $guias['departamentos.html'] = 'Gu&iacute;a para departamentos'; }
+if ($es_admin || $es_sac) { $guias['sac.html'] = 'Gu&iacute;a para la Secretar&iacute;a Acad&eacute;mica'; }
+$url_ayuda = toba_recurso::url_proyecto() . '/ayuda/';
 
-    $es_admin = in_array("admin", $perfil_usuario_lower);
-    $es_docente = in_array("docente", $perfil_usuario_lower) || in_array("docentefadel", $perfil_usuario_lower);
-    $es_depto = count(array_intersect($perfil_usuario_lower, $perfiles_deptos)) > 0;
+echo '<div class="hy-inicio">';
 
-    // --- CARD 1: USUARIO & INSTRUCTIVO ---
-    echo '<div class="card">';
-    echo '<h2>' . $nombre_completo . '</h2>';
+// --- Saludo ---
+echo '<header class="hy-inicio-saludo">';
+echo '<p class="hy-inicio-sistema">C&aacute;tedras &middot; CRUB</p>';
+echo '<h1>Hola, ' . $nombre_completo . '</h1>';
+echo '<p class="hy-inicio-bajada">Programas, planificaciones e informes de c&aacute;tedra. Eleg&iacute; una opci&oacute;n del men&uacute; para empezar.</p>';
+echo '</header>';
 
-    if ($es_admin || $es_docente || $es_depto) {
-        // Text using HTML entities for accents
-        echo '<p>Pod&eacute;s acceder al <strong>instructivo de carga</strong> para el sistema Huayca a trav&eacute;s del siguiente enlace:</p>';
-        echo '<a href="'.$url_instructivo.'" target="_blank" class="link-button">Abrir Instructivo</a>';
-    }
-    echo '</div>';
+if ($guias) {
+	// --- Guia de uso ---
+	echo '<section class="hy-tarjeta hy-instructivo">';
+	echo '<div>';
+	echo '<h2>C&oacute;mo usar C&aacute;tedras</h2>';
+	echo '<p>Una gu&iacute;a corta para presentar, revisar y aprobar programas, planificaciones e informes.</p>';
+	echo '</div>';
+	echo '<div class="hy-guias">';
+	foreach ($guias as $archivo => $titulo) {
+		echo '<a href="' . $url_ayuda . $archivo . '" target="_blank" rel="noopener" class="hy-boton-primario">' . $titulo . ' <span aria-hidden="true">&#8599;</span></a>';
+	}
+	echo '</div>';
+	echo '</section>';
+}
 
-    // --- CARD 2: OBLIGACIONES DOCENTES ---
-    if ($es_admin || $es_docente || $es_depto) {
-        echo '<div class="card">';
-        echo '<h2>Oblicaciones Docentes (ANEXO I - Calendario Acad&eacute;mico CRUB 1719/25)</h2>';
-        echo '<p>Se solicita a los/as Profesores/as encargados/as de c&aacute;tedra el estricto cumplimiento de las fechas establecidas.</p>';
-        
-        echo '<h3>Presentaci&oacute;n de Programas y Planificaciones Acad&eacute;micas</h3>';
-        echo '<p>A trav&eacute;s de sistema Huayca a Directores/as o Delegados/as Departamentales:</p>';
-        echo '<ul>
-                <li><strong>Asignaturas del Primer Cuatrimestre y Anuales:</strong> Del 18 de febrero al 6 de marzo</li>
-                <li><strong>Asignaturas del Segundo Cuatrimestre:</strong> Del 27 de julio al 7 de agosto</li>
-              </ul>';
+if ($ve_obligaciones) {
+	// --- Obligaciones docentes ---
+	echo '<section class="hy-tarjeta">';
+	echo '<h2>Obligaciones docentes</h2>';
+	echo '<p class="hy-fuente">Anexo I &middot; Calendario Acad&eacute;mico CRUB 1719/25</p>';
+	echo '<p>Se solicita a los/as Profesores/as encargados/as de c&aacute;tedra el estricto cumplimiento de las fechas establecidas.</p>';
 
+	echo '<ul class="hy-fechas">';
+	echo '<li>'
+		. '<span class="hy-fecha">18 de febrero &ndash; 6 de marzo</span>'
+		. '<span class="hy-que"><strong>Programas y planificaciones</strong> &middot; asignaturas del primer cuatrimestre y anuales</span>'
+		. '</li>';
+	echo '<li>'
+		. '<span class="hy-fecha">27 de julio &ndash; 7 de agosto</span>'
+		. '<span class="hy-que"><strong>Programas y planificaciones</strong> &middot; asignaturas del segundo cuatrimestre</span>'
+		. '</li>';
+	echo '<li>'
+		. '<span class="hy-fecha">Hasta el 11 de diciembre</span>'
+		. '<span class="hy-que"><strong>Informe de c&aacute;tedra</strong> &middot; asignaturas de 1&deg; y 2&deg; cuatrimestre y anuales</span>'
+		. '</li>';
+	echo '</ul>';
 
-        echo '<h3>Presentaci&oacute;n Informe de C&aacute;tedra</h3>';
-        echo '<p>A trav&eacute;s de sistema Huayca (Asignaturas 1&deg;, 2&deg; Cuatrimestre y Anuales):</p>';
-        echo '<ul><li><strong>Hasta el 11 de diciembre</strong></li></ul>';
-        echo '</div>';
-    }
+	echo '<p class="hy-nota">Programas y planificaciones se presentan a trav&eacute;s de Huayca a Directores/as o Delegados/as Departamentales.</p>';
+	echo '</section>';
+}
 
 echo '</div>';
 ?>
