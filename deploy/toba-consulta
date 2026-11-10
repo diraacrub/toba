@@ -1,0 +1,89 @@
+#!/usr/bin/python3 -I
+"""
+Acceso de solo lectura a la base de Toba (catedras) en huayca, para Claude Code.
+
+Es lo unico que puede ejecutar la clave claude_huayca_toba (forced command en
+~/.ssh/authorized_keys). El pedido llega en SSH_ORIGINAL_COMMAND:
+
+    bases                     muestra los bases.ini de Toba, con la clave tapada
+    dump BASE [SCHEMA ...]    pg_dump -Fc de BASE (solo esos schemas si se dan)
+
+La contraseña de la base se lee del bases.ini aca, en el servidor, y va a
+pg_dump por PGPASSWORD: no viaja por SSH ni aparece en argumentos.
+
+pg_dump no escribe en la base. No hay ningun otro comando.
+
+Ver deploy/INSTALAR-acceso-claude.md.
+"""
+
+import configparser
+import glob
+import os
+import re
+import sys
+
+RAICES = ["/var/www", "/var/local", "/home", "/opt", "/srv", "/usr/local"]
+NOMBRE = re.compile(r"^[A-Za-z0-9_]{1,63}$")
+
+
+def archivos_bases():
+    vistos = []
+    for raiz in RAICES:
+        for f in glob.glob(f"{raiz}/**/instalacion/bases.ini", recursive=True):
+            r = os.path.realpath(f)
+            if r not in vistos and os.access(r, os.R_OK):
+                vistos.append(r)
+    return vistos
+
+
+def leer(f):
+    cp = configparser.RawConfigParser(strict=False, interpolation=None)
+    cp.read(f, encoding="latin-1")
+    return {s: {k: v.strip().strip('"').strip("'") for k, v in cp.items(s)}
+            for s in cp.sections()}
+
+
+def cmd_bases():
+    fs = archivos_bases()
+    if not fs:
+        print("No encontre ningun instalacion/bases.ini legible.")
+    for f in fs:
+        print(f"== {f}")
+        for s, kv in leer(f).items():
+            print(f"[{s}]")
+            for k, v in kv.items():
+                print(f"  {k} = {'***' if k in ('clave', 'password') else v}")
+
+
+def cmd_dump(base, schemas):
+    for n in [base, *schemas]:
+        if not NOMBRE.match(n):
+            sys.exit(f"Nombre invalido: {n!r}")
+    for f in archivos_bases():
+        for kv in leer(f).values():
+            if kv.get("base") == base:
+                env = dict(os.environ, PGPASSWORD=kv.get("clave", ""))
+                argv = ["pg_dump", "-Fc", "--no-owner", "--no-privileges",
+                        "-h", kv.get("profile") or "localhost",
+                        "-p", kv.get("puerto") or "5432",
+                        "-U", kv.get("usuario") or "postgres"]
+                for s in schemas:
+                    argv += ["-n", s]
+                argv.append(base)
+                sys.stdout.flush()
+                os.execvpe("pg_dump", argv, env)
+    sys.exit(f"La base {base!r} no figura en ningun bases.ini.")
+
+
+def main():
+    partes = os.environ.get("SSH_ORIGINAL_COMMAND", "").split()
+    if partes == ["bases"]:
+        cmd_bases()
+    elif len(partes) >= 2 and partes[0] == "dump":
+        cmd_dump(partes[1], partes[2:])
+    else:
+        sys.exit("Uso: bases | dump BASE [SCHEMA ...]")
+
+
+if __name__ == "__main__":
+    main()

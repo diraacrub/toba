@@ -1,4 +1,22 @@
+# Dependencias (composer install / yarn)
 vendor
+node_modules
+composer.phar
+
+# Instalacion local de Toba: bases.ini tiene claves, logs y config por maquina
+instalacion
+parameters.yml
+
+# Temporales y logs generados en runtime
+temp
+www/temp
+*.log
+
+# Dumps de base (copias de prod con datos personales)
+*.dump
+*.backup
+
+# IDEs
 .idea
 *.iml
-instalacion
+.vscode
