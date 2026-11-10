@@ -19,6 +19,82 @@ class modelo_programa {
         return strtr($string, $unwanted_array);
     }
 
+    // ------------------------------------------------------------------
+    // Programas del formulario integrado (operacion "Programas y
+    // Planificaciones", ci_programas_y_planif).
+    //
+    // El programa se guarda en la misma fila de 'programas' que el
+    // formulario separado, con el mismo circuito de estados, asi que la API
+    // lo trata igual. La unica diferencia de formato es equipo_catedra: el
+    // formulario integrado lo guarda como JSON, una fila por docente
+    // [apellido, nombre, legajo, cargo, dedicacion] (sin el responsable,
+    // que sigue en apellido_resp/nombre_resp/cargo_resp).
+    //
+    // Para que los consumidores sigan recibiendo lo de siempre, la API lo
+    // devuelve como texto, un docente por linea ("APELLIDO, NOMBRE - PAD3"),
+    // y agrega:
+    //   - formulario: "integrado" | "separado"
+    //   - equipo_catedra_lista: [{apellido, nombre, cargo, dedicacion}] en
+    //     los integrados (sin legajos), null en los separados.
+    // Los datos vienen de la base en LATIN1, como el resto de los campos.
+    // ------------------------------------------------------------------
+
+    static function equipo_desde_json($valor) {
+        if (!is_string($valor) || substr(ltrim($valor), 0, 1) !== '[') {
+            return null;
+        }
+        $filas = json_decode(mb_convert_encoding($valor, 'UTF-8', 'ISO-8859-1'), true);
+        return is_array($filas) ? $filas : null;
+    }
+
+    static function normalizar_programa($programa) {
+        if (!is_array($programa) || !array_key_exists('equipo_catedra', $programa)) {
+            return $programa;
+        }
+        $filas = self::equipo_desde_json($programa['equipo_catedra']);
+        if ($filas === null) {
+            $programa['formulario'] = 'separado';
+            $programa['equipo_catedra_lista'] = null;
+            return $programa;
+        }
+        $lineas = array();
+        $lista = array();
+        foreach ($filas as $fila) {
+            if (!is_array($fila)) {
+                continue;
+            }
+            $apellido = trim((string) ($fila[0] ?? ''));
+            $nombre = trim((string) ($fila[1] ?? ''));
+            $cargo = trim((string) ($fila[3] ?? ''));
+            $dedicacion = trim((string) ($fila[4] ?? ''));
+            if ($apellido === '' && $nombre === '') {
+                continue;
+            }
+            $linea = $apellido . ($nombre !== '' ? ', ' . $nombre : '');
+            if ($cargo !== '' || $dedicacion !== '') {
+                $linea .= ' - ' . $cargo . $dedicacion;
+            }
+            $lineas[] = mb_convert_encoding($linea, 'ISO-8859-1', 'UTF-8');
+            $lista[] = array(
+                'apellido' => mb_convert_encoding($apellido, 'ISO-8859-1', 'UTF-8'),
+                'nombre' => mb_convert_encoding($nombre, 'ISO-8859-1', 'UTF-8'),
+                'cargo' => $cargo,
+                'dedicacion' => $dedicacion,
+            );
+        }
+        $programa['equipo_catedra'] = implode("\n", $lineas);
+        $programa['formulario'] = 'integrado';
+        $programa['equipo_catedra_lista'] = $lista;
+        return $programa;
+    }
+
+    static function normalizar_programas($programas) {
+        if (!is_array($programas)) {
+            return $programas;
+        }
+        return array_map(array('modelo_programa', 'normalizar_programa'), $programas);
+    }
+
     // Función para traer todos los programas junto con los datos de la materia asociada (información completa)
     static function get_programas_con_materia() {
         $sql = "SELECT p.*, m.* 

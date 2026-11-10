@@ -91,6 +91,10 @@ class recurso_programas implements modelable
                 }
             }
         }
+        // Programas del formulario integrado: equipo_catedra como texto, igual que los demas
+        if (!$reducido) {
+            $programas = modelo_programa::normalizar_programas($programas);
+        }
         rest::response()->get($programas);
     }
 
@@ -98,6 +102,6 @@ class recurso_programas implements modelable
     // Se invoca, por ejemplo, con GET /rest/programas/{id}
     static function get($id){
         $programa = modelo_programa::get_programa_con_materia($id);
-        rest::response()->get($programa);
+        rest::response()->get(modelo_programa::normalizar_programa($programa));
     }
 }
