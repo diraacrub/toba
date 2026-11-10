@@ -32,7 +32,7 @@ import sys
 RAICES = ["/var/www", "/var/local", "/home", "/opt", "/srv", "/usr/local"]
 NOMBRE = re.compile(r"^[A-Za-z0-9_]{1,63}$")
 
-RAIZ_TOBA = "/home/huayca/toba-desarrollo"
+RAIZ_TOBA = "/opt/catedras"
 MAX_BYTES = 2 * 1024 * 1024
 PROHIBIDOS = re.compile(r"(^bases\.ini$|\.(key|pem|p12|pfx)$)", re.I)
 PEM = re.compile(r"(-----BEGIN [A-Z ]*PRIVATE KEY-----).*?(-----END [A-Z ]*PRIVATE KEY-----)", re.S)

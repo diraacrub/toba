@@ -3,7 +3,7 @@
 `deploy/toba-consulta` es lo único que puede ejecutar la clave
 `~/.ssh/claude_huayca_toba`: listar los `bases.ini` de Toba (con la clave
 tapada), hacer `pg_dump` de una base que figure en ellos, y listar o leer
-archivos dentro de `/home/huayca/toba-desarrollo` (sin `bases.ini` ni archivos
+archivos dentro de `/opt/catedras` (sin `bases.ini` ni archivos
 de llaves; tapa llaves privadas y valores de clave/password/secret fuera del
 código PHP). No da shell ni escribe nada.
 
@@ -34,7 +34,7 @@ K="ssh -i $HOME/.ssh/claude_huayca_toba -o IdentitiesOnly=yes huayca@huayca.crub
 $K bases                                  # ver bases.ini (clave tapada)
 $K dump toba_3_4 > prod.dump              # base completa
 $K dump toba_3_4 huayca > prod.dump       # solo un schema
-$K ls instalacion                         # listar (relativo a toba-desarrollo)
+$K ls instalacion                         # listar (relativo a /opt/catedras)  
 $K ver instalacion/instalacion.ini        # leer, con secretos tapados
 ```
 
