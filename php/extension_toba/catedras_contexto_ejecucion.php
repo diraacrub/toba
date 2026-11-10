@@ -15,7 +15,36 @@ require_once __DIR__ . '/catedras_autenticacion_keycloak.php';
 
 class catedras_contexto_ejecucion extends toba_contexto_ejecucion
 {
+	// Opciones del menu que abren un sitio externo en una pestana nueva, en vez
+	// de reemplazar la de Toba (asi no se pierde la navegacion). El window.open
+	// sale del clic en el menu, por eso el navegador no lo bloquea.
+	// item => url
+	private static $menu_externo = array(
+		'3516' => 'https://huayca.crub.uncoma.edu.ar/programas/',	// APROBADOS CRUB > Ver Programas Aprobados
+	);
+
 	function conf__inicial()
+	{
+		$this->configurar_autenticacion();
+		$this->configurar_menu();
+	}
+
+	protected function configurar_menu()
+	{
+		if (PHP_SAPI === 'cli' || toba_nucleo::instancia()->es_acceso_rest()
+				|| !toba::manejador_sesiones()->existe_usuario_activo()) {
+			return;
+		}
+		$menu = toba::menu();
+		foreach (self::$menu_externo as $item => $url) {
+			// Va dentro de onclick='...': sin comillas simples
+			$menu->set_datos_opcion($item, array(
+				'js' => 'window.open("' . $url . '", "_blank", "noopener"); return false;',
+			));
+		}
+	}
+
+	protected function configurar_autenticacion()
 	{
 		$tipo = toba::instalacion()->get_tipo_autenticacion();
 		if ($tipo === 'saml_onelogin') {
