@@ -686,6 +686,8 @@ function get_listado_control_depto_excepciones($filtro=array())
 	}
 	
 	// todos los programas con estado docente
+	//SE PUEDEN VER LAS INGENIERIAS OJO
+	// AGREGAR ESTE AND:  AND t_m.cod_carrera NOT LIKE 'I%'                  
 	function get_listado_estado_docente()
 	{
 			$sql = "SELECT
@@ -697,9 +699,8 @@ function get_listado_control_depto_excepciones($filtro=array())
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
 			t_p.estado = 'docente'
-			AND t_m.cod_carrera NOT LIKE 'I%'                
 			AND (t_p.observaciones IS NULL
-				OR t_p.observaciones NOT ILIKE '%[ocultar]%')
+			OR t_p.observaciones NOT ILIKE '%[ocultar]%')
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 		
@@ -911,6 +912,8 @@ function get_listado_para_imprimir_publico($filtro = "")
 
 	
 	//---- Nuevo método para obtener datos específicos de un programa ----
+
+	//MUESTRA LOS DE INGENIERÍA LE SAQUÉ ESTE AND: AND t_m.cod_carrera NOT LIKE 'I%'
 	
 	function get_datos_programa($id_programa)
 {
@@ -923,8 +926,6 @@ function get_listado_para_imprimir_publico($filtro = "")
 		materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 	WHERE
 		(t_p.observaciones IS NULL OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
-		AND
-		t_m.cod_carrera NOT LIKE 'I%'
 		AND t_p.id_programa = " . quote($id_programa);
 		
 	return toba::db('catedras')->consultar_fila($sql);
@@ -968,7 +969,7 @@ function get_listado_para_imprimir_publico($filtro = "")
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
 			t_p.legajo_resp = " . quote($usuario_id) . "
-			AND t_p.estado IN ('depto', 'sac')
+			AND t_p.estado IN ('depto', 'sac','aprobado')
 			AND t_m.cod_carrera NOT LIKE 'I%'
 			AND (t_p.observaciones IS NULL
 				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
@@ -1362,7 +1363,113 @@ ORDER BY
 			$sql = sql_concatenar_where($sql, $where);
 		}
 		return toba::db('catedras')->consultar($sql);
+	
+	
 	}
+	
+///**** PROG Y PLANIF ************
+	
+	
+	
+	function get_datos_programa_integrado($id_programa)
+{
+	$sql = "
+		SELECT
+			-- PROGRAMAS
+			p.id_programa,
+			p.id_designacion,
+			p.id_asignacion,
+			p.legajo_resp,
+			p.dni_resp,
+			p.apellido_resp,
+			p.nombre_resp,
+			p.cargo_resp,
+			p.equipo_catedra,
+			p.id_materia_prog,
+			p.periodo_dictado,
+			p.ano_academico,
+			p.fundamentacion,
+			p.objetivos,
+			p.programa_analitico,
+			p.bibliografia,
+			p.propuesta_metodologica,
+			p.evaluacion_acreditacion,
+			p.distribucion_horaria,
+			p.cronograma_tentativo,
+			p.estado,
+			p.observaciones,
+			p.comentarios,
+			p.firma_doc,
+			p.firma_dto,
+			p.firma_sac,
+			p.horas_teoricas,
+			p.horas_practicas,
+			p.horas_teoricopracticas,
+
+			-- MATERIAS
+			m.id_materia,
+			m.nombre_carrera,
+			m.nombre_materia,
+			m.ano_plan,
+			m.periodo_plan,
+			m.horas_totales,
+			m.horas_semanales,
+			m.depto_principal,
+			m.depto,
+			m.area,
+			m.orientacion,
+			m.contenidos_minimos,
+			m.correlativas_para_cursar,
+			m.correlativas_para_aprobar,
+			m.competencias,
+			m.optativa,
+			m.trayecto,
+			m.cod_carrera,
+			m.plan_guarani,
+			m.version_guarani,
+			m.plan_mocovi,
+			m.plan_ordenanzas,
+			m.cod_guarani,
+			m.observaciones AS observaciones_materia,
+
+			-- PLANIFICACIONES
+			pl.id_planificacion,
+			pl.ano_acad_planif,
+			pl.id_prog_planif,
+			pl.equipo_catedra_planif,
+			pl.dist_horaria_planif,
+			pl.horarios_consulta,
+			pl.otras_tareas,
+			pl.bibliografia_pedida,
+			pl.actividades_internas,
+			pl.actividades_externas,
+			pl.libros_pub,
+			pl.apuntes_pub,
+			pl.guia_trabajos_pub,
+			pl.publicaciones_periodicas,
+			pl.opinion_area,
+			pl.opinion_depto,
+			pl.observaciones_planif,
+			pl.comentarios_planif,
+			pl.estado_planificacion,
+			pl.firma_doc_planif,
+			pl.firma_dto_planif,
+			pl.firma_sac_planif
+
+		FROM huayca.programas AS p
+
+		JOIN huayca.materias AS m
+			ON m.id_materia = p.id_materia_prog
+
+		LEFT JOIN huayca.planificaciones AS pl
+			ON pl.id_prog_planif = p.id_programa
+
+		WHERE p.id_programa = " . quote($id_programa);
+
+	return toba::db('catedras')->consultar_fila($sql);
+}
+	
+	
 	
 	
 	

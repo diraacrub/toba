@@ -1,8 +1,239 @@
 <?php
 class ci_base_operaciones extends catedras_ci
 {
+	
 
+function ini()
+{
+	echo '<script type="text/javascript">
+	(function() {
 
+		function insertarTitulo(id, nombre, textoTitulo, obligatorio) {
+			var cuerpo = document.getElementById(
+				"cuerpo_js_form_" + id + "_" + nombre
+			);
+
+			if (!cuerpo) {
+				return false;
+			}
+
+			var idTexto = "texto_titulo_" + id;
+
+			if (!document.getElementById(idTexto)) {
+				var texto = document.createElement("div");
+
+				texto.id = idTexto;
+
+				texto.style.padding = "10px 10px 10px 5px";
+				texto.style.marginLeft = "-5px";
+				texto.style.color = "#000000";
+				texto.style.fontSize = "11px";
+				texto.style.fontWeight = "bold";
+
+				texto.appendChild(
+					document.createTextNode(textoTitulo + " ")
+				);
+
+				if (obligatorio) {
+					var aviso = document.createElement("span");
+
+					aviso.textContent = "(obligatorio)";
+					aviso.style.color = "#c0392b";
+					aviso.style.fontWeight = "700";
+					
+		
+					texto.appendChild(aviso);
+				}
+
+				cuerpo.parentNode.insertBefore(texto, cuerpo);
+			}
+
+			return true;
+		}
+
+		function insertarTodos() {
+			var equipo = insertarTitulo(
+				2651,
+				"equipo_de_catedra",
+				"Equipo de Cátedra:"
+			);
+
+			var distribucion = insertarTitulo(
+				2658,
+				"dist_hor_planif",
+				"Cuadro de Distribución Horaria:",
+				true
+			);
+
+			var consulta = insertarTitulo(
+				2659,
+				"horario_de_consulta",
+				"Horarios de Consulta de Estudiantes:",
+				true
+			);
+
+			var tareas = insertarTitulo(
+				2662,
+				"otras_tareas",
+				"Otras tareas que realiza cada docente:",
+				true
+			);
+
+			var bibliopedida = insertarTitulo(
+				2664,
+				"bibliografia_pedida",
+				"Pedido de Bibliografia priorizada:"
+			);
+
+		
+			var ver_equipo = insertarTitulo(
+				2684,
+				"ver_equipo_de_catedra",
+				"Equipo de Cátedra:"
+			);
+
+			var ver_distribucion = insertarTitulo(
+				2683,
+				"ver_dist_hor_planif",
+				"Cuadro de Distribución Horaria:",
+				);
+
+			var ver_consulta = insertarTitulo(
+				2687,
+				"ver_horario_de_consulta",
+				"Horarios de Consulta de Estudiantes:",
+			);
+
+			var ver_tareas = insertarTitulo(
+				2688,
+				"ver_otras_tareas",
+				"Otras tareas que realiza cada docente:",
+			);
+
+			var ver_bibliopedida = insertarTitulo(
+				2682,
+				"ver_bibliografia_pedida",
+				"Pedido de Bibliografia priorizada:"
+			);
+		
+		
+		
+			return equipo && distribucion && consulta && tareas && bibliopedida && ver_equipo && ver_distribucion && ver_consulta && ver_tareas && ver_bibliopedida ;
+		}
+
+		var intentos = 0;
+		var intervalo = setInterval(function() {
+			intentos++;
+
+			if (insertarTodos() || intentos >= 50) {
+				clearInterval(intervalo);
+			}
+		}, 200);
+
+		insertarTodos();
+
+	})();
+	</script>';
+}
+
+	
+	
+	
+function ini_viejo()
+{
+	echo '<script type="text/javascript">
+	(function() {
+
+		function insertarTitulo(id, nombre, textoTitulo) {
+			var cuerpo = document.getElementById(
+				"cuerpo_js_form_" + id + "_" + nombre
+			);
+
+			if (!cuerpo) {
+				return false;
+			}
+
+			var idTexto = "texto_titulo_" + id;
+
+			if (!document.getElementById(idTexto)) {
+				var texto = document.createElement("div");
+
+				texto.id = idTexto;
+				texto.textContent = textoTitulo;
+
+				//texto.style.padding = "10px";
+		
+texto.style.padding = "10px 10px 10px 5px";
+texto.style.marginLeft = "-5px";
+				texto.style.color = "#000000";
+				texto.style.fontSize = "11px";
+				texto.style.fontWeight = "bold";
+
+				cuerpo.parentNode.insertBefore(texto, cuerpo);
+			}
+
+			return true;
+		}
+
+		function insertarTodos() {
+			var equipo = insertarTitulo(
+				2651,
+				"equipo_de_catedra",
+				"Equipo de Cátedra:"
+			);
+
+			var distribucion = insertarTitulo(
+				2658,
+				"dist_hor_planif",
+				"Cuadro de Distribución Horaria:"
+			);
+
+			var consulta = insertarTitulo(
+				2659,
+				"horario_de_consulta",
+				"Horarios de Consulta de Estudiantes:"
+			);
+
+			var tareas = insertarTitulo(
+				2662,
+				"otras_tareas",
+				"Otras tareas que realiza cada docente (obligatorio):"
+			);         
+
+			var bibliopedida = insertarTitulo(
+				2664,
+				"bibliografia_pedida",
+				"Pedido de Bibliografia priorizada:"
+			);        
+		
+		
+			return equipo && distribucion && consulta && tareas && bibliopedida;
+		}
+
+		var intentos = 0;
+		var intervalo = setInterval(function() {
+			intentos++;
+
+			if (insertarTodos() || intentos >= 50) {
+				clearInterval(intervalo);
+			}
+		}, 200);
+
+		insertarTodos();
+
+	})();
+	</script>';
+}
+
+	
+		////////////////
+	
+
+	
+	
+	
+	
+	
 //***********************************************************************************************
 	
 	// botones flotantes a la derecha y volver a la izquierda
@@ -1051,7 +1282,7 @@ function ini_tampoco()
 	
 	//***************************************************************************************
 	//***************************************************************************************
-	function ini_hamburgues_para_todes()
+	function ini_hamburgues_para_todes_vieja()
 	//function ini()
 {
 	static $ejecutado = false;

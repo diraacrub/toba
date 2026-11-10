@@ -62,7 +62,7 @@ INSERT INTO apex_objeto_cuadro (objeto_cuadro_proyecto, objeto_cuadro, titulo, s
 	'1', --mostrar_total_registros
 	'0', --eof_invisible
 	NULL, --eof_customizado
-	'0', --siempre_con_titulo
+	'1', --siempre_con_titulo
 	'0', --exportar_paginado
 	'1', --exportar
 	'0', --exportar_rtf
