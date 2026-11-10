@@ -35,8 +35,8 @@ INSERT INTO apex_proyecto (proyecto, descripcion, descripcion_corta, estilo, con
 	NULL, --sesion_subclase
 	NULL, --sesion_subclase_archivo
 	'13', --pm_contexto
-	NULL, --contexto_ejecucion_subclase
-	NULL, --contexto_ejecucion_subclase_archivo
+	'catedras_contexto_ejecucion', --contexto_ejecucion_subclase
+	'extension_toba/catedras_contexto_ejecucion.php', --contexto_ejecucion_subclase_archivo
 	'13', --pm_usuario
 	NULL, --usuario_subclase
 	NULL, --usuario_subclase_archivo

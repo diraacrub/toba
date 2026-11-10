@@ -7,11 +7,18 @@ Es lo unico que puede ejecutar la clave claude_huayca_toba (forced command en
 
     bases                     muestra los bases.ini de Toba, con la clave tapada
     dump BASE [SCHEMA ...]    pg_dump -Fc de BASE (solo esos schemas si se dan)
+    ls [RUTA]                 lista un directorio dentro de RAIZ_TOBA
+    ver RUTA                  muestra un archivo dentro de RAIZ_TOBA
 
 La contraseña de la base se lee del bases.ini aca, en el servidor, y va a
 pg_dump por PGPASSWORD: no viaja por SSH ni aparece en argumentos.
 
-pg_dump no escribe en la base. No hay ningun otro comando.
+`ls` y `ver` solo miran dentro de RAIZ_TOBA (las rutas son relativas a ella y
+no pueden salir por .. ni por enlaces). `ver` no muestra bases.ini ni archivos
+de llaves (.key, .pem, .p12), tapa las llaves privadas PEM de cualquier archivo
+y, fuera del codigo PHP, tapa los valores de clave/password/secret/private.
+
+Nada escribe: pg_dump no modifica la base y no hay ningun otro comando.
 
 Ver deploy/INSTALAR-acceso-claude.md.
 """
@@ -24,6 +31,52 @@ import sys
 
 RAICES = ["/var/www", "/var/local", "/home", "/opt", "/srv", "/usr/local"]
 NOMBRE = re.compile(r"^[A-Za-z0-9_]{1,63}$")
+
+RAIZ_TOBA = "/home/huayca/toba-desarrollo"
+MAX_BYTES = 2 * 1024 * 1024
+PROHIBIDOS = re.compile(r"(^bases\.ini$|\.(key|pem|p12|pfx)$)", re.I)
+PEM = re.compile(r"(-----BEGIN [A-Z ]*PRIVATE KEY-----).*?(-----END [A-Z ]*PRIVATE KEY-----)", re.S)
+SECRETO = re.compile(
+    r"^(\s*[;#]?\s*[\w.\-]*(clave|password|passwd|secret|private)[\w.\-]*\s*[=:]\s*).+$",
+    re.I | re.M)
+
+
+def ruta_segura(rel):
+    if rel.startswith("/") or "\0" in rel:
+        sys.exit("La ruta tiene que ser relativa a " + RAIZ_TOBA)
+    raiz = os.path.realpath(RAIZ_TOBA)
+    r = os.path.realpath(os.path.join(raiz, rel))
+    if r != raiz and not r.startswith(raiz + os.sep):
+        sys.exit("Ruta fuera de " + RAIZ_TOBA)
+    return r
+
+
+def cmd_ls(rel):
+    d = ruta_segura(rel)
+    if not os.path.isdir(d):
+        sys.exit(f"No es un directorio: {rel}")
+    for n in sorted(os.listdir(d)):
+        p = os.path.join(d, n)
+        st = os.lstat(p)
+        tipo = "d" if os.path.isdir(p) else "l" if os.path.islink(p) else "-"
+        print(f"{tipo} {st.st_size:>10} {int(st.st_mtime)} {n}")
+
+
+def cmd_ver(rel):
+    f = ruta_segura(rel)
+    if PROHIBIDOS.search(os.path.basename(f)):
+        sys.exit("Ese archivo no se muestra (claves).")
+    if not os.path.isfile(f):
+        sys.exit(f"No es un archivo: {rel}")
+    if os.path.getsize(f) > MAX_BYTES:
+        sys.exit("Archivo demasiado grande.")
+    with open(f, "rb") as fh:
+        texto = fh.read().decode("latin-1")
+    texto = PEM.sub(r"\1 *** \2", texto)
+    if not f.endswith(".php"):
+        texto = SECRETO.sub(r"\1***", texto)
+    # latin-1 ida y vuelta: salen los mismos bytes del archivo (UTF-8 o LATIN1)
+    sys.stdout.buffer.write(texto.encode("latin-1"))
 
 
 def archivos_bases():
@@ -81,8 +134,12 @@ def main():
         cmd_bases()
     elif len(partes) >= 2 and partes[0] == "dump":
         cmd_dump(partes[1], partes[2:])
+    elif partes[:1] == ["ls"] and len(partes) <= 2:
+        cmd_ls(partes[1] if len(partes) == 2 else ".")
+    elif partes[:1] == ["ver"] and len(partes) == 2:
+        cmd_ver(partes[1])
     else:
-        sys.exit("Uso: bases | dump BASE [SCHEMA ...]")
+        sys.exit("Uso: bases | dump BASE [SCHEMA ...] | ls [RUTA] | ver RUTA")
 
 
 if __name__ == "__main__":

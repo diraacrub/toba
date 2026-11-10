@@ -1,0 +1,19 @@
+; Login de catedras con la cuenta Huayca (Keycloak), en el formulario propio.
+; Copiar a instalacion/keycloak.ini y completar client_secret.
+; Sin ese archivo catedras usa el login comun de Toba.
+; instalacion.ini tiene que dejar la autenticacion comun (sin "saml_onelogin").
+
+[keycloak]
+url = "https://huayca.crub.uncoma.edu.ar/keycloak"
+realm = "CRUB"
+; Cliente OIDC confidencial con "Direct access grants" (realm CRUB)
+client_id = "catedras"
+client_secret = ""
+verify_ssl = 1
+
+; 1 = los usuarios sin DNI cargado (ej. el admin "toba") entran con la clave de Toba
+permite_login_toba = 1
+
+; Pantallas de cuenta Huayca (Quintral). ?app=catedras dice "para entrar a Catedras".
+url_activar = "https://huayca.crub.uncoma.edu.ar/quintral/activate?app=catedras"
+url_reset = "https://huayca.crub.uncoma.edu.ar/quintral/reset-password?app=catedras"
