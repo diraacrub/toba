@@ -78,8 +78,8 @@ a { color: var(--hy-azul-fuerte); }
 /* Menu: arriba, sobre la barra azul, a continuacion de la marca */
 ul#menu-h {
 	top: 0;
-	left: 160px;
-	right: 300px;
+	left: 150px;
+	right: 280px;
 	flex-wrap: nowrap;
 	height: var(--hy-alto-barra);
 	display: flex;
@@ -92,10 +92,10 @@ ul#menu-h > li {
 ul#menu-h a.nivel-0, ul#menu-h a.nivel-0:visited {
 	color: #fff !important;
 	font-family: var(--hy-fuente);
-	font-size: 13.5px;
+	font-size: 13px;
 	font-weight: 500;
 	line-height: 20px;
-	padding: 8px 9px;
+	padding: 8px 7px;
 	border-radius: var(--hy-radio-chico);
 	background: transparent !important;
 	border: 0 !important;
@@ -764,3 +764,44 @@ a.cke_button_on { background: #dbeafe !important; box-shadow: none !important; b
 	.hy-fechas li { grid-template-columns: 1fr; gap: 2px; }
 }
 .hy-guias { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* ==========================================================================
+   Importar usuarios (php/administracion/importar_usuarios.php)
+   ========================================================================== */
+
+.hy-import { max-width: 980px; }
+.hy-import code { font-size: 13px; background: var(--hy-superficie-2); border: 1px solid var(--hy-borde); border-radius: 4px; padding: 0 4px; }
+.hy-import-form { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 14px 0 4px; }
+.hy-import-form input[type=file] { font-size: 14px; }
+.hy-boton-secundario, .hy-boton-secundario:visited {
+	display: inline-flex; align-items: center; padding: 9px 16px; border-radius: 8px;
+	background: var(--hy-superficie); border: 1px solid var(--hy-borde-fuerte);
+	color: var(--hy-texto) !important; font-size: 14px; font-weight: 500; text-decoration: none;
+}
+.hy-boton-secundario:hover { background: var(--hy-superficie-2); }
+button.hy-boton-primario { border: 0; cursor: pointer; font-family: var(--hy-fuente); }
+
+.hy-import-aviso { margin: 0 0 16px; padding: 12px 16px; border-radius: 8px; font-size: 14px; }
+.hy-import-aviso-error { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+.hy-import-aviso-ok { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+
+.hy-import-resumen { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 16px; }
+.hy-chip { padding: 6px 12px; border-radius: 999px; font-size: 14px; border: 1px solid var(--hy-borde); background: var(--hy-superficie-2); color: var(--hy-texto-2); }
+.hy-chip strong { font-size: 15px; color: var(--hy-texto); }
+.hy-chip-nuevo { background: #ecfdf5; border-color: #a7f3d0; }
+.hy-chip-cambio { background: var(--hy-azul-suave); border-color: var(--hy-azul-borde); }
+.hy-chip-problema { background: #fef2f2; border-color: #fecaca; }
+
+.hy-import-grupo { margin: 0 0 12px; border: 1px solid var(--hy-borde); border-radius: 8px; overflow: hidden; }
+.hy-import-grupo summary { cursor: pointer; padding: 10px 14px; font-size: 14px; font-weight: 600; background: var(--hy-superficie-2); }
+.hy-import-tabla { width: 100%; border-collapse: collapse; font-size: 13px; }
+.hy-import-tabla th, .hy-import-tabla td { text-align: left; padding: 7px 10px; border-top: 1px solid var(--hy-borde); vertical-align: top; }
+.hy-import-tabla th { font-size: 12px; color: var(--hy-tenue); font-weight: 600; }
+.hy-import-tabla del { color: #991b1b; }
+.hy-import-tabla ins { color: #065f46; text-decoration: none; font-weight: 600; }
+.hy-import-campo { color: var(--hy-tenue); }
+.hy-import-acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 8px; }
+.hy-import-acciones form { margin: 0; }
+
+/* Selector de proyecto mas angosto, para dejarle lugar al menu */
+.enc-cambio-proy select, .enc-cambio-proy select.ef-combo { max-width: 120px; }
