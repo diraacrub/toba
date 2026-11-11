@@ -290,6 +290,11 @@ input[disabled], textarea[disabled], select[disabled], .ef-input[readonly] {
 	color: var(--hy-tenue);
 }
 .ef-fijo { color: var(--hy-texto); }
+/* Toba pone white-space: nowrap en .ei-form-fila y los campos fijos lo heredan:
+   un texto largo (ej. el historial de Comentarios del Programa) quedaba en una
+   sola linea y ensanchaba la plantilla fuera de la tarjeta. Los fijos cortan
+   lineas; "anywhere" tambien parte URLs o palabras largas sin espacios. */
+.ef-fijo { white-space: normal; overflow-wrap: anywhere; }
 
 /* ---------- Botones ---------- */
 
