@@ -126,8 +126,11 @@ class analisis_por_cargo
 		if (empty($filas)) {
 			return '<em>Sin cargar</em>';
 		}
+		// Solo ASCII (tildes como entidades): el ef_html de Toba pasa el valor por
+		// htmlspecialchars() sin charset, que en PHP 8 asume UTF-8 y cambia cada
+		// byte LATIN1 por U+FFFD ("Nu\xEF\xBF\xBDez" en vez de "Nu&ntilde;ez").
 		$e = function ($v) {
-			return htmlspecialchars((string) $v, ENT_QUOTES, 'ISO-8859-1');
+			return htmlentities((string) $v, ENT_QUOTES, 'ISO-8859-1');
 		};
 		$html = '<table border="1" cellspacing="0" cellpadding="3" class="analisis-por-cargo" '
 			. 'style="border-collapse: collapse; width: 100%; text-align: center; font-size: 12px;">'
