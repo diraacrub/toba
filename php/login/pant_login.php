@@ -4,9 +4,11 @@
  *
  * Con la cuenta Huayca activa (instalacion/keycloak.ini) se ve como las
  * pantallas de cuenta de Huayca (Quintral, deptos): campo azul, el sello,
- * "/huayca", la tarjeta blanca con DNI y contraseña, y abajo los enlaces para
- * activar la cuenta o recuperar la contraseña. El formulario sigue siendo el de
- * Toba (sus efs, su JS, el token CSRF): solo se lo envuelve y se lo reestila.
+ * "/cátedras", la tarjeta blanca con DNI y contraseña, abajo los enlaces para
+ * activar la cuenta o recuperar la contraseña, y al pie la franja institucional
+ * (la misma de las demas paginas: catedras_salida::pie_html()).
+ * El formulario sigue siendo el de Toba (sus efs, su JS, el token CSRF): solo
+ * se lo envuelve y se lo reestila.
  *
  * Sin keycloak.ini queda el layout original de Toba.
  *
@@ -33,10 +35,15 @@ class pant_login extends toba_ei_pantalla
 		$sello = toba_recurso::imagen_proyecto('huayca-sello.png');
 
 		echo $this->estilos_huayca();
+		// La pagina de login de Toba no declara viewport: en el celular se veia
+		// a 980px, chiquita. Se agrega al <head> desde aca.
+		echo "<script>(function(){if(!document.querySelector('meta[name=viewport]')){var m=document.createElement('meta');"
+			. "m.name='viewport';m.content='width=device-width, initial-scale=1';document.head.appendChild(m);}})();</script>";
 		echo "<div class='hc-pagina'>";
+		echo "<div class='hc-centro'>";
 		echo "<header class='hc-marca'>";
 		echo "<img class='hc-sello' src='" . $esc->escapeHtmlAttr($sello) . "' alt='' aria-hidden='true'>";
-		echo "<div><div class='hc-nombre'>/huayca</div><div class='hc-bajada'>Aplicaciones Digitales del CRUB</div></div>";
+		echo "<div><div class='hc-nombre'>/c&aacute;tedras</div><div class='hc-bajada'>Programas, planificaciones e informes</div></div>";
 		echo "</header>";
 
 		echo "<main class='hc-tarjeta'>";
@@ -61,8 +68,9 @@ class pant_login extends toba_ei_pantalla
 		echo "<a href='" . $esc->escapeHtmlAttr($reset) . "'>&iquest;Olvidaste tu contrase&ntilde;a?</a>";
 		echo "</nav>";
 
-		echo "<footer class='hc-pie'>Centro Regional Universitario Bariloche &middot; Universidad Nacional del Comahue</footer>";
-		echo "</div>";
+		echo "</div>";	// .hc-centro
+		echo catedras_salida::pie_html();
+		echo "</div>";	// .hc-pagina
 	}
 
 	protected function generar_layout_toba()
@@ -108,12 +116,22 @@ class pant_login extends toba_ei_pantalla
 html, body { background: var(--hc-azul) !important; margin: 0; }
 body { font-family: system-ui, Avenir, Helvetica, Arial, sans-serif !important; }
 .hc-pagina { color: #fff; }
-#barra-superior, .barra-superior-login, .login-titulo { display: none !important; }
-.cuerpo { padding: 0 !important; margin: 0 !important; }
-.ci-base, .ci-base > tbody > tr > td, .ci-cuerpo, .ci-simple-cont { background: transparent !important; border: 0 !important; padding: 0 !important; width: 100% !important; box-shadow: none !important; }
+/* Lo de Toba alrededor: barra, logo, titulo, y su pie "Desarrollado por SIU-CIN"
+   (quedaba debajo de la pagina y obligaba a hacer scroll) */
+#barra-superior, .barra-superior-login, .login-titulo, .login-pie { display: none !important; }
+html body .cuerpo { padding: 0 !important; margin: 0 !important; overflow: visible; }
+/* El contenedor del ci: sin marco. huayca.css le pone borde y fondo a la tarjeta
+   de las operaciones (.cuerpo > form > table.ci-base) y aca se veia como un
+   marco de 1px alrededor de toda la pagina. */
+html body .cuerpo .ci-base, html body .ci-base > tbody > tr > td, html body .ci-cuerpo, html body .ci-simple-cont {
+	background: transparent !important; border: 0 !important; border-radius: 0 !important; padding: 0 !important;
+	width: 100% !important; min-width: 0 !important; margin: 0 !important; box-shadow: none !important; }
 .ci-base > tbody > tr > td > .ei-barra-sup { display: none !important; }
 
-.hc-pagina { font-size: 16px; line-height: 1.4; min-height: 100vh; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 32px 16px; }
+/* Toda la altura: el bloque central se centra y la franja institucional queda al pie */
+.hc-pagina { font-size: 16px; line-height: 1.4; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+.hc-centro { flex: 1; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 40px 16px 48px; }
+.hc-pagina .hy-pie { margin-top: 0; background: #fff; border-top: 0; text-align: left; }
 .hc-marca, .hc-marca div { color: #fff !important; }
 .hc-marca { display: flex; align-items: center; gap: 16px; max-width: 100%; text-align: left; }
 .hc-sello { width: clamp(64px, 9vw, 92px); height: auto; flex: none; }
@@ -148,11 +166,12 @@ body { font-family: system-ui, Avenir, Helvetica, Arial, sans-serif !important; 
 .hc-enlaces { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: -8px; }
 .hc-enlaces a { color: #fff !important; font-size: 15px; padding: 4px 8px; border-radius: 6px; text-decoration: underline; text-underline-offset: 3px; }
 .hc-enlaces a:hover { background: rgba(255,255,255,.14); }
-.hc-pie { font-size: 13px; color: rgba(255,255,255,.85); text-align: center; }
 
 @media (max-width: 560px) {
-	.hc-pagina { justify-content: flex-start; padding: 24px 16px; }
+	.hc-centro { justify-content: flex-start; padding: 28px 16px 36px; }
 	.hc-marca { flex-direction: column; gap: 8px; text-align: center; }
+	.hc-pagina .hy-pie { padding: 20px 16px; }
+	.hc-pagina .hy-pie-inst img { height: 44px; }
 }
 </style>
 CSS;
