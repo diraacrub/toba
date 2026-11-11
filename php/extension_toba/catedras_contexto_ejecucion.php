@@ -12,6 +12,7 @@
  */
 require_once __DIR__ . '/catedras_autenticacion_saml.php';
 require_once __DIR__ . '/catedras_autenticacion_keycloak.php';
+require_once __DIR__ . '/catedras_salida.php';
 
 class catedras_contexto_ejecucion extends toba_contexto_ejecucion
 {
@@ -27,6 +28,9 @@ class catedras_contexto_ejecucion extends toba_contexto_ejecucion
 	{
 		$this->configurar_autenticacion();
 		$this->configurar_menu();
+		if (PHP_SAPI !== 'cli') {
+			catedras_salida::registrar();	// pie institucional en las paginas
+		}
 	}
 
 	protected function configurar_menu()

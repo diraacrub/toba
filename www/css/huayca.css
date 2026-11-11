@@ -51,7 +51,7 @@ body {
 }
 a { color: var(--hy-azul-fuerte); }
 
-/* ---------- Barra superior: sello, /huayca, menu, usuario ---------- */
+/* ---------- Barra superior: sello, /catedras, menu, usuario ---------- */
 
 /* Bloque comun (no flex): asi el fondo azul pasa por debajo de los elementos
    flotantes de la derecha (proyecto, usuario, salir) en vez de esquivarlos. */
@@ -63,7 +63,7 @@ a { color: var(--hy-azul-fuerte); }
 }
 #enc-logo img { display: none; }
 #enc-logo::before {
-	content: "/huayca";
+	content: "/c\00e1tedras";	/* /catedras; huayca es el servidor, con muchos servicios */
 	display: inline-flex;
 	align-items: center;
 	height: 36px;
@@ -78,7 +78,7 @@ a { color: var(--hy-azul-fuerte); }
 /* Menu: arriba, sobre la barra azul, a continuacion de la marca */
 ul#menu-h {
 	top: 0;
-	left: 150px;
+	left: 184px;	/* despues de la marca "/catedras" */
 	right: 280px;
 	flex-wrap: nowrap;
 	height: var(--hy-alto-barra);
@@ -873,4 +873,35 @@ button.hy-boton-primario { border: 0; cursor: pointer; font-family: var(--hy-fue
 	height: auto;
 	min-height: 38px;
 	max-height: 240px;
+}
+
+/* ==========================================================================
+   Pie: institucion y aplicacion (php/extension_toba/catedras_salida.php)
+   ========================================================================== */
+
+.hy-pie {
+	clear: both;
+	margin-top: 32px;
+	padding: 24px max(var(--hy-margen), calc((100% - var(--hy-columna)) / 2));
+	border-top: 1px solid var(--hy-borde);	/* sobre el fondo de la pagina: sin franja en las paginas cortas */
+	color: var(--hy-tenue);
+	font-size: 13px;
+	line-height: 1.5;
+}
+.hy-pie-col {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px 32px;
+}
+.hy-pie p { margin: 0; }
+.hy-pie strong { color: var(--hy-texto-2); font-weight: 600; }
+.hy-pie-inst { display: flex; align-items: center; gap: 16px; }
+.hy-pie-inst img { display: block; width: auto; height: 56px; }
+.hy-pie-inst p { padding-left: 16px; border-left: 1px solid var(--hy-borde); }
+.hy-pie-app { max-width: 380px; text-align: right; }
+@media (max-width: 760px) {
+	.hy-pie-col { flex-direction: column; align-items: flex-start; }
+	.hy-pie-app { text-align: left; }
 }
