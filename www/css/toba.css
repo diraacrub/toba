@@ -1,4 +1,6 @@
-@import url("huayca.css?v=22"); /* tema Huayca: quitar esta linea para volver al aspecto anterior */
+/* El tema Huayca (huayca.css) ya no se importa desde aca: lo enlaza cada pagina
+   con ?v=<fecha del archivo> (php/extension_toba/catedras_salida.php), para que
+   el navegador no siga con el CSS viejo despues de un deploy. */
 /**
 	Incluir aquí las reglas css propias de este proyecto 
 */
