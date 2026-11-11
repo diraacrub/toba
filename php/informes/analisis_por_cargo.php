@@ -5,8 +5,11 @@
  * Se guarda en informes.analisis_por_cargo como JSON: una lista de objetos con
  * las claves de self::$columnas. Dentro del JSON los textos van en UTF-8
  * escapados como \uXXXX, asi el JSON es ASCII y pasa sin cambios por la base
- * LATIN1. La aplicacion trabaja en LATIN1: filas() devuelve los textos en
- * LATIN1 y a_json() los recibe asi.
+ * LATIN1. La aplicacion trabaja en LATIN1, pero lo que manda el navegador en
+ * una pagina "ISO-8859-1" es en realidad Windows-1252 (comillas y guiones de
+ * Word, euro); por eso filas() devuelve y a_json() recibe Windows-1252. Lo que
+ * no entra en Windows-1252 (emojis, etc.) el navegador lo manda como "&#N;":
+ * a_json() lo guarda como el caracter real y filas() lo devuelve como "&#N;".
  *
  * Los informes cargados antes del ML tenian una tabla HTML; html() la muestra
  * tal cual y desde_html() la convierte en filas (ver deploy/convertir_analisis_por_cargo.php).
@@ -58,6 +61,28 @@ class analisis_por_cargo
 	 */
 	static function filas($valor)
 	{
+		$filas = self::filas_utf8($valor);
+		if (! is_array($filas)) {
+			return $filas;
+		}
+		$anterior = mb_substitute_character();
+		mb_substitute_character('entity');
+		foreach ($filas as $i => $fila) {
+			foreach ($fila as $columna => $v) {
+				if (is_string($v)) {
+					$filas[$i][$columna] = mb_convert_encoding($v, 'Windows-1252', 'UTF-8');
+				}
+			}
+		}
+		mb_substitute_character($anterior);
+		return $filas;
+	}
+
+	/**
+	 * Como filas(), pero con los textos en UTF-8 tal como estan en el JSON.
+	 */
+	protected static function filas_utf8($valor)
+	{
 		if (! is_string($valor) || trim($valor) === '') {
 			return array();
 		}
@@ -72,8 +97,7 @@ class analisis_por_cargo
 			}
 			$limpia = array();
 			foreach (self::$columnas as $columna) {
-				$v = isset($fila[$columna]) ? $fila[$columna] : null;
-				$limpia[$columna] = is_string($v) ? mb_convert_encoding($v, 'ISO-8859-1', 'UTF-8') : $v;
+				$limpia[$columna] = isset($fila[$columna]) ? $fila[$columna] : null;
 			}
 			$salida[] = $limpia;
 		}
@@ -81,7 +105,7 @@ class analisis_por_cargo
 	}
 
 	/**
-	 * Filas (textos en LATIN1, por ejemplo lo que devuelve el ML) -> JSON.
+	 * Filas (textos en Windows-1252, por ejemplo lo que devuelve el ML) -> JSON.
 	 * Devuelve null si no hay filas.
 	 */
 	static function a_json($filas)
@@ -93,7 +117,16 @@ class analisis_por_cargo
 				$v = isset($fila[$columna]) ? $fila[$columna] : null;
 				if (is_string($v)) {
 					$v = trim($v);
-					$v = ($v === '') ? null : mb_convert_encoding($v, 'UTF-8', 'ISO-8859-1');
+					if ($v === '') {
+						$v = null;
+					} else {
+						$v = mb_convert_encoding($v, 'UTF-8', 'Windows-1252');
+						// "&#N;" / "&#xN;": caracteres que no entran en Windows-1252
+						$v = preg_replace_callback('/&#(x[0-9a-f]+|[0-9]+);/i', function ($m) {
+							$n = ($m[1][0] === 'x' || $m[1][0] === 'X') ? hexdec(substr($m[1], 1)) : (int) $m[1];
+							return ($n > 0 && $n <= 0x10FFFF) ? mb_chr($n, 'UTF-8') : $m[0];
+						}, $v);
+					}
 				}
 				$limpia[$columna] = $v;
 			}
@@ -119,7 +152,7 @@ class analisis_por_cargo
 	 */
 	static function html($valor)
 	{
-		$filas = self::filas($valor);
+		$filas = self::filas_utf8($valor);
 		if ($filas === null) {
 			return $valor;
 		}
@@ -128,9 +161,10 @@ class analisis_por_cargo
 		}
 		// Solo ASCII (tildes como entidades): el ef_html de Toba pasa el valor por
 		// htmlspecialchars() sin charset, que en PHP 8 asume UTF-8 y cambia cada
-		// byte LATIN1 por U+FFFD ("Nu\xEF\xBF\xBDez" en vez de "Nu&ntilde;ez").
+		// byte LATIN1 por U+FFFD ("Nu\xEF\xBF\xBDez" en vez de "Nu&#241;ez").
 		$e = function ($v) {
-			return htmlentities((string) $v, ENT_QUOTES, 'ISO-8859-1');
+			$v = htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+			return mb_encode_numericentity($v, array(0x80, 0x10FFFF, 0, 0x1FFFFF), 'UTF-8');
 		};
 		$html = '<table border="1" cellspacing="0" cellpadding="3" class="analisis-por-cargo" '
 			. 'style="border-collapse: collapse; width: 100%; text-align: center; font-size: 12px;">'
