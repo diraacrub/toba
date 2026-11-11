@@ -261,6 +261,18 @@ INSERT INTO apex_objeto_dependencias (proyecto, dep_id, objeto_consumidor, objet
 );
 INSERT INTO apex_objeto_dependencias (proyecto, dep_id, objeto_consumidor, objeto_proveedor, identificador, parametros_a, parametros_b, parametros_c, inicializar, orden) VALUES (
 	'catedras', --proyecto
+	'1561', --dep_id
+	'2695', --objeto_consumidor
+	'2697', --objeto_proveedor
+	'form_cierre', --identificador
+	NULL, --parametros_a
+	NULL, --parametros_b
+	NULL, --parametros_c
+	NULL, --inicializar
+	NULL  --orden
+);
+INSERT INTO apex_objeto_dependencias (proyecto, dep_id, objeto_consumidor, objeto_proveedor, identificador, parametros_a, parametros_b, parametros_c, inicializar, orden) VALUES (
+	'catedras', --proyecto
 	'1558', --dep_id
 	'2695', --objeto_consumidor
 	'2693', --objeto_proveedor
@@ -365,6 +377,13 @@ INSERT INTO apex_objetos_pantalla (proyecto, pantalla, objeto_ci, orden, dep_id)
 	'2695', --objeto_ci
 	'1', --orden
 	'1560'  --dep_id
+);
+INSERT INTO apex_objetos_pantalla (proyecto, pantalla, objeto_ci, orden, dep_id) VALUES (
+	'catedras', --proyecto
+	'1320', --pantalla
+	'2695', --objeto_ci
+	'2', --orden
+	'1561'  --dep_id
 );
 INSERT INTO apex_objetos_pantalla (proyecto, pantalla, objeto_ci, orden, dep_id) VALUES (
 	'catedras', --proyecto

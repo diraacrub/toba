@@ -544,6 +544,14 @@ table.ei-cuadro-cuerpo {
 /* El cuerpo del formulario usa el ancho disponible (hasta una medida de lectura) */
 .ei-form-cuerpo { width: auto !important; max-width: 880px; margin: 0 auto; padding: 8px 4px !important; }
 
+/* Campos numericos dentro de plantillas en tabla (ej. punto 1 del informe de catedra):
+   se achican con la celda en vez de ensanchar la tabla fuera del formulario */
+.ei-form-cuerpo td input.ef-numero { width: 100%; max-width: 160px; }
+
+/* Informe de catedra: el ML del punto 11 (analisis por cargo) va en la misma
+   columna que los formularios de arriba y abajo; las columnas se ven con scroll */
+#cuerpo_js_form_2696_analisis_por_cargo { max-width: 800px; margin: 0 auto; }
+
 /* Etiqueta arriba del campo (Toba la pone a la izquierda con un ancho fijo) */
 .ei-form-fila { padding: 0 !important; margin: 0 0 16px; }
 .ei-form-fila > label.ei-form-etiq, .ei-form-fila > label.ei-form-etiq-oblig {

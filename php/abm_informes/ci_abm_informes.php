@@ -54,7 +54,10 @@ class ci_abm_informes extends ci_base_operaciones
 	function conf__formulario(toba_ei_formulario $form)
 	{
 		if ($this->dep('datos')->esta_cargada()) {
-			$form->set_datos($this->dep('datos')->tabla('informes')->get());
+			// El punto 11 se muestra como tabla (columna virtual, no se guarda desde aca)
+			$tabla = $this->dep('datos')->tabla('informes');
+			$fila = $tabla->agregar_html_por_cargo(array($tabla->get()));
+			$form->set_datos($fila[0]);
 		} else {
 			$this->pantalla()->eliminar_evento('eliminar');
 		}

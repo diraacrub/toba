@@ -385,8 +385,29 @@ function get_datos_informe($id_informe_seleccionado)
 		WHERE
 			t_i.id_informe = " . quote($id_informe_seleccionado);
 	
-	return toba::db('catedras')->consultar_fila($sql);
+	$fila = toba::db('catedras')->consultar_fila($sql);
+	if (is_array($fila)) {
+		$fila = $this->agregar_html_por_cargo(array($fila));
+		$fila = $fila[0];
+	}
+	return $fila;
 }
+
+	/**
+	 * Agrega a cada fila 'analisis_por_cargo_html': el punto 11 (JSON) como tabla
+	 * HTML para las pantallas de solo lectura y los reportes. Es una columna
+	 * virtual: si un formulario la devuelve, el datos_tabla la ignora y el JSON
+	 * guardado no se pisa.
+	 */
+	function agregar_html_por_cargo($filas)
+	{
+		require_once 'informes/analisis_por_cargo.php';
+		foreach ($filas as $i => $fila) {
+			$valor = isset($fila['analisis_por_cargo']) ? $fila['analisis_por_cargo'] : null;
+			$filas[$i]['analisis_por_cargo_html'] = analisis_por_cargo::html($valor);
+		}
+		return $filas;
+	}
 
 	
 	function get_listado_filtrado($usuario_id)

@@ -2934,7 +2934,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'catedras', --objeto_ei_formulario_proyecto
 	'analisis_por_cargo', --identificador
 	'ef_html', --elemento_formulario
-	'analisis_por_cargo', --columnas
+	'analisis_por_cargo_html', --columnas
 	'0', --obligatorio
 	'0', --oculto_relaja_obligatorio
 	'18', --orden

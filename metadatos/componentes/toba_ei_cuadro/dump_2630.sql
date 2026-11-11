@@ -559,7 +559,7 @@ INSERT INTO apex_objeto_ei_cuadro_columna (objeto_cuadro_proyecto, objeto_cuadro
 	'catedras', --objeto_cuadro_proyecto
 	'2630', --objeto_cuadro
 	'2240', --objeto_cuadro_col
-	'analisis_por_cargo', --clave
+	'analisis_por_cargo_html', --clave
 	'17', --orden
 	'Analisis Por Cargo', --titulo
 	'ei-cuadro-col-tit', --estilo_titulo

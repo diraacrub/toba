@@ -1432,8 +1432,8 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'2553', --objeto_ei_formulario
 	'catedras', --objeto_ei_formulario_proyecto
 	'analisis_por_cargo', --identificador
-	'ef_editable_textarea', --elemento_formulario
-	'analisis_por_cargo', --columnas
+	'ef_html', --elemento_formulario
+	'analisis_por_cargo_html', --columnas
 	'0', --obligatorio
 	NULL, --oculto_relaja_obligatorio
 	'16', --orden
@@ -1448,7 +1448,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL, --permitir_html
 	NULL, --deshabilitar_rest_func
 	NULL, --estado_defecto
-	NULL, --solo_lectura
+	'1', --solo_lectura
 	'0', --solo_lectura_modificacion
 	NULL, --carga_metodo
 	NULL, --carga_clase
@@ -1494,7 +1494,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL, --check_ml_toggle
 	NULL, --fijo_sin_estado
 	NULL, --editor_ancho
-	NULL, --editor_alto
+	'250px', --editor_alto
 	NULL, --editor_botonera
 	NULL, --editor_config_file
 	NULL, --selec_cant_minima

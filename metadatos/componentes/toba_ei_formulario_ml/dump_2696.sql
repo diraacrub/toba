@@ -101,7 +101,7 @@ INSERT INTO apex_objeto_ut_formulario (objeto_ut_formulario_proyecto, objeto_ut_
 	NULL, --clase_proyecto
 	NULL, --clase
 	NULL, --auto_reset
-	'850px', --ancho
+	'800px', --ancho
 	NULL, --ancho_etiqueta
 	NULL, --expandir_descripcion
 	NULL, --campo_bl
@@ -111,7 +111,7 @@ INSERT INTO apex_objeto_ut_formulario (objeto_ut_formulario_proyecto, objeto_ut_
 	'1', --filas_agregar_online
 	'0', --filas_agregar_abajo
 	NULL, --filas_agregar_texto
-	'0', --filas_borrar_en_linea
+	'1', --filas_borrar_en_linea
 	NULL, --filas_undo
 	'0', --filas_ordenar
 	'0', --filas_ordenar_en_linea
@@ -242,7 +242,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	NULL, --carga_consulta_php
 	NULL, --carga_sql
 	'catedras', --carga_fuente
-	'AYS,AYP,ASD,PAD,PAS,PTR', --carga_lista
+	'AYS,AYP,JTP,PAD,PAS,PTR', --carga_lista
 	NULL, --carga_col_clave
 	NULL, --carga_col_desc
 	NULL, --carga_maestros
@@ -303,7 +303,7 @@ INSERT INTO apex_objeto_ei_formulario_ef (objeto_ei_formulario_fila, objeto_ei_f
 	'1', --obligatorio
 	'0', --oculto_relaja_obligatorio
 	'3', --orden
-	'Dedicacioón', --etiqueta
+	'Dedicación', --etiqueta
 	NULL, --etiqueta_estilo
 	NULL, --descripcion
 	'0', --colapsado

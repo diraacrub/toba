@@ -8,7 +8,9 @@ function ini()
 	echo '<script type="text/javascript">
 	(function() {
 
-		function insertarTitulo(id, nombre, textoTitulo, obligatorio) {
+		// detalle (opcional): lineas debajo del titulo; cada una es un texto
+		// o {texto: "...", negrita: true}
+		function insertarTitulo(id, nombre, textoTitulo, obligatorio, detalle) {
 			var cuerpo = document.getElementById(
 				"cuerpo_js_form_" + id + "_" + nombre
 			);
@@ -43,6 +45,19 @@ function ini()
 					
 		
 					texto.appendChild(aviso);
+				}
+
+				if (detalle) {
+					for (var i = 0; i < detalle.length; i++) {
+						var linea = document.createElement("div");
+						var item = (typeof detalle[i] === "string") ? {texto: detalle[i]} : detalle[i];
+
+						linea.textContent = item.texto;
+						linea.style.fontWeight = item.negrita ? "bold" : "normal";
+						linea.style.marginTop = "3px";
+
+						texto.appendChild(linea);
+					}
 				}
 
 				cuerpo.parentNode.insertBefore(texto, cuerpo);
@@ -118,7 +133,19 @@ function ini()
 		
 		
 		
-			return equipo && distribucion && consulta && tareas && bibliopedida && ver_equipo && ver_distribucion && ver_consulta && ver_tareas && ver_bibliopedida ;
+			var analisis_por_cargo = insertarTitulo(
+				2696,
+				"analisis_por_cargo",
+				"11- Análisis por cargo:",
+				true,
+				[
+					"El presente cuadro debe ser completado, luego de analizar con toda la cátedra cada cargo en particular.",
+					"Es necesario completar una línea por cada docente que integra la cátedra, incluyendo al Responsable de cátedra, indicando los datos de cada docente en las primeras dos columnas y en las siguentes:",
+					{texto: "1 = Muy bueno\u00a0\u00a0\u00a0\u00a0\u00a0 2 = Bueno\u00a0\u00a0\u00a0\u00a0\u00a0 3 = Malo\u00a0\u00a0\u00a0\u00a0\u00a0 4 = No lo tiene en cuenta", negrita: true}
+				]
+			);
+
+			return equipo && distribucion && consulta && tareas && bibliopedida && ver_equipo && ver_distribucion && ver_consulta && ver_tareas && ver_bibliopedida && analisis_por_cargo;
 		}
 
 		var intentos = 0;

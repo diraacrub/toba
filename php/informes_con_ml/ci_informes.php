@@ -1,5 +1,6 @@
 <?php
 require_once 'ci_base_operaciones.php';
+require_once 'informes/analisis_por_cargo.php';
 class ci_informes extends ci_base_operaciones
 {
 	
@@ -133,178 +134,262 @@ class ci_informes extends ci_base_operaciones
 	
 
 	//---- Formulario -------------------------------------------------------------------
+	//
+	// La pantalla de edicion tiene tres componentes: 'formulario' (puntos 1 a 10),
+	// el ML 'analisis_por_cargo' (punto 11) y 'form_cierre' (punto 12, comentarios
+	// y estado). Sus eventos de modificacion solo guardan lo recibido: las
+	// validaciones y el guardado en la tabla informes se hacen en evt__guardar,
+	// que Toba dispara despues de los eventos de los tres componentes.
 
-	
+	private $datos_formulario = array();
+	private $datos_cierre = array();
+	private $filas_por_cargo = array();
+
+	/**
+	 * Informe en edicion: lo que trae get_datos_informe (informe + programa + materia)
+	 * con lo que hay en memoria en el datos_tabla encima. Se toma el id de la fila
+	 * cargada (no de $this->id_informe_seleccionado, que no se conserva entre pedidos).
+	 */
+	protected function get_datos_edicion()
+	{
+		$tabla = $this->dep('datos')->tabla('informes');
+		if (! $tabla->esta_cargada()) {
+			return array();
+		}
+		$en_memoria = $tabla->get();
+		if (! is_array($en_memoria)) {
+			return array();
+		}
+		$datos = array();
+		if (isset($en_memoria['id_informe'])) {
+			$base = $tabla->get_datos_informe($en_memoria['id_informe']);
+			if (is_array($base)) {
+				$datos = $base;
+			}
+		}
+		return array_merge($datos, $en_memoria);
+	}
+
 	function conf__formulario(toba_ei_formulario $form)
 	{
-		
 		if ($this->dep('datos')->esta_cargada()) {
-			$form->set_datos($this->dep('datos')->tabla('informes')->get_datos_informe($this->id_informe_seleccionado));
+			$form->set_datos($this->get_datos_edicion());
 		} else {
 			$this->pantalla()->eliminar_evento('eliminar');
 		}
-
-		toba::notificacion()->info("Completar sin alterar la estructura del cuadro en el punto 11.Gracias");
-	
 	}
-	
-	
-	
+
 	function evt__formulario__modificacion($datos)
 	{
-	
+		$this->datos_formulario = $datos;
+	}
+
+	//---- analisis_por_cargo (ML, punto 11) --------------------------------------------
+
+	function conf__analisis_por_cargo(toba_ei_formulario_ml $form_ml)
+	{
+		$datos = $this->get_datos_edicion();
+		$valor = isset($datos['analisis_por_cargo']) ? $datos['analisis_por_cargo'] : null;
+		$filas = analisis_por_cargo::filas($valor);
+		if ($filas === null) {
+			toba::notificacion()->warning("Este informe tiene el análisis por cargo (punto 11) guardado en el formato anterior. "
+				. "Cárguelo nuevamente en el cuadro: mientras quede vacío se conserva el contenido anterior.");
+			$filas = array();
+		}
+		$form_ml->set_datos($filas);
+	}
+
+	function evt__analisis_por_cargo__modificacion($datos)
+	{
+		$this->filas_por_cargo = is_array($datos) ? $datos : array();
+	}
+
+	/**
+	 * analisis_por_cargo tal como esta en la base (no en memoria: tras un error
+	 * de validacion la memoria puede tener filas que todavia no se guardaron).
+	 */
+	protected function get_analisis_guardado()
+	{
+		$tabla = $this->dep('datos')->tabla('informes');
+		if (! $tabla->esta_cargada()) {
+			return null;
+		}
+		$fila = $tabla->get();
+		if (! is_array($fila) || empty($fila['id_informe'])) {
+			return null;
+		}
+		$base = $tabla->get_datos_informe($fila['id_informe']);
+		return (is_array($base) && isset($base['analisis_por_cargo'])) ? $base['analisis_por_cargo'] : null;
+	}
+
+	//---- form_cierre (punto 12, comentarios y estado) ---------------------------------
+
+	function conf__form_cierre(toba_ei_formulario $form)
+	{
+		if ($this->dep('datos')->esta_cargada()) {
+			$form->set_datos($this->get_datos_edicion());
+		}
+	}
+
+	function evt__form_cierre__modificacion($datos)
+	{
+		$this->datos_cierre = $datos;
+	}
+
+	//---- Guardado ---------------------------------------------------------------------
+
+	function evt__guardar()
+	{
+		$tabla = $this->dep('datos')->tabla('informes');
+		$datos = array_merge($this->datos_formulario, $this->datos_cierre);
+
 		// Guardar datos viejos antes de modificar
-	
-	if ($this->dep('datos')->tabla('informes')->esta_cargada()) {
-		$this->s__datos_viejos = $this->dep('datos')->tabla('informes')->get();
+		if ($tabla->esta_cargada()) {
+			$this->s__datos_viejos = $tabla->get();
 		} else {
-		$this->s__datos_viejos = $datos;
+			$this->s__datos_viejos = $datos;
 		}
 
-			// Lógica de firma electrónica según estado
-	if (isset($datos['estado_informe']) && $datos['estado_informe'] === 'depto') {
-		$nombre_completo = toba::usuario()->get_nombre();
-		$timestamp_obj = new DateTime('now', new DateTimeZone('America/Argentina/Buenos_Aires'));
-		$formatted_timestamp = $timestamp_obj->format('Y-m-d H:i:s');
-		$datos['firma_doc_inf'] = "Firmado electrónicamente por $nombre_completo - Responsable de Cátedra - $formatted_timestamp";
-	}
-		
-		
-	
-	// Manejo de comentarios
-	$comentario = isset($datos['comentario']) ? $datos['comentario'] : '';
-	if (!empty($comentario)) {
-		// Obtener el timestamp y el nombre del usuario
-		$timestamp = date('Y-m-d H:i:s');
-		$usuario_id = toba::usuario()->get_id();
-		$nombre_completo = toba::usuario()->get_nombre();
-		
-		// Crear el HTML del comentario
-		$nuevo_comentario = "<div style='border: 1px solid #ccc; padding: 10px; margin-top: 10px;'>
-								<strong>$nombre_completo ($usuario_id) - $timestamp</strong><br>
-								<p style='margin: 5px 0;'>$comentario</p>
-								</div>";
+		// Punto 11: filas del ML como JSON en informes.analisis_por_cargo.
+		// Si el ML viene vacio y el informe tiene la tabla HTML del formato
+		// anterior, no se toca la columna (esos informes se adaptan aparte).
+		$filas_por_cargo = $this->filas_por_cargo;
+		$json_por_cargo = analisis_por_cargo::a_json($filas_por_cargo);
+		$analisis_guardado = $this->get_analisis_guardado();
+		if ($json_por_cargo === null && analisis_por_cargo::filas($analisis_guardado) === null) {
+			$datos['analisis_por_cargo'] = $analisis_guardado;
+		} else {
+			$datos['analisis_por_cargo'] = $json_por_cargo;
+		}
 
-		// Obtener el contenido existente del campo comentarios
-		$comentarios_inf = $this->dep('datos')->tabla('informes')->get_columna('comentarios_inf');
+		// Validación de cantidad de estudiantes. Va antes de la firma y los
+		// comentarios: si falla, lo cargado queda en memoria (sin sincronizar)
+		// para que el docente no lo pierda al volver a mostrarse la pantalla.
+		$inscriptos   = isset($datos['inscriptos']) ? $datos['inscriptos'] : 0;
+		$comenzaron   = isset($datos['comenzaron']) ? $datos['comenzaron'] : 0;
+		$aprobaron    = isset($datos['aprobaron']) ? $datos['aprobaron'] : 0;
+		$desaprobaron = isset($datos['desaprobaron']) ? $datos['desaprobaron'] : 0;
+		$abandonaron  = isset($datos['abandonaron']) ? $datos['abandonaron'] : 0;
 
-		// Concatenar el nuevo comentario al contenido existente
-		$nuevo_comentarios_inf = $comentarios_inf . $nuevo_comentario;
+		$suma_resultados = $aprobaron + $desaprobaron + $abandonaron;
 
-		// Asignar el nuevo valor a la columna comentarios_inf
-		$datos['comentarios_inf'] = $nuevo_comentarios_inf;
-	}
-	
-	//***PEGUÉ DESDE ACÁ
-		
-		
-	// Validación de cantidad de estudiantes campos obligatorios
+		if ($comenzaron > $inscriptos) {
+			$tabla->set($datos);
+			throw new toba_error("El número de estudiantes que comenzaron no puede ser mayor que los inscriptos.");
+		}
 
-		
-$inscriptos   = isset($datos['inscriptos']) ? $datos['inscriptos'] : 0;
-$comenzaron   = isset($datos['comenzaron']) ? $datos['comenzaron'] : 0;
-$aprobaron    = isset($datos['aprobaron']) ? $datos['aprobaron'] : 0;
-$desaprobaron = isset($datos['desaprobaron']) ? $datos['desaprobaron'] : 0;
-$abandonaron  = isset($datos['abandonaron']) ? $datos['abandonaron'] : 0;
+		if ($suma_resultados != $comenzaron) {
+			$tabla->set($datos);
+			throw new toba_error("La suma de aprobaron, desaprobaron y abandonaron debe ser igual a los que comenzaron.");
+		}
 
-$suma_resultados = $aprobaron + $desaprobaron + $abandonaron;
+		// Lógica de firma electrónica según estado
+		if (isset($datos['estado_informe']) && $datos['estado_informe'] === 'depto') {
+			$nombre_completo = toba::usuario()->get_nombre();
+			$timestamp_obj = new DateTime('now', new DateTimeZone('America/Argentina/Buenos_Aires'));
+			$formatted_timestamp = $timestamp_obj->format('Y-m-d H:i:s');
+			$datos['firma_doc_inf'] = "Firmado electrónicamente por $nombre_completo - Responsable de Cátedra - $formatted_timestamp";
+		}
 
-// Validaciones
-if ($comenzaron > $inscriptos) {
-	throw new toba_error("El número de estudiantes que comenzaron no puede ser mayor que los inscriptos.");
-	toba::notificacion()->info(" "); 
-}
+		// Manejo de comentarios
+		$comentario = isset($datos['comentario']) ? $datos['comentario'] : '';
+		if (!empty($comentario)) {
+			$timestamp = date('Y-m-d H:i:s');
+			$usuario_id = toba::usuario()->get_id();
+			$nombre_completo = toba::usuario()->get_nombre();
 
-if ($suma_resultados != $comenzaron) {
-	throw new toba_error("La suma de aprobaron, desaprobaron y abandonaron debe ser igual a los que comenzaron.");
-	toba::notificacion()->info(" ");
-}
-		
-		
-		
-		// Validación de campos obligatorios
-$campos_obligatorios = array(
-	'inscriptos', 'causas_abandono_desap', 'caract_grupo',
-	'estrategias', 'consideraciones_interior', 'analisis_actividades',
-	'suficiencia_adecuacion', 'evaluacion_ays', 'articulacion', 'capacitacion',
-	'analisis_por_cargo'
-);
+			$nuevo_comentario = "<div style='border: 1px solid #ccc; padding: 10px; margin-top: 10px;'>
+									<strong>$nombre_completo ($usuario_id) - $timestamp</strong><br>
+									<p style='margin: 5px 0;'>$comentario</p>
+									</div>";
 
-foreach ($campos_obligatorios as $campo) {
-	if ($datos['estado_informe'] === 'depto') {
+			// Concatenar el nuevo comentario al contenido existente
+			$comentarios_inf = $tabla->get_columna('comentarios_inf');
+			$datos['comentarios_inf'] = $comentarios_inf . $nuevo_comentario;
+		}
 
-		// Caso especial: "inscriptos"
-		if ($campo === 'inscriptos') {
-			$valor_inscriptos = isset($datos['inscriptos']) ? $datos['inscriptos'] : null;
-			$sin_inscriptos   = isset($datos['sin_inscriptos']) ? $datos['sin_inscriptos'] : 0;
+		// Validación de campos obligatorios (al firmar y enviar al Departamento)
+		$campos_obligatorios = array(
+			'inscriptos', 'causas_abandono_desap', 'caract_grupo',
+			'estrategias', 'consideraciones_interior', 'analisis_actividades',
+			'suficiencia_adecuacion', 'evaluacion_ays', 'articulacion', 'capacitacion',
+			'analisis_por_cargo'
+		);
 
-			// Si inscriptos es 0 o vacío y no marcó sin_inscriptos &#8594; falta completar
-			if (($valor_inscriptos === '' || $valor_inscriptos === null || $valor_inscriptos == 0) && !$sin_inscriptos) {
-				$datos['estado_informe'] = 'docente';
-				$datos['firma_doc_inf'] = '';
-				$this->dep('datos')->tabla('informes')->set($datos);
-				$this->dep('datos')->sincronizar();
-				throw new toba_error("Debe indicar cantidad de inscriptos o marcar 'sin inscriptos'.");
+		if (isset($datos['estado_informe']) && $datos['estado_informe'] === 'depto') {
+			foreach ($campos_obligatorios as $campo) {
+
+				// Caso especial: "inscriptos"
+				if ($campo === 'inscriptos') {
+					$valor_inscriptos = isset($datos['inscriptos']) ? $datos['inscriptos'] : null;
+					$sin_inscriptos   = isset($datos['sin_inscriptos']) ? $datos['sin_inscriptos'] : 0;
+
+					// Si inscriptos es 0 o vacío y no marcó sin_inscriptos -> falta completar
+					if (($valor_inscriptos === '' || $valor_inscriptos === null || $valor_inscriptos == 0) && !$sin_inscriptos) {
+						$this->volver_a_borrador($datos);
+						throw new toba_error("Debe indicar cantidad de inscriptos o marcar 'sin inscriptos'.");
+					}
+					continue;
+				}
+
+				// Caso especial: "analisis_por_cargo" (ML, punto 11): al menos una fila
+				if ($campo === 'analisis_por_cargo') {
+					if (empty($filas_por_cargo)) {
+						$this->volver_a_borrador($datos);
+						throw new toba_error("Falta cargar el análisis por cargo (punto 11): agregue una fila por cada docente de la cátedra.");
+					}
+					continue;
+				}
+
+				// Validación general para los demás campos
+				if (empty($datos[$campo]) && (! isset($datos[$campo]) || $datos[$campo] !== '0')) {
+					$this->volver_a_borrador($datos);
+					throw new toba_error("Falta cargar datos obligatorios, por favor corrija.");
+				}
 			}
-
-			continue; // ya validamos este campo, pasamos al siguiente
 		}
 
-		// Validación general para los demás campos
-		if (empty($datos[$campo]) && $datos[$campo] !== '0') {
-			$datos['estado_informe'] = 'docente';
-			$datos['firma_doc_inf'] = '';
-			$this->dep('datos')->tabla('informes')->set($datos);
-			$this->dep('datos')->sincronizar();
-			throw new toba_error("Falta cargar datos obligatorios, por favor corrija.");
-		}
+		// Guardar finalmente los datos en informes
+		$tabla->set($datos);
+		$tabla->sincronizar();
+		toba::notificacion()->agregar("Su informe ha sido guardado correctamente", 'info');
+
+		// ---- REGISTRO DE MOVIMIENTOS ----
+		$est_mov = isset($datos['estado_informe']) ? $datos['estado_informe'] : "";
+		$estado_mov = quote($est_mov);
+		$usuario_id = toba::usuario()->get_id();
+		$nombre_tabla = quote('informes');
+		date_default_timezone_set('America/Argentina/Buenos_Aires');
+		$fecha_movimiento = quote(date('Y-m-d H:i:s'));
+		$usuario_movimiento = quote($usuario_id);
+
+		$id_informe = isset($datos['id_informe']) ? $datos['id_informe'] : null;
+		$id_tabla = quote($id_informe);
+		$observaciones_txt = $this->armar_observaciones_inf($this->s__datos_viejos, "Actualización desde formulario");
+		$tipo_movimiento = quote('Actualización');
+		$observaciones = quote($observaciones_txt);
+		$sql = "
+			INSERT INTO huayca.movimientos
+			(nombre_tabla, id_tabla, fecha_movimiento, tipo_movimiento, usuario_movimiento, observaciones,estado_mov)
+			VALUES ($nombre_tabla, $id_tabla, $fecha_movimiento, $tipo_movimiento, $usuario_movimiento, $observaciones, $estado_mov)
+		";
+		toba::db()->ejecutar($sql);
+
+		$this->resetear();
 	}
-}
 
-		
-		
-		
-		
-		
-	// Guardar finalmente los datos en programas
-	$this->dep('datos')->tabla('informes')->set($datos);
-	$this->dep('datos')->tabla('informes')->sincronizar();
-	toba::notificacion()->agregar("Su informe ha sido guardado correctamente", 'info');
-
-
-		
-	//***HASTA ACÁ    
-
-	// ---- REGISTRO DE MOVIMIENTOS ----
-	$est_mov = isset($datos['estado_informe']) ? $datos['estado_informe'] : "";
-	$estado_mov = quote($est_mov);  
-	$usuario_id = toba::usuario()->get_id();
-	$nombre_tabla = quote('informes');
-	date_default_timezone_set('America/Argentina/Buenos_Aires');
-	$fecha_movimiento = quote(date('Y-m-d H:i:s'));
-	$usuario_movimiento = quote($usuario_id);
-
-	// ID de la planificación
-	$inf = $this->dep('datos')->tabla('informes')->get();
-	$id_informe = isset($datos['id_informe']) ? $datos['id_informe'] : null;    
-	$id_tabla = quote($id_informe);
-	$observaciones_txt = $this->armar_observaciones_inf($this->s__datos_viejos, "Actualización desde formulario");
-	$tipo_movimiento = quote('Actualización');
-	$observaciones = quote($observaciones_txt);
-	// Insert en movimientos
-	$sql = "
-		INSERT INTO huayca.movimientos
-		(nombre_tabla, id_tabla, fecha_movimiento, tipo_movimiento, usuario_movimiento, observaciones,estado_mov)
-		VALUES ($nombre_tabla, $id_tabla, $fecha_movimiento, $tipo_movimiento, $usuario_movimiento, $observaciones, $estado_mov)
-	";
-	toba::db()->ejecutar($sql);
-	//----
-
-	// Guardar los datos modificados
-	$this->dep('datos')->tabla('informes')->set($datos);
-	// $this->resetear();
-	
-}
+	/**
+	 * Si al enviar falta algo obligatorio, el informe se guarda igual pero como
+	 * borrador y sin firma (mismo comportamiento que antes).
+	 */
+	private function volver_a_borrador($datos)
+	{
+		$datos['estado_informe'] = 'docente';
+		$datos['firma_doc_inf'] = '';
+		$tabla = $this->dep('datos')->tabla('informes');
+		$tabla->set($datos);
+		$this->dep('datos')->sincronizar();
+	}
 
 
 ///// funcion VER fromulario planif
@@ -366,13 +451,6 @@ foreach ($campos_obligatorios as $campo) {
 	}
 
 	
-	
-	function evt__guardar()
-	{
-		$this->dep('datos')->sincronizar();
-		$this->resetear();
-	}
-	
 	// Función auxiliar para armar observaciones de planificaciones
 private function armar_observaciones_inf($datos, $accion)
 {
@@ -412,21 +490,6 @@ private function armar_observaciones_inf($datos, $accion)
 	$txt .= $accion;
 	return $txt;
 }
-	
-	
-	
-	
-	//-----------------------------------------------------------------------------------
-	//---- analisis_por_cargo -----------------------------------------------------------
-	//-----------------------------------------------------------------------------------
-
-	function conf__analisis_por_cargo(catedras_ei_formulario_ml $form_ml)
-	{
-	}
-
-	function evt__analisis_por_cargo__modificacion($datos)
-	{
-	}
 
 }
 ?>

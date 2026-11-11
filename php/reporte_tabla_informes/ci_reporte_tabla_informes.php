@@ -27,11 +27,10 @@ class ci_reporte_tabla_informes extends catedras_ci
 
 	function conf__cuadro(toba_ei_cuadro $cuadro)
 	{
-		if (isset($this->s__datos_filtro)) {
-			$cuadro->set_datos($this->dep('datos')->tabla('informes')->get_listado($this->s__datos_filtro));
-		} else {
-			$cuadro->set_datos($this->dep('datos')->tabla('informes')->get_listado());
-		}
+		$tabla = $this->dep('datos')->tabla('informes');
+		$filtro = isset($this->s__datos_filtro) ? $this->s__datos_filtro : array();
+		// El punto 11 (JSON) se muestra como tabla en la columna analisis_por_cargo_html
+		$cuadro->set_datos($tabla->agregar_html_por_cargo($tabla->get_listado($filtro)));
 	}
 
 	function evt__cuadro__seleccion($datos)
