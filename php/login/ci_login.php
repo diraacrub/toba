@@ -190,7 +190,7 @@ class ci_login extends toba_ci
 		}
 		if (toba::manejador_sesiones()->get_autenticacion() instanceof catedras_autenticacion_keycloak) {
 			//En la transicion tambien vale el usuario de Toba de siempre
-			$form->ef('usuario')->set_etiqueta(catedras_autenticacion_keycloak::en_transicion() ? 'DNI o usuario' : 'DNI');
+			$form->ef('usuario')->set_etiqueta(catedras_autenticacion_keycloak::en_transicion() ? 'DNI o legajo' : 'DNI');
 			$form->ef('clave')->set_etiqueta('Contraseña');
 			$form->ef('usuario')->set_obligatorio(false);	//sin el (*): la pantalla dice que van los dos
 			$form->ef('clave')->set_obligatorio(false);

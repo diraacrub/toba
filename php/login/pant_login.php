@@ -50,14 +50,22 @@ class pant_login extends toba_ei_pantalla
 		echo "<div class='hc-cabeza'>";
 		echo "<h1 class='hc-titulo'>Iniciar sesi&oacute;n</h1>";
 		echo "<p class='hc-destino'>para entrar a <strong>C&aacute;tedras</strong></p>";
-		echo "<p class='hc-intro'>Con tu DNI y la contrase&ntilde;a de tu cuenta Huayca.</p>";
 		if (catedras_autenticacion_keycloak::en_transicion()) {
+			// Transicion: las dos formas de entrar, cada una con su dato, y la fecha
+			// de corte en palabras. exclusivo_desde es el primer dia SOLO Huayca.
 			$desde = catedras_autenticacion_keycloak::exclusivo_desde();
 			$hasta = $desde->modify('-1 day');
-			echo "<div class='hc-aviso' role='note'><strong>Cambia el acceso.</strong> "
-				. "Hasta el " . $hasta->format('d/m/Y') . " tambi&eacute;n pod&eacute;s entrar con tu usuario y clave de siempre. "
-				. "Desde el " . $desde->format('d/m/Y') . " se entra <strong>solo con tu DNI y la clave de tu cuenta Huayca (CRUB)</strong>. "
-				. "Si todav&iacute;a no la ten&eacute;s, activala con el enlace de abajo.</div>";
+			echo "<div class='hc-aviso' role='note'>"
+				. "<p class='hc-aviso-tit'>Hasta el " . self::fecha_larga($hasta) . " pod&eacute;s entrar de dos maneras:</p>"
+				. "<ul>"
+				. "<li><strong>Con tu cuenta Huayca:</strong> tu DNI y la contrase&ntilde;a de la cuenta Huayca (CRUB).</li>"
+				. "<li><strong>Como siempre:</strong> tu n&uacute;mero de legajo (sin puntos) y tu clave de C&aacute;tedras.</li>"
+				. "</ul>"
+				. "<p>Desde el <strong>" . self::fecha_larga($desde) . "</strong> se entra <strong>solo con la cuenta Huayca</strong>. "
+				. "Si todav&iacute;a no la ten&eacute;s, <a href='" . $esc->escapeHtmlAttr($activar) . "'>activala ahora</a>.</p>"
+				. "</div>";
+		} else {
+			echo "<p class='hc-intro'>Con tu DNI y la contrase&ntilde;a de tu cuenta Huayca.</p>";
 		}
 		echo "</div>";
 		$this->dep('datos')->generar_html();
@@ -95,6 +103,14 @@ class pant_login extends toba_ei_pantalla
 			echo '</div>';
 		}
 		echo '</div>';
+	}
+
+	/** "31 de enero de 2027" */
+	protected static function fecha_larga(DateTimeInterface $f)
+	{
+		$meses = array('enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio',
+			'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre');
+		return $f->format('j') . ' de ' . $meses[(int)$f->format('n') - 1] . ' de ' . $f->format('Y');
 	}
 
 	/**
@@ -143,8 +159,13 @@ html body .cuerpo .ci-base, html body .ci-base > tbody > tr > td, html body .ci-
 .hc-titulo { margin: 0; font-size: 22px; font-weight: 600; color: var(--hc-texto); }
 .hc-destino { margin: 2px 0 0; font-size: 15px; color: var(--hc-tenue); }
 .hc-intro { margin: 12px 0 0; font-size: 15px; color: var(--hc-tenue); }
-.hc-aviso { margin: 16px 0 0; padding: 12px 14px; font-size: 14px; line-height: 1.45; color: #78350f; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; }
+.hc-aviso { margin: 16px 0 0; padding: 14px 16px; font-size: 14px; line-height: 1.5; color: #78350f; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; }
+.hc-aviso p { margin: 0; }
+.hc-aviso-tit { font-weight: 600; }
+.hc-aviso ul { margin: 6px 0 10px; padding-left: 20px; }
+.hc-aviso li + li { margin-top: 4px; }
 .hc-aviso strong { color: #78350f; }
+.hc-aviso a { color: #78350f; font-weight: 600; text-underline-offset: 2px; }
 
 /* El formulario de Toba, adentro de la tarjeta */
 .hc-tarjeta table.ei-base, .hc-tarjeta table.ei-base > tbody > tr > td { width: 100% !important; border: 0 !important; background: none !important; padding: 0 !important; }

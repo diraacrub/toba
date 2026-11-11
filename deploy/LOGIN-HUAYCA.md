@@ -41,16 +41,17 @@ Nada de esto toca `vendor/`: sobrevive a `composer install`.
 Toba guarda la config de la instalación en la sesión: después de cambiarla,
 probar con una sesión nueva (borrar la cookie `TOBA_SESSID`).
 
-## Transición (hasta el 30/01/2027)
+## Transición (hasta el 31/01/2027 inclusive)
 
-`exclusivo_desde = "2027-01-31"` en `keycloak.ini`. Hasta el día anterior:
+`exclusivo_desde = "2027-02-01"` en `keycloak.ini` (el primer día solo Huayca). Hasta el día anterior:
 
 - el mismo formulario acepta **DNI o usuario** y prueba primero la clave CRUB
   (Keycloak) y, si no, la clave de Toba de siempre;
 - si Keycloak no contesta, se sigue con la clave de Toba;
-- la tarjeta muestra un aviso con las dos fechas.
+- la tarjeta muestra un aviso con las dos formas de entrar (DNI + cuenta Huayca,
+  o legajo + clave de siempre) y las dos fechas en palabras.
 
-Desde el 31/01/2027 el aviso desaparece, la etiqueta pasa a "DNI" y solo vale
+Desde el 01/02/2027 el aviso desaparece, la etiqueta pasa a "DNI" y solo vale
 la cuenta Huayca, sin tocar nada. Para correr la fecha, se cambia en
 `keycloak.ini`; vacío = solo cuenta Huayca desde ya.
 
