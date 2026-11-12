@@ -40,6 +40,18 @@ class ci_login extends toba_ci
                 if (! $this->redirect_hecho) {
                     $this->chequear_acceso_centralizado();
                 }
+		if ($this->es_login_huayca()) {
+			//Cuenta Huayca por redireccion a Keycloak: puede redirigir o abrir la sesion
+			catedras_huayca_sso::procesar();
+			if (catedras_huayca_sso::mensaje() !== null) {
+				toba::notificacion()->agregar(catedras_huayca_sso::mensaje(), catedras_huayca_sso::tipo_mensaje());
+			}
+		}
+	}
+
+	protected function es_login_huayca()
+	{
+		return toba::manejador_sesiones()->get_autenticacion() instanceof catedras_autenticacion_keycloak;
 	}
 
 	function conf__login()
@@ -48,6 +60,9 @@ class ci_login extends toba_ci
 			$this->pantalla()->eliminar_dep('seleccion_usuario');
 		}
 		$this->eliminar_dependencias_no_usadas();										//Quito los forms que no uso dependiendo del tipo de autenticacion
+		if ($this->es_login_huayca() && ! catedras_huayca_sso::muestra_formulario_toba() && $this->pantalla()->existe_dependencia('datos')) {
+			$this->pantalla()->eliminar_dep('datos');		//Solo cuenta Huayca: el boton, sin legajo y clave
+		}
 		if ($this->en_popup && toba::manejador_sesiones()->existe_usuario_activo()) {
 			//Si ya esta logueado y se abre el sistema en popup, ocultar componentes visuales
 			$this->pantalla()->set_titulo('');
@@ -188,9 +203,9 @@ class ci_login extends toba_ci
 		if (toba::instalacion()->get_tipo_autenticacion() != 'openid') {
 			$form->set_titulo('');
 		}
-		if (toba::manejador_sesiones()->get_autenticacion() instanceof catedras_autenticacion_keycloak) {
-			//En la transicion tambien vale el usuario de Toba de siempre
-			$form->ef('usuario')->set_etiqueta(catedras_autenticacion_keycloak::en_transicion() ? 'DNI o legajo' : 'DNI');
+		if ($this->es_login_huayca()) {
+			//El formulario es para la clave de Toba; la cuenta Huayca entra por el boton
+			$form->ef('usuario')->set_etiqueta(catedras_autenticacion_keycloak::en_transicion() ? 'Legajo' : 'Usuario');
 			$form->ef('clave')->set_etiqueta('Contraseña');
 			$form->ef('usuario')->set_obligatorio(false);	//sin el (*): la pantalla dice que van los dos
 			$form->ef('clave')->set_obligatorio(false);
@@ -355,8 +370,8 @@ class ci_login extends toba_ci
                     if (toba_autenticacion::es_autenticacion_centralizada($tipo_auth)) {
                             toba::manejador_sesiones()->get_autenticacion()->usar_login_basico();
                     }
-                    if (toba::manejador_sesiones()->get_autenticacion() instanceof catedras_autenticacion_keycloak) {
-                            //Cuenta Huayca: se escribe el DNI y la sesion se abre con el legajo
+                    if ($this->es_login_huayca()) {
+                            //Si escribio el DNI se lo manda al boton de la cuenta Huayca
                             $usuario = catedras_autenticacion_keycloak::usuario_para_login($usuario, $clave);
                     }
                     toba::manejador_sesiones()->login($usuario, $clave);

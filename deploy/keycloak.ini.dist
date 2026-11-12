@@ -1,4 +1,5 @@
-; Login de catedras con la cuenta Huayca (Keycloak), en el formulario propio.
+; Login de catedras con la cuenta Huayca (Keycloak): boton que redirige a
+; Keycloak, con la sesion compartida con Quintral y deptos.
 ; Copiar a instalacion/keycloak.ini y completar client_secret.
 ; Sin ese archivo catedras usa el login comun de Toba.
 ; instalacion.ini tiene que dejar la autenticacion comun (sin "saml_onelogin").
@@ -6,17 +7,26 @@
 [keycloak]
 url = "https://huayca.crub.uncoma.edu.ar/keycloak"
 realm = "CRUB"
-; Cliente OIDC confidencial con "Direct access grants" (realm CRUB)
+; Cliente OIDC confidencial con "Standard flow" (realm CRUB). En Keycloak:
+; Valid redirect URIs y Valid post logout redirect URIs = url_sistema + "*".
 client_id = "catedras"
 client_secret = ""
+; Tiene que quedar en 1: el id_token se acepta porque llega por TLS verificado.
 verify_ssl = 1
 
-; 1 = los usuarios sin DNI cargado (ej. el admin "toba") entran con la clave de Toba
+; Raiz de catedras, con la barra final. Es la vuelta desde Keycloak. Vacio = la
+; del pedido (sirve en desarrollo; en produccion conviene fijarla).
+url_sistema = "https://huayca.crub.uncoma.edu.ar/catedras/1.0/"
+
+; 1 = los usuarios sin DNI cargado (ej. el admin "toba") entran con la clave de
+; Toba. Despues de la transicion, por url_sistema + "?huayca=toba".
 permite_login_toba = 1
 
 ; Transicion: esta fecha (AAAA-MM-DD) es el PRIMER dia en que se entra solo con
-; la cuenta Huayca. Hasta el dia anterior inclusive vale tambien el legajo y la
-; clave de Toba de siempre, y la pantalla lo avisa con las dos fechas.
+; la cuenta Huayca. Hasta el dia anterior inclusive la pantalla muestra, debajo
+; del boton Huayca, el formulario de legajo y clave de Toba de siempre, y al
+; abrirla se pregunta en silencio a Keycloak si ya hay sesion Huayca. Desde esa
+; fecha se va directo a Keycloak.
 ; Vacio = solo la cuenta Huayca desde ya.
 exclusivo_desde = "2027-02-01"
 

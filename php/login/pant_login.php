@@ -4,9 +4,11 @@
  *
  * Con la cuenta Huayca activa (instalacion/keycloak.ini) se ve como las
  * pantallas de cuenta de Huayca (Quintral, deptos): campo azul, el sello,
- * "/cátedras", la tarjeta blanca con DNI y contraseña, abajo los enlaces para
- * activar la cuenta o recuperar la contraseña, y al pie la franja institucional
- * (la misma de las demas paginas: catedras_salida::pie_html()).
+ * "/cátedras", la tarjeta blanca con el boton "Entrar con cuenta Huayca" (va a
+ * Keycloak, ver catedras_huayca_sso), abajo los enlaces para activar la cuenta
+ * o recuperar la contraseña, y al pie la franja institucional (la misma de las
+ * demas paginas: catedras_salida::pie_html()).
+ * En la transicion, debajo del boton, el formulario de legajo y clave de Toba.
  * El formulario sigue siendo el de Toba (sus efs, su JS, el token CSRF): solo
  * se lo envuelve y se lo reestila.
  *
@@ -18,8 +20,7 @@ class pant_login extends toba_ei_pantalla
 {
 	function generar_layout()
 	{
-		if (class_exists('catedras_autenticacion_keycloak', false) && catedras_autenticacion_keycloak::activa()
-				&& $this->existe_dependencia('datos')) {
+		if (class_exists('catedras_autenticacion_keycloak', false) && catedras_autenticacion_keycloak::activa()) {
 			$this->generar_layout_huayca();
 		} else {
 			$this->generar_layout_toba();
@@ -50,25 +51,33 @@ class pant_login extends toba_ei_pantalla
 		echo "<div class='hc-cabeza'>";
 		echo "<h1 class='hc-titulo'>Iniciar sesi&oacute;n</h1>";
 		echo "<p class='hc-destino'>para entrar a <strong>C&aacute;tedras</strong></p>";
-		if (catedras_autenticacion_keycloak::en_transicion()) {
-			// Transicion: las dos formas de entrar, cada una con su dato, y la fecha
-			// de corte en palabras. exclusivo_desde es el primer dia SOLO Huayca.
-			$desde = catedras_autenticacion_keycloak::exclusivo_desde();
-			$hasta = $desde->modify('-1 day');
-			echo "<div class='hc-aviso' role='note'>"
-				. "<p class='hc-aviso-tit'>Hasta el " . self::fecha_larga($hasta) . " pod&eacute;s entrar de dos maneras:</p>"
-				. "<ul>"
-				. "<li><strong>Con tu cuenta Huayca:</strong> tu DNI y la contrase&ntilde;a de la cuenta Huayca (CRUB).</li>"
-				. "<li><strong>Como siempre:</strong> tu n&uacute;mero de legajo (sin puntos) y tu clave de C&aacute;tedras.</li>"
-				. "</ul>"
-				. "<p>Desde el <strong>" . self::fecha_larga($desde) . "</strong> se entra <strong>solo con la cuenta Huayca</strong>. "
-				. "Si todav&iacute;a no la ten&eacute;s, <a href='" . $esc->escapeHtmlAttr($activar) . "'>activala ahora</a>.</p>"
-				. "</div>";
-		} else {
-			echo "<p class='hc-intro'>Con tu DNI y la contrase&ntilde;a de tu cuenta Huayca.</p>";
-		}
 		echo "</div>";
-		$this->dep('datos')->generar_html();
+
+		echo "<a class='hc-boton' href='" . $esc->escapeHtmlAttr(catedras_huayca_sso::url_entrar()) . "'>Entrar con cuenta Huayca</a>";
+		echo "<p class='hc-intro'>Con tu DNI y la contrase&ntilde;a de tu cuenta Huayca. "
+			. "Si ya entraste a Quintral o a deptos, no te la vuelve a pedir.</p>";
+		if (catedras_huayca_sso::tiene_sesion_huayca()) {
+			// Volvio de Keycloak pero no pudo entrar (DNI sin acceso a catedras, etc.)
+			echo "<p class='hc-intro'><a href='" . $esc->escapeHtmlAttr(catedras_huayca_sso::url_salida()) . "'>Entrar con otra cuenta Huayca</a></p>";
+		}
+
+		if ($this->existe_dependencia('datos')) {
+			if (catedras_autenticacion_keycloak::en_transicion()) {
+				// exclusivo_desde es el primer dia SOLO Huayca
+				$desde = catedras_autenticacion_keycloak::exclusivo_desde();
+				$hasta = $desde->modify('-1 day');
+				echo "<div class='hc-separador'><span>o como siempre</span></div>";
+				echo "<div class='hc-aviso' role='note'>"
+					. "<p>Hasta el <strong>" . self::fecha_larga($hasta) . "</strong> tambi&eacute;n pod&eacute;s entrar con tu "
+					. "<strong>n&uacute;mero de legajo</strong> (sin puntos) y tu <strong>clave de C&aacute;tedras</strong>. "
+					. "Desde el " . self::fecha_larga($desde) . ", solo con la cuenta Huayca. "
+					. "Si todav&iacute;a no la ten&eacute;s, <a href='" . $esc->escapeHtmlAttr($activar) . "'>activala ahora</a>.</p>"
+					. "</div>";
+			} else {
+				echo "<div class='hc-separador'><span>usuario y clave de Toba</span></div>";
+			}
+			$this->dep('datos')->generar_html();
+		}
 		echo "</main>";
 
 		echo "<nav class='hc-enlaces'>";
@@ -161,9 +170,6 @@ html body .cuerpo .ci-base, html body .ci-base > tbody > tr > td, html body .ci-
 .hc-intro { margin: 12px 0 0; font-size: 15px; color: var(--hc-tenue); }
 .hc-aviso { margin: 16px 0 0; padding: 14px 16px; font-size: 14px; line-height: 1.5; color: #78350f; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; }
 .hc-aviso p { margin: 0; }
-.hc-aviso-tit { font-weight: 600; }
-.hc-aviso ul { margin: 6px 0 10px; padding-left: 20px; }
-.hc-aviso li + li { margin-top: 4px; }
 .hc-aviso strong { color: #78350f; }
 .hc-aviso a { color: #78350f; font-weight: 600; text-underline-offset: 2px; }
 
@@ -183,6 +189,17 @@ html body .cuerpo .ci-base, html body .ci-base > tbody > tr > td, html body .ci-
 .hc-tarjeta .ei-boton u { text-decoration: none; }
 .hc-tarjeta [id\$='_notificacion'] { color: var(--hc-peligro); font-size: 15px; }
 .hc-tarjeta .ef-clave-fuerza, .hc-tarjeta [id\$='_fuerza'] { display: none !important; }
+
+.hc-boton { display: flex; align-items: center; justify-content: center; box-sizing: border-box; width: 100%; min-height: 44px; padding: 0 16px; font-size: 16px; font-weight: 600; color: #fff !important; background: var(--hc-azul); border-radius: 8px; text-decoration: none !important; }
+.hc-boton:hover { background: var(--hc-azul-fuerte); }
+.hc-boton:focus-visible { outline: 2px solid var(--hc-azul-fuerte); outline-offset: 2px; }
+.hc-intro a { color: var(--hc-azul-fuerte); }
+.hc-separador { display: flex; align-items: center; gap: 12px; margin: 24px 0 16px; font-size: 14px; color: var(--hc-tenue); }
+.hc-separador::before, .hc-separador::after { content: ''; flex: 1; border-top: 1px solid var(--hc-borde); }
+.hc-separador + .hc-aviso { margin: 0 0 16px; }
+/* El boton del formulario de Toba queda secundario: el principal es el de Huayca */
+.hc-tarjeta .ei-boton { color: var(--hc-azul-fuerte) !important; background: #fff !important; border: 1px solid var(--hc-borde) !important; }
+.hc-tarjeta .ei-boton:hover { background: #eff6ff !important; }
 
 .hc-enlaces { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: -8px; }
 .hc-enlaces a { color: #fff !important; font-size: 15px; padding: 4px 8px; border-radius: 6px; text-decoration: underline; text-underline-offset: 3px; }
