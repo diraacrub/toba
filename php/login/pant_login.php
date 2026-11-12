@@ -5,10 +5,15 @@
  * Con la cuenta Huayca activa (instalacion/keycloak.ini) se ve como las
  * pantallas de cuenta de Huayca (Quintral, deptos): campo azul, el sello,
  * "/cátedras", la tarjeta blanca con el boton "Entrar con cuenta Huayca" (va a
- * Keycloak, ver catedras_huayca_sso), abajo los enlaces para activar la cuenta
- * o recuperar la contraseña, y al pie la franja institucional (la misma de las
- * demas paginas: catedras_salida::pie_html()).
- * En la transicion, debajo del boton, el formulario de legajo y clave de Toba.
+ * Keycloak, ver catedras_huayca_sso), "Activa tu cuenta" y, al pie, la franja
+ * institucional (la misma de las demas paginas: catedras_salida::pie_html()).
+ *
+ * La pantalla empuja a pasar a la cuenta Huayca antes de que la clave vieja
+ * deje de valer (exclusivo_desde):
+ *  - el legajo y la clave de Toba van plegados detras de un enlace chico;
+ *  - quien entra con ellos ve, antes de seguir, una tarjeta que le pide
+ *    activar la cuenta Huayca (con un boton que le manda el mail) o, si ya la
+ *    uso alguna vez, que entre con ella (catedras_ingresos).
  * El formulario sigue siendo el de Toba (sus efs, su JS, el token CSRF): solo
  * se lo envuelve y se lo reestila.
  *
@@ -30,10 +35,8 @@ class pant_login extends toba_ei_pantalla
 	protected function generar_layout_huayca()
 	{
 		$esc = toba::escaper();
-		$base = 'https://huayca.crub.uncoma.edu.ar/quintral';
-		$activar = catedras_autenticacion_keycloak::param('url_activar', "$base/activate?app=catedras");
-		$reset = catedras_autenticacion_keycloak::param('url_reset', "$base/reset-password?app=catedras");
 		$sello = toba_recurso::imagen_proyecto('huayca-sello.png');
+		$aviso = toba::manejador_sesiones()->existe_usuario_activo() && catedras_ingresos::hay_aviso();
 
 		echo $this->estilos_huayca();
 		// La pagina de login de Toba no declara viewport: en el celular se veia
@@ -47,6 +50,34 @@ class pant_login extends toba_ei_pantalla
 		echo "<div><div class='hc-nombre'>/c&aacute;tedras</div><div class='hc-bajada'>Programas, planificaciones e informes</div></div>";
 		echo "</header>";
 
+		if ($aviso) {
+			$this->tarjeta_pasar_a_huayca();
+		} else {
+			$this->tarjeta_login();
+			echo "<nav class='hc-enlaces'>";
+			echo "<a href='" . $esc->escapeHtmlAttr(self::url_cuenta('url_reset', 'reset-password')) . "'>&iquest;Olvidaste tu contrase&ntilde;a?</a>";
+			echo "</nav>";
+		}
+
+		echo "</div>";	// .hc-centro
+		echo catedras_salida::pie_html();
+		echo "</div>";	// .hc-pagina
+	}
+
+	/** Pantallas de cuenta de Quintral (activar, restablecer), con ?app=catedras. */
+	protected static function url_cuenta($param, $pantalla)
+	{
+		return catedras_autenticacion_keycloak::param($param, "https://huayca.crub.uncoma.edu.ar/quintral/$pantalla?app=catedras");
+	}
+
+	/**
+	 * El login: el boton de la cuenta Huayca primero, activar la cuenta segundo y,
+	 * en la transicion, el legajo y la clave vieja plegados detras de un enlace
+	 * (cuesta un clic mas). Se abre solo si se acaba de intentar entrar con ellos.
+	 */
+	protected function tarjeta_login()
+	{
+		$esc = toba::escaper();
 		echo "<main class='hc-tarjeta'>";
 		echo "<div class='hc-cabeza'>";
 		echo "<h1 class='hc-titulo'>Iniciar sesi&oacute;n</h1>";
@@ -58,34 +89,132 @@ class pant_login extends toba_ei_pantalla
 			// Volvio de Keycloak pero no pudo entrar (DNI sin acceso a catedras, etc.)
 			echo "<p class='hc-intro'><a href='" . $esc->escapeHtmlAttr(catedras_huayca_sso::url_salida()) . "'>Entrar con otra cuenta Huayca</a></p>";
 		}
+		echo "<p class='hc-activar'>&iquest;Primera vez? <a href='" . $esc->escapeHtmlAttr(self::url_cuenta('url_activar', 'activate')) . "'>"
+			. "Activ&aacute; tu cuenta</a> &mdash; te lleva 2 minutos.</p>";
 
 		if ($this->existe_dependencia('datos')) {
 			if (catedras_autenticacion_keycloak::en_transicion()) {
 				// exclusivo_desde es el primer dia SOLO Huayca
 				$desde = catedras_autenticacion_keycloak::exclusivo_desde();
 				$hasta = $desde->modify('-1 day');
-				echo "<div class='hc-separador'><span>o como siempre</span></div>";
-				echo "<div class='hc-aviso' role='note'>"
-					. "<p>Hasta el <strong>" . self::fecha_larga($hasta) . "</strong> tambi&eacute;n pod&eacute;s entrar con tu "
-					. "<strong>n&uacute;mero de legajo</strong> (sin puntos) y tu <strong>clave de C&aacute;tedras</strong>. "
-					. "Desde el " . self::fecha_larga($desde) . ", solo con la cuenta Huayca. "
-					. "Si todav&iacute;a no la ten&eacute;s, <a href='" . $esc->escapeHtmlAttr($activar) . "'>activala ahora</a>.</p>"
-					. "</div>";
+				$dias = catedras_ingresos::dias_restantes();
+				$abierto = (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') ? ' open' : '';
+				echo "<details class='hc-viejo'$abierto>";
+				echo "<summary>Entrar con legajo y clave vieja"
+					. "<span>hasta el " . self::fecha_larga($hasta) . " &middot; " . self::faltan($dias) . "</span></summary>";
+				echo "<p class='hc-viejo-nota'>Tu n&uacute;mero de legajo (sin puntos) y tu clave de C&aacute;tedras. "
+					. "Desde el " . self::fecha_larga($desde) . ", solo con la cuenta Huayca.</p>";
+				$this->dep('datos')->generar_html();
+				echo "</details>";
 			} else {
 				echo "<div class='hc-separador'><span>usuario y clave de Toba</span></div>";
+				$this->dep('datos')->generar_html();
 			}
-			$this->dep('datos')->generar_html();
 		}
 		echo "</main>";
+	}
 
-		echo "<nav class='hc-enlaces'>";
-		echo "<a href='" . $esc->escapeHtmlAttr($activar) . "'>&iquest;Primera vez? Activ&aacute; tu cuenta</a>";
-		echo "<a href='" . $esc->escapeHtmlAttr($reset) . "'>&iquest;Olvidaste tu contrase&ntilde;a?</a>";
-		echo "</nav>";
+	/**
+	 * Despues de entrar con la clave vieja, antes de seguir a Catedras: que pase
+	 * a la cuenta Huayca. Si ya entro alguna vez con ella, solo se le recuerda
+	 * usar el boton; si no, el boton principal le manda el mail de activacion
+	 * (el mismo de Quintral, que ya sabe a donde mandarlo por el DNI).
+	 * El ultimo mes el plazo va en naranja.
+	 */
+	protected function tarjeta_pasar_a_huayca()
+	{
+		$esc = toba::escaper();
+		$usuario = toba::usuario()->get_id();
+		$dni = catedras_usuarios::dni_de_usuario($usuario);
+		$ya_la_tiene = catedras_ingresos::uso_huayca($usuario);
+		$dias = catedras_ingresos::dias_restantes();
+		$desde = catedras_autenticacion_keycloak::exclusivo_desde();
+		$urgente = ($dias !== null && $dias <= 30) ? ' hc-urgente' : '';
+		$seguir = $this->controlador()->url_inicio();
+		// Sale de la sesion de la clave vieja y va derecho a la cuenta Huayca
+		$huayca = catedras_huayca_sso::url_sistema() . '?' . apex_sesion_qs_finalizar . '=1&' . catedras_huayca_sso::PARAM . '=entrar';
 
-		echo "</div>";	// .hc-centro
-		echo catedras_salida::pie_html();
-		echo "</div>";	// .hc-pagina
+		echo "<main class='hc-tarjeta hc-pasaje$urgente'>";
+		if ($ya_la_tiene) {
+			echo "<p class='hc-plazo'>" . ucfirst(self::faltan($dias)) . "</p>";
+			echo "<h1 class='hc-titulo'>Ya ten&eacute;s tu cuenta Huayca</h1>";
+			echo "<p class='hc-intro'>La pr&oacute;xima vez entr&aacute; con el bot&oacute;n azul: es la misma cuenta de Quintral y deptos. "
+				. "Desde el " . self::fecha_larga($desde) . " la clave vieja deja de funcionar.</p>";
+			echo "<a class='hc-boton' href='" . $esc->escapeHtmlAttr($huayca) . "'>Entrar con cuenta Huayca ahora</a>";
+			echo "<div class='hc-otras'><a href='" . $esc->escapeHtmlAttr($seguir) . "'>Seguir a C&aacute;tedras</a></div>";
+		} else {
+			echo "<h1 class='hc-titulo'>" . ($dias > 1 ? "Te quedan $dias d&iacute;as" : ($dias == 1 ? 'Te queda 1 d&iacute;a' : 'Hoy es el &uacute;ltimo d&iacute;a'))
+				. " para pasar a tu cuenta Huayca</h1>";
+			echo "<p class='hc-intro'>Desde el " . self::fecha_larga($desde) . " solo vas a poder entrar con tu DNI y la cuenta Huayca, "
+				. "la misma de Quintral y deptos. Activarla te lleva 2 minutos.</p>";
+			$api = catedras_autenticacion_keycloak::param('url_api_activar', '/quintral/api/auth/password-reset');
+			echo "<button type='button' class='hc-boton' id='hc-mandar' data-api='" . $esc->escapeHtmlAttr($api) . "'"
+				. " data-dni='" . $esc->escapeHtmlAttr((string) $dni) . "'>Mandame el mail para activarla</button>";
+			echo "<p class='hc-resultado' id='hc-resultado' role='status' aria-live='polite'></p>";
+			echo "<div class='hc-otras'>";
+			echo "<a href='" . $esc->escapeHtmlAttr($huayca) . "'>Ya la tengo: entrar con Huayca</a>";
+			echo "<a href='" . $esc->escapeHtmlAttr($seguir) . "'>Seguir con la clave vieja por esta vez</a>";
+			echo "</div>";
+			echo $this->js_mandar_mail();
+		}
+		echo "</main>";
+	}
+
+	/** "faltan 80 dias", "falta 1 dia", "ultimo dia" */
+	protected static function faltan($dias)
+	{
+		if ($dias === null) {
+			return '';
+		}
+		if ($dias <= 0) {
+			return '&uacute;ltimo d&iacute;a';
+		}
+		return $dias == 1 ? 'falta 1 d&iacute;a' : "faltan $dias d&iacute;as";
+	}
+
+	/**
+	 * El boton "Mandame el mail": el endpoint de activacion de Quintral (mismo
+	 * dominio), con el DNI que ya conoce catedras. Textos con \u: la pagina de
+	 * Toba es latin1 y este archivo ASCII.
+	 */
+	protected function js_mandar_mail()
+	{
+		return <<<'JS'
+<script>
+(function () {
+	var boton = document.getElementById('hc-mandar');
+	var salida = document.getElementById('hc-resultado');
+	if (!boton) { return; }
+	boton.addEventListener('click', function () {
+		boton.disabled = true;
+		boton.textContent = 'Mandando\u2026';
+		salida.className = 'hc-resultado';
+		fetch(boton.getAttribute('data-api'), {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ username: boton.getAttribute('data-dni'), flow: 'activate', app: 'catedras' })
+		}).then(function (r) { return r.json(); }).then(function (r) {
+			if (r && r.success) {
+				boton.textContent = 'Mail enviado';
+				salida.className = 'hc-resultado hc-ok';
+				salida.textContent = 'Listo: te mandamos el mail' + (r.email_hint ? ' a ' + r.email_hint : '') +
+					'. Abrilo, eleg\u00ed tu contrase\u00f1a y la pr\u00f3xima vez entr\u00e1 con el bot\u00f3n azul.';
+			} else {
+				boton.disabled = false;
+				boton.textContent = 'Mandame el mail para activarla';
+				salida.className = 'hc-resultado hc-error';
+				salida.textContent = 'No encontramos tu cuenta Huayca con tu DNI. Escribile a Secretar\u00eda Acad\u00e9mica para que te la den de alta.';
+			}
+		}).catch(function () {
+			boton.disabled = false;
+			boton.textContent = 'Mandame el mail para activarla';
+			salida.className = 'hc-resultado hc-error';
+			salida.textContent = 'No se pudo mandar el mail. Prob\u00e1 de nuevo en un rato.';
+		});
+	});
+})();
+</script>
+JS;
 	}
 
 	protected function generar_layout_toba()
@@ -166,10 +295,6 @@ html body .cuerpo .ci-base, html body .ci-base > tbody > tr > td, html body .ci-
 .hc-titulo { margin: 0; font-size: 22px; font-weight: 600; color: var(--hc-texto); }
 .hc-destino { margin: 2px 0 0; font-size: 15px; color: var(--hc-tenue); }
 .hc-intro { margin: 12px 0 0; font-size: 15px; color: var(--hc-tenue); }
-.hc-aviso { margin: 16px 0 0; padding: 14px 16px; font-size: 14px; line-height: 1.5; color: #78350f; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; }
-.hc-aviso p { margin: 0; }
-.hc-aviso strong { color: #78350f; }
-.hc-aviso a { color: #78350f; font-weight: 600; text-underline-offset: 2px; }
 
 /* El formulario de Toba, adentro de la tarjeta */
 .hc-tarjeta table.ei-base, .hc-tarjeta table.ei-base > tbody > tr > td { width: 100% !important; border: 0 !important; background: none !important; padding: 0 !important; }
@@ -194,10 +319,37 @@ html body .cuerpo .ci-base, html body .ci-base > tbody > tr > td, html body .ci-
 .hc-intro a { color: var(--hc-azul-fuerte); }
 .hc-separador { display: flex; align-items: center; gap: 12px; margin: 24px 0 16px; font-size: 14px; color: var(--hc-tenue); }
 .hc-separador::before, .hc-separador::after { content: ''; flex: 1; border-top: 1px solid var(--hc-borde); }
-.hc-separador + .hc-aviso { margin: 0 0 16px; }
 /* El boton del formulario de Toba queda secundario: el principal es el de Huayca */
 .hc-tarjeta .ei-boton { color: var(--hc-azul-fuerte) !important; background: #fff !important; border: 1px solid var(--hc-borde) !important; }
 .hc-tarjeta .ei-boton:hover { background: #eff6ff !important; }
+
+/* Activar la cuenta: lo segundo mas visible */
+.hc-activar { margin: 12px 0 0; font-size: 15px; color: var(--hc-tenue); text-align: center; }
+.hc-activar a { color: var(--hc-azul-fuerte); font-weight: 600; }
+
+/* La cuenta vieja: plegada detras de un enlace chico */
+.hc-viejo { margin: 24px 0 0; padding-top: 16px; border-top: 1px solid var(--hc-borde); }
+.hc-viejo > summary { cursor: pointer; font-size: 14px; color: var(--hc-tenue); text-align: center; list-style: none; }
+.hc-viejo > summary::-webkit-details-marker { display: none; }
+.hc-viejo > summary { text-decoration: underline; text-underline-offset: 3px; }
+.hc-viejo > summary span { display: block; margin-top: 2px; font-size: 13px; text-decoration: none; }
+.hc-viejo[open] > summary { margin-bottom: 12px; }
+.hc-viejo-nota { margin: 0 0 16px; font-size: 14px; color: var(--hc-tenue); }
+
+/* Despues de entrar con la clave vieja */
+.hc-plazo { display: inline-block; margin: 0 0 10px; padding: 3px 10px; font-size: 13px; font-weight: 600; color: var(--hc-azul-fuerte); background: #eff6ff; border-radius: 999px; }
+.hc-urgente .hc-plazo { color: #9a3412; background: #ffedd5; }
+.hc-pasaje .hc-titulo { line-height: 1.25; }
+.hc-pasaje .hc-intro { margin: 10px 0 20px; }
+.hc-pasaje .hc-boton { font-family: inherit; border: 0; cursor: pointer; }
+.hc-pasaje .hc-boton:disabled { cursor: default; opacity: .85; }
+.hc-resultado { margin: 12px 0 0; font-size: 15px; }
+.hc-resultado:empty { display: none; }
+.hc-resultado.hc-ok { color: #166534; }
+.hc-resultado.hc-error { color: var(--hc-peligro); }
+.hc-otras { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 16px; font-size: 14px; }
+.hc-otras a { color: var(--hc-tenue); text-underline-offset: 3px; }
+.hc-otras a:first-child { color: var(--hc-azul-fuerte); font-weight: 600; font-size: 15px; }
 
 .hc-enlaces { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: -8px; }
 .hc-enlaces a { color: #fff !important; font-size: 15px; padding: 4px 8px; border-radius: 6px; text-decoration: underline; text-underline-offset: 3px; }

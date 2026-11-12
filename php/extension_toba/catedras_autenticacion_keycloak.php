@@ -20,6 +20,7 @@
  */
 require_once __DIR__ . '/catedras_usuarios.php';
 require_once __DIR__ . '/catedras_huayca_sso.php';
+require_once __DIR__ . '/catedras_ingresos.php';
 
 class catedras_autenticacion_keycloak extends toba_autenticacion_basica
 {
@@ -89,14 +90,21 @@ class catedras_autenticacion_keycloak extends toba_autenticacion_basica
 	function autenticar($id_usuario, $clave, $datos_iniciales = null)
 	{
 		if (self::entro_por_huayca($id_usuario)) {
+			catedras_ingresos::registrar($id_usuario, 'huayca');
 			return true;
 		}
 		// Formulario: legajo y clave de Toba
-		if (self::en_transicion()) {
-			return parent::autenticar($id_usuario, $clave, $datos_iniciales);
-		}
-		if (catedras_usuarios::dni_de_usuario($id_usuario) === null && self::permite_login_toba_local()) {
-			return parent::autenticar($id_usuario, $clave, $datos_iniciales);
+		$con_dni = catedras_usuarios::dni_de_usuario($id_usuario) !== null;
+		if (self::en_transicion() || (! $con_dni && self::permite_login_toba_local())) {
+			$ok = parent::autenticar($id_usuario, $clave, $datos_iniciales);
+			if ($ok) {
+				catedras_ingresos::registrar($id_usuario, 'legado');
+				if ($con_dni && self::en_transicion()) {
+					// Antes de entrar, la pantalla que le pide pasar a la cuenta Huayca
+					catedras_ingresos::marcar_aviso();
+				}
+			}
+			return $ok;
 		}
 		toba::logger()->notice("LOGIN: '$id_usuario' intento entrar con la clave de Toba fuera de la transicion");
 		return false;

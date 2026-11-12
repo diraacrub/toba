@@ -33,3 +33,8 @@ exclusivo_desde = "2027-02-01"
 ; Pantallas de cuenta Huayca (Quintral). ?app=catedras dice "para entrar a Catedras".
 url_activar = "https://huayca.crub.uncoma.edu.ar/quintral/activate?app=catedras"
 url_reset = "https://huayca.crub.uncoma.edu.ar/quintral/reset-password?app=catedras"
+
+; Boton "Mandame el mail para activarla" (despues de entrar con la clave vieja):
+; el endpoint de activacion de Quintral, llamado desde el navegador. Vacio = el
+; de este mismo dominio.
+;url_api_activar = "/quintral/api/auth/password-reset"

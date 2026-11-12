@@ -63,6 +63,14 @@ class ci_login extends toba_ci
 		if ($this->es_login_huayca() && ! catedras_huayca_sso::muestra_formulario_toba() && $this->pantalla()->existe_dependencia('datos')) {
 			$this->pantalla()->eliminar_dep('datos');		//Solo cuenta Huayca: el boton, sin legajo y clave
 		}
+		if ($this->es_login_huayca() && toba::manejador_sesiones()->existe_usuario_activo() && catedras_ingresos::hay_aviso()) {
+			//Aviso de la cuenta Huayca despues de entrar con la clave vieja: no se dibuja ningun formulario
+			foreach (array('datos', 'seleccion_usuario', 'openid', 'cas') as $dep) {
+				if ($this->pantalla()->existe_dependencia($dep)) {
+					$this->pantalla()->eliminar_dep($dep);
+				}
+			}
+		}
 		if ($this->en_popup && toba::manejador_sesiones()->existe_usuario_activo()) {
 			//Si ya esta logueado y se abre el sistema en popup, ocultar componentes visuales
 			$this->pantalla()->set_titulo('');
@@ -404,6 +412,17 @@ class ci_login extends toba_ci
 
 	//-------------------------------------------------------------------
 
+	/** A donde va la persona despues de entrar (lo usa tambien pant_login). */
+	function url_inicio()
+	{
+		$proyecto = toba::proyecto()->get_id();
+		$item = toba::proyecto()->get_parametro('item_inicio_sesion');
+		if (is_array($this->s__item_inicio) && count($this->s__item_inicio) == 2) {
+			list($proyecto, $item) = array_values($this->s__item_inicio);
+		}
+		return toba::vinculador()->get_url($proyecto, $item);
+	}
+
 	function extender_objeto_js()
 	{
 		$escapador = toba::escaper();
@@ -428,14 +447,14 @@ class ci_login extends toba_ci
 		$finalizar = toba::memoria()->get_parametro(apex_sesion_qs_finalizar);
 		if (is_null($finalizar)) {											//Sesion activa
 			if (toba::manejador_sesiones()->existe_usuario_activo() && ! toba::nucleo()->verifica_necesidad_2FA()) {
-				//Si ya esta logueado y se abre el sistema en popup, abrirlo
-				if (isset($this->s__item_inicio)) {
-					list($proyecto, $item) = explode($this->s__item_inicio);
-				} else {
-					$proyecto = toba::proyecto()->get_id();
-					$item = toba::proyecto()->get_parametro('item_inicio_sesion');
+				if ($this->es_login_huayca() && catedras_ingresos::hay_aviso()) {
+					//Entro con la clave vieja: pant_login muestra el aviso de la cuenta Huayca
+					//en vez de seguir solo. Se consume aca, despues de dibujar la pantalla.
+					catedras_ingresos::consumir_aviso();
+					return;
 				}
-				$url = $escapador->escapeJs(toba::vinculador()->get_url($proyecto, $item));
+				//Si ya esta logueado y se abre el sistema en popup, abrirlo
+				$url = $escapador->escapeJs($this->url_inicio());
 
 				if ($this->en_popup) {
 					echo " abrir_popup('sistema', '$url', {resizable: 1});	";

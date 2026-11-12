@@ -69,6 +69,31 @@ Desde el 01/02/2027 el formulario desaparece y cátedras redirige directo a
 Keycloak, sin tocar nada. Los usuarios sin DNI cargado (ej. `toba`) entran por
 `url_sistema?huayca=toba` si `permite_login_toba = 1`.
 
+## Empujar el paso a la cuenta Huayca
+
+Para que la gente active su cuenta antes del corte:
+
+- **En el login**, la cuenta vieja queda plegada detrás de un enlace chico
+  ("Entrar con legajo y clave vieja · faltan N días"); lo visible es el botón
+  Huayca y "¿Primera vez? Activá tu cuenta". Si se acaba de intentar entrar con
+  legajo y clave (POST), el formulario aparece abierto.
+- **Después de entrar con la clave vieja**, antes de seguir, una tarjeta:
+  - si nunca entró con la cuenta Huayca: "Te quedan N días…", con el botón
+    **"Mandame el mail para activarla"** (llama desde el navegador a
+    `/quintral/api/auth/password-reset` con su DNI, `flow=activate`,
+    `app=catedras`, y muestra a qué mail enmascarado se mandó), "Ya la tengo:
+    entrar con Huayca" y "Seguir con la clave vieja por esta vez";
+  - si ya entró alguna vez con ella: "Ya tenés tu cuenta Huayca", con "Entrar
+    con cuenta Huayca ahora" y "Seguir a Cátedras".
+  El último mes el plazo va en naranja. "Entrar con Huayca" es
+  `?fs=1&huayca=entrar`: cierra la sesión de la clave vieja y va a Keycloak.
+- **Administración > Cuentas Huayca** (ítem 3536, perfil admin): quién sigue
+  con la clave vieja, quién ya entra con la cuenta Huayca y quién no entró.
+
+Cada ingreso se anota en `huayca.ingresos_cuenta` (`catedras_ingresos`), desde
+el 12/11/2026. La tabla se crea una vez con `deploy/sql/ingresos_cuenta.sql`;
+si falta, se loguea y el ingreso sigue igual.
+
 ## Errores que ve la persona
 
 - DNI con cuenta Huayca pero sin usuario en cátedras → "Tu cuenta Huayca es
