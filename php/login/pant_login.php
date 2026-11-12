@@ -54,8 +54,6 @@ class pant_login extends toba_ei_pantalla
 		echo "</div>";
 
 		echo "<a class='hc-boton' href='" . $esc->escapeHtmlAttr(catedras_huayca_sso::url_entrar()) . "'>Entrar con cuenta Huayca</a>";
-		echo "<p class='hc-intro'>Con tu DNI y la contrase&ntilde;a de tu cuenta Huayca. "
-			. "Si ya entraste a Quintral o a deptos, no te la vuelve a pedir.</p>";
 		if (catedras_huayca_sso::tiene_sesion_huayca()) {
 			// Volvio de Keycloak pero no pudo entrar (DNI sin acceso a catedras, etc.)
 			echo "<p class='hc-intro'><a href='" . $esc->escapeHtmlAttr(catedras_huayca_sso::url_salida()) . "'>Entrar con otra cuenta Huayca</a></p>";
