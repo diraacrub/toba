@@ -1,0 +1,154 @@
+<?php
+use SIUToba\rest\rest;
+use SIUToba\rest\lib\modelable;
+use SIUToba\rest\lib\rest_error;
+
+/**
+ * @description Programas, planificaciones e informes de un anio, con su estado
+ *
+ * GET /rest/documentos?ano_academico=2026
+ *     [&tipo=programa,planificacion,informe]
+ *     [&estado=docente,depto,sac,aprobado,no_entregado]
+ *     [&dni=12345678] [&legajo=12345] [&depto_principal=MATEMATICA]
+ *
+ * Una fila por documento: el programa, su planificacion y su informe pasan
+ * cada uno por docente -> depto -> sac -> aprobado (o no_entregado). Sirve
+ * para que Gestion Academica le muestre a cada uno lo que espera de el: al
+ * docente lo suyo sin presentar, al departamento lo que tiene que avalar.
+ * Solo lo necesario para eso, sin el contenido de los documentos.
+ *
+ * El anio es el del programa (el de la planificacion casi siempre coincide;
+ * el informe no tiene). Los programas ocultos (observaciones con "[ocultar]",
+ * como en dt_programas) no cuentan, ni sus planificaciones e informes.
+ * depto_principal se compara sin acentos, mayusculas ni espacios, como el
+ * aval de los departamentos (en PHP: la base es LATIN1). Las reglas de cada pantalla (por ejemplo, que el aval de
+ * programas deja afuera las carreras que empiezan con I) las aplica quien
+ * consume: aca va cod_carrera para eso.
+ *
+ * Lo usa Gestion Academica (deptos-crub, catedras.py). Archivo en ASCII.
+ */
+class recurso_documentos implements modelable
+{
+	const TIPOS = array('programa', 'planificacion', 'informe');
+	const ESTADOS = array('docente', 'depto', 'sac', 'aprobado', 'no_entregado');
+
+	static function _get_modelos()
+	{
+		return array();
+	}
+
+	// "a,b" -> array de los valores permitidos; null si no vino el parametro.
+	static function lista($nombre, $permitidos)
+	{
+		if (! isset($_GET[$nombre]) || trim((string) $_GET[$nombre]) === '') {
+			return null;
+		}
+		$valores = array_unique(array_map('trim', explode(',', strtolower((string) $_GET[$nombre]))));
+		$malos = array_diff($valores, $permitidos);
+		if ($malos) {
+			throw new rest_error(400, $nombre . ' desconocido: ' . implode(', ', $malos)
+				. ' (se acepta ' . implode(', ', $permitidos) . ').');
+		}
+		return array_values($valores);
+	}
+
+	static function numero($nombre)
+	{
+		if (! isset($_GET[$nombre])) {
+			return null;
+		}
+		$v = preg_replace('/[^0-9]/', '', (string) $_GET[$nombre]);
+		if ($v === '') {
+			throw new rest_error(400, 'El ' . $nombre . ' tiene que ser numerico.');
+		}
+		return $v;
+	}
+
+	static function utf8($v)
+	{
+		if ($v === null) {
+			return null;
+		}
+		$v = trim((string) $v);
+		return mb_check_encoding($v, 'UTF-8') ? $v : mb_convert_encoding($v, 'UTF-8', 'ISO-8859-1');
+	}
+
+	// "Biologia General" == "BIOLOGIA GENERAL" (con tilde): mayusculas, sin acentos ni espacios.
+	static function plano($v)
+	{
+		$v = mb_strtoupper(self::utf8($v), 'UTF-8');
+		$v = strtr($v, array("\u{00C1}" => 'A', "\u{00C9}" => 'E', "\u{00CD}" => 'I', "\u{00D3}" => 'O',
+			"\u{00DA}" => 'U', "\u{00DC}" => 'U', "\u{00D1}" => 'N'));
+		return preg_replace('/[^A-Z0-9]/', '', $v);
+	}
+
+	static function get_list()
+	{
+		$ano = trim((string) ($_GET['ano_academico'] ?? ''));
+		if (! preg_match('/^[0-9]{4}$/', $ano)) {
+			throw new rest_error(400, 'Falta ano_academico (AAAA).');
+		}
+		$tipos = self::lista('tipo', self::TIPOS);
+		$estados = self::lista('estado', self::ESTADOS);
+		$dni = self::numero('dni');
+		$legajo = self::numero('legajo');
+
+		$where = array(
+			'trim(p.ano_academico) = ' . quote($ano),
+			"(p.observaciones IS NULL OR p.observaciones NOT ILIKE '%[ocultar]%')",
+		);
+		if ($dni !== null) {
+			$where[] = 'p.dni_resp = ' . quote($dni);
+		}
+		if ($legajo !== null) {
+			$where[] = 'p.legajo_resp = ' . quote($legajo);
+		}
+		$depto = trim((string) ($_GET['depto_principal'] ?? ''));
+
+		// Lo comun de las tres: el programa y su materia.
+		$comun = 'p.id_programa, p.id_materia_prog AS id_materia, trim(p.ano_academico) AS ano_academico,
+			p.periodo_dictado, p.legajo_resp, p.dni_resp, p.apellido_resp, p.nombre_resp,
+			m.nombre_materia, m.cod_carrera, m.depto_principal';
+		$desde = 'FROM programas p JOIN materias m ON m.id_materia = p.id_materia_prog';
+		$filtro = implode(' AND ', $where);
+		$partes = array(
+			'programa' => "SELECT 'programa' AS tipo, p.id_programa AS id, p.estado, $comun
+				$desde WHERE $filtro",
+			'planificacion' => "SELECT 'planificacion' AS tipo, pl.id_planificacion AS id, pl.estado_planificacion AS estado, $comun
+				FROM planificaciones pl JOIN programas p ON p.id_programa = pl.id_prog_planif
+				JOIN materias m ON m.id_materia = p.id_materia_prog WHERE $filtro",
+			'informe' => "SELECT 'informe' AS tipo, i.id_informe AS id, i.estado_informe AS estado, $comun
+				FROM informes i JOIN programas p ON p.id_programa = i.id_prog_informe
+				JOIN materias m ON m.id_materia = p.id_materia_prog WHERE $filtro",
+		);
+		$sql = array();
+		foreach ($partes as $tipo => $s) {
+			if ($tipos === null || in_array($tipo, $tipos)) {
+				$sql[] = $s;
+			}
+		}
+		$sql = 'SELECT * FROM (' . implode(' UNION ALL ', $sql) . ') d';
+		if ($estados !== null) {
+			$sql .= ' WHERE d.estado IN (' . implode(', ', array_map('quote', $estados)) . ')';
+		}
+		$sql .= ' ORDER BY d.id_programa, d.tipo';
+
+		$salida = array();
+		foreach (toba::db()->consultar($sql) as $f) {
+			foreach (array('id', 'id_programa', 'id_materia', 'legajo_resp', 'dni_resp') as $c) {
+				$f[$c] = ($f[$c] === null || $f[$c] === '') ? null : (int) $f[$c];
+			}
+			// La base es LATIN1: los textos salen en UTF-8, como en /rest/materias.
+			foreach (array('apellido_resp', 'nombre_resp', 'nombre_materia', 'cod_carrera', 'depto_principal', 'periodo_dictado', 'estado') as $c) {
+				$f[$c] = self::utf8($f[$c]);
+			}
+			// El departamento se compara aca, sin acentos ni mayusculas ni
+			// espacios: en SQL dependeria de la codificacion de la conexion.
+			if ($depto !== '' && self::plano($f['depto_principal']) !== self::plano($depto)) {
+				continue;
+			}
+			$salida[] = $f;
+		}
+		rest::response()->get($salida);
+	}
+}
