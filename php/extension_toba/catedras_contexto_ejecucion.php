@@ -22,6 +22,9 @@ class catedras_contexto_ejecucion extends toba_contexto_ejecucion
 	// item => url
 	private static $menu_externo = array(
 		'3516' => 'https://huayca.crub.uncoma.edu.ar/programas/',	// APROBADOS CRUB > Ver Programas Aprobados
+		// DOCENTES > Salidas: las salidas de campo de deptos (Tus salidas y "Nueva
+		// salida"). La sesion Huayca es la misma: no pide la contrasena.
+		'3535' => 'https://huayca.crub.uncoma.edu.ar/deptos/salidas-de-campo/',
 	);
 
 	function conf__inicial()
