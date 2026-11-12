@@ -90,7 +90,7 @@ class pant_login extends toba_ei_pantalla
 			echo "<p class='hc-intro'><a href='" . $esc->escapeHtmlAttr(catedras_huayca_sso::url_salida()) . "'>Entrar con otra cuenta Huayca</a></p>";
 		}
 		echo "<p class='hc-activar'>&iquest;Primera vez? <a href='" . $esc->escapeHtmlAttr(self::url_cuenta('url_activar', 'activate')) . "'>"
-			. "Activ&aacute; tu cuenta</a> &mdash; te lleva 2 minutos.</p>";
+			. "Activ&aacute; tu cuenta</a></p>";
 
 		if ($this->existe_dependencia('datos')) {
 			if (catedras_autenticacion_keycloak::en_transicion()) {
@@ -100,8 +100,8 @@ class pant_login extends toba_ei_pantalla
 				$dias = catedras_ingresos::dias_restantes();
 				$abierto = (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') ? ' open' : '';
 				echo "<details class='hc-viejo'$abierto>";
-				echo "<summary>Entrar con legajo y clave vieja"
-					. "<span>hasta el " . self::fecha_larga($hasta) . " &middot; " . self::faltan($dias) . "</span></summary>";
+				echo "<summary><span class='hc-viejo-tit'>Entrar con legajo y clave vieja</span>"
+					. "<span class='hc-viejo-plazo'>hasta el " . self::fecha_larga($hasta) . " &middot; " . self::faltan($dias) . "</span></summary>";
 				echo "<p class='hc-viejo-nota'>Tu n&uacute;mero de legajo (sin puntos) y tu clave de C&aacute;tedras. "
 					. "Desde el " . self::fecha_larga($desde) . ", solo con la cuenta Huayca.</p>";
 				$this->dep('datos')->generar_html();
@@ -260,13 +260,19 @@ JS;
 	{
 		return <<<CSS
 <style>
+/* La misma familia que la landing, Quintral (frontend/src/index.css, "Pantallas
+   de cuenta") y la pantalla de la cuenta Huayca en Keycloak
+   (lenga-crub/deploy/keycloak-tema): campo azul con el degrade de la landing,
+   la marca, una tarjeta de 400px, campos y botones de 46px. */
 :root {
-	--hc-azul: #2563eb; --hc-azul-fuerte: #1d4ed8; --hc-texto: #111827; --hc-tenue: #475569;
-	--hc-borde: #d1d5db; --hc-peligro: #b91c1c; --hc-radio: 12px;
-	--hc-sombra: 0 6px 20px rgba(15, 23, 42, 0.12);
+	--hc-azul: #2563eb; --hc-azul-fuerte: #1d4ed8; --hc-azul-suave: #eff6ff;
+	--hc-texto: #0f172a; --hc-texto-2: #334155; --hc-tenue: #64748b;
+	--hc-borde: #cbd5e1; --hc-borde-suave: #e2e8f0; --hc-peligro: #b91c1c;
+	--hc-radio: 16px; --hc-radio-campo: 10px;
+	--hc-sombra: 0 1px 2px rgba(15,23,42,.08), 0 8px 24px rgba(15,23,42,.12);
 }
 html, body { background: var(--hc-azul) !important; margin: 0; }
-body { font-family: system-ui, Avenir, Helvetica, Arial, sans-serif !important; }
+body { font-family: system-ui, -apple-system, "Segoe UI", Ubuntu, Roboto, "Helvetica Neue", Arial, sans-serif !important; -webkit-font-smoothing: antialiased; }
 .hc-pagina { color: #fff; }
 /* Lo de Toba alrededor: barra, logo, titulo, y su pie "Desarrollado por SIU-CIN"
    (quedaba debajo de la pagina y obligaba a hacer scroll) */
@@ -281,20 +287,64 @@ html body .cuerpo .ci-base, html body .ci-base > tbody > tr > td, html body .ci-
 .ci-base > tbody > tr > td > .ei-barra-sup { display: none !important; }
 
 /* Toda la altura: el bloque central se centra y la franja institucional queda al pie */
-.hc-pagina { font-size: 16px; line-height: 1.4; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
-.hc-centro { flex: 1; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 40px 16px 48px; }
+.hc-pagina { font-size: 16px; line-height: 1.5; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+.hc-centro {
+	flex: 1; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center;
+	gap: 28px; padding: 48px 16px 56px;
+	background:
+		radial-gradient(1200px 600px at 15% -10%, rgba(255,255,255,.14), transparent 60%),
+		radial-gradient(900px 500px at 110% 110%, rgba(30,58,138,.55), transparent 60%),
+		var(--hc-azul);
+}
 .hc-pagina .hy-pie { margin-top: 0; background: #fff; border-top: 0; text-align: left; }
-.hc-marca, .hc-marca div { color: #fff !important; }
-.hc-marca { display: flex; align-items: center; gap: 16px; max-width: 100%; text-align: left; }
-.hc-sello { width: clamp(64px, 9vw, 92px); height: auto; flex: none; }
-.hc-nombre { font-size: clamp(30px, 5vw, 42px); line-height: 1.05; letter-spacing: .3px; }
-.hc-bajada { margin-top: 2px; font-size: 15px; color: rgba(255,255,255,.85); }
 
-.hc-tarjeta { width: 100%; max-width: 420px; box-sizing: border-box; background: #fff; color: var(--hc-texto); border-radius: var(--hc-radio); padding: 24px 24px 20px; box-shadow: var(--hc-sombra); text-align: left; }
-.hc-cabeza { margin-bottom: 20px; }
-.hc-titulo { margin: 0; font-size: 22px; font-weight: 600; color: var(--hc-texto); }
+/* La marca */
+.hc-marca, .hc-marca div { color: #fff !important; }
+.hc-marca { display: flex; align-items: center; gap: 18px; max-width: 100%; text-align: left; }
+.hc-sello { width: clamp(68px, 9vw, 88px); height: auto; flex: none; }
+.hc-nombre { font-size: clamp(34px, 5.5vw, 46px); font-weight: 500; line-height: 1.02; letter-spacing: .2px; }
+.hc-bajada { margin-top: 6px; font-size: clamp(15px, 2vw, 17px); color: rgba(255,255,255,.88) !important; }
+
+/* La tarjeta */
+.hc-tarjeta { width: 100%; max-width: 400px; box-sizing: border-box; background: #fff; color: var(--hc-texto); border-radius: var(--hc-radio); padding: 28px 28px 24px; box-shadow: var(--hc-sombra); text-align: left; }
+.hc-cabeza { margin-bottom: 18px; }
+.hc-titulo { margin: 0; font-size: 22px; font-weight: 600; line-height: 1.25; color: var(--hc-texto); }
 .hc-destino { margin: 2px 0 0; font-size: 15px; color: var(--hc-tenue); }
-.hc-intro { margin: 12px 0 0; font-size: 15px; color: var(--hc-tenue); }
+.hc-destino strong { color: var(--hc-texto-2); }
+.hc-intro { margin: 12px 0 0; font-size: 15px; color: var(--hc-texto-2); }
+.hc-intro a { color: var(--hc-azul-fuerte); font-weight: 600; }
+
+/* El boton principal */
+.hc-boton {
+	display: flex; align-items: center; justify-content: center; box-sizing: border-box; width: 100%;
+	min-height: 46px; padding: 0 16px; font-size: 16px; font-weight: 600;
+	color: #fff !important; background: var(--hc-azul); border-radius: var(--hc-radio-campo);
+	text-decoration: none !important; transition: background-color .15s ease;
+}
+.hc-boton:hover { background: var(--hc-azul-fuerte); }
+.hc-boton:focus-visible { outline: 3px solid rgba(37,99,235,.35); outline-offset: 2px; }
+
+/* Activar la cuenta: lo segundo mas visible */
+.hc-activar { margin: 16px 0 0; font-size: 15px; color: var(--hc-tenue); text-align: center; }
+.hc-activar a { color: var(--hc-azul-fuerte); font-weight: 600; text-decoration: none; }
+.hc-activar a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* La cuenta vieja: plegada detras de un enlace chico */
+.hc-viejo { margin: 20px 0 0; padding-top: 16px; border-top: 1px solid var(--hc-borde-suave); }
+.hc-viejo > summary { list-style: none; cursor: pointer; text-align: center; border-radius: 8px; padding: 4px; }
+.hc-viejo > summary::-webkit-details-marker { display: none; }
+.hc-viejo > summary:focus-visible { outline: 2px solid var(--hc-azul); outline-offset: 2px; }
+.hc-viejo-tit { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 500; color: var(--hc-texto-2); }
+.hc-viejo-tit::after {
+	content: ''; width: 7px; height: 7px; margin-top: -3px;
+	border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+	transform: rotate(45deg); transition: transform .15s ease;
+}
+.hc-viejo[open] .hc-viejo-tit::after { transform: rotate(-135deg); margin-top: 3px; }
+.hc-viejo > summary:hover .hc-viejo-tit { color: var(--hc-texto); }
+.hc-viejo-plazo { display: block; margin-top: 2px; font-size: 13px; color: var(--hc-tenue); }
+.hc-viejo[open] > summary { margin-bottom: 14px; }
+.hc-viejo-nota { margin: 0 0 16px; font-size: 14px; color: var(--hc-tenue); }
 
 /* El formulario de Toba, adentro de la tarjeta */
 .hc-tarjeta table.ei-base, .hc-tarjeta table.ei-base > tbody > tr > td { width: 100% !important; border: 0 !important; background: none !important; padding: 0 !important; }
@@ -303,63 +353,60 @@ html body .cuerpo .ci-base, html body .ci-base > tbody > tr > td, html body .ci-
 .hc-tarjeta .ei-form-fila { display: block; margin: 0 0 16px; padding: 0; border: 0; background: none; }
 .hc-tarjeta .ei-form-fila label { display: block; width: auto !important; float: none !important; text-align: left !important; margin: 0 0 6px; padding: 0; font-size: 15px; font-weight: 600; color: var(--hc-texto); }
 .hc-tarjeta .ei-form-fila label + div { margin-left: 0 !important; }
-.hc-tarjeta .ef-input, .hc-tarjeta input[type=text], .hc-tarjeta input[type=password] { width: 100% !important; box-sizing: border-box; min-height: 44px !important; padding: 10px 12px !important; font: inherit; font-size: 16px !important; color: var(--hc-texto); background: #fff; border: 1px solid var(--hc-borde); border-radius: 8px; box-shadow: none; }
-.hc-tarjeta .ef-input:focus { outline: 2px solid var(--hc-azul); outline-offset: 1px; border-color: var(--hc-azul); }
+.hc-tarjeta .ef-input, .hc-tarjeta input[type=text], .hc-tarjeta input[type=password] {
+	width: 100% !important; box-sizing: border-box; min-height: 46px !important; padding: 10px 12px !important;
+	font: inherit; font-size: 16px !important; color: var(--hc-texto); background: #fff;
+	border: 1px solid var(--hc-borde); border-radius: var(--hc-radio-campo); box-shadow: none;
+	transition: border-color .15s ease, box-shadow .15s ease;
+}
+.hc-tarjeta .ef-input:hover { border-color: #94a3b8; }
+.hc-tarjeta .ef-input:focus { outline: none; border-color: var(--hc-azul); box-shadow: 0 0 0 3px rgba(37,99,235,.22); }
 .hc-tarjeta .ei-botonera { padding: 0 !important; margin: 8px 0 0; background: none !important; border: 0 !important; text-align: left; }
-.hc-tarjeta .ei-boton { width: 100%; min-height: 44px !important; margin: 0; padding: 0 16px !important; font: inherit; font-size: 16px !important; font-weight: 600; color: #fff !important; background: var(--hc-azul) !important; border: 0 !important; border-radius: 8px; cursor: pointer; box-shadow: none !important; text-shadow: none !important; }
-.hc-tarjeta .ei-boton { justify-content: center; }
-.hc-tarjeta .ei-boton:hover { background: var(--hc-azul-fuerte) !important; }
+/* El boton del formulario de Toba es secundario: el principal es el de Huayca */
+.hc-tarjeta .ei-boton {
+	width: 100%; min-height: 46px !important; margin: 0; padding: 0 16px !important; justify-content: center;
+	font: inherit; font-size: 16px !important; font-weight: 600;
+	color: var(--hc-azul-fuerte) !important; background: #fff !important;
+	border: 1px solid var(--hc-borde) !important; border-radius: var(--hc-radio-campo);
+	cursor: pointer; box-shadow: none !important; text-shadow: none !important;
+}
+.hc-tarjeta .ei-boton:hover { background: var(--hc-azul-suave) !important; border-color: #93c5fd !important; }
 .hc-tarjeta .ei-boton u { text-decoration: none; }
 .hc-tarjeta [id\$='_notificacion'] { color: var(--hc-peligro); font-size: 15px; }
 .hc-tarjeta .ef-clave-fuerza, .hc-tarjeta [id\$='_fuerza'] { display: none !important; }
-
-.hc-boton { display: flex; align-items: center; justify-content: center; box-sizing: border-box; width: 100%; min-height: 44px; padding: 0 16px; font-size: 16px; font-weight: 600; color: #fff !important; background: var(--hc-azul); border-radius: 8px; text-decoration: none !important; }
-.hc-boton:hover { background: var(--hc-azul-fuerte); }
-.hc-boton:focus-visible { outline: 2px solid var(--hc-azul-fuerte); outline-offset: 2px; }
-.hc-intro a { color: var(--hc-azul-fuerte); }
 .hc-separador { display: flex; align-items: center; gap: 12px; margin: 24px 0 16px; font-size: 14px; color: var(--hc-tenue); }
-.hc-separador::before, .hc-separador::after { content: ''; flex: 1; border-top: 1px solid var(--hc-borde); }
-/* El boton del formulario de Toba queda secundario: el principal es el de Huayca */
-.hc-tarjeta .ei-boton { color: var(--hc-azul-fuerte) !important; background: #fff !important; border: 1px solid var(--hc-borde) !important; }
-.hc-tarjeta .ei-boton:hover { background: #eff6ff !important; }
-
-/* Activar la cuenta: lo segundo mas visible */
-.hc-activar { margin: 12px 0 0; font-size: 15px; color: var(--hc-tenue); text-align: center; }
-.hc-activar a { color: var(--hc-azul-fuerte); font-weight: 600; }
-
-/* La cuenta vieja: plegada detras de un enlace chico */
-.hc-viejo { margin: 24px 0 0; padding-top: 16px; border-top: 1px solid var(--hc-borde); }
-.hc-viejo > summary { cursor: pointer; font-size: 14px; color: var(--hc-tenue); text-align: center; list-style: none; }
-.hc-viejo > summary::-webkit-details-marker { display: none; }
-.hc-viejo > summary { text-decoration: underline; text-underline-offset: 3px; }
-.hc-viejo > summary span { display: block; margin-top: 2px; font-size: 13px; text-decoration: none; }
-.hc-viejo[open] > summary { margin-bottom: 12px; }
-.hc-viejo-nota { margin: 0 0 16px; font-size: 14px; color: var(--hc-tenue); }
+.hc-separador::before, .hc-separador::after { content: ''; flex: 1; border-top: 1px solid var(--hc-borde-suave); }
 
 /* Despues de entrar con la clave vieja */
-.hc-plazo { display: inline-block; margin: 0 0 10px; padding: 3px 10px; font-size: 13px; font-weight: 600; color: var(--hc-azul-fuerte); background: #eff6ff; border-radius: 999px; }
+.hc-plazo { display: inline-block; margin: 0 0 10px; padding: 3px 10px; font-size: 13px; font-weight: 600; color: var(--hc-azul-fuerte); background: var(--hc-azul-suave); border-radius: 999px; }
 .hc-urgente .hc-plazo { color: #9a3412; background: #ffedd5; }
-.hc-pasaje .hc-titulo { line-height: 1.25; }
+.hc-urgente .hc-titulo { color: #9a3412; }
 .hc-pasaje .hc-intro { margin: 10px 0 20px; }
 .hc-pasaje .hc-boton { font-family: inherit; border: 0; cursor: pointer; }
-.hc-pasaje .hc-boton:disabled { cursor: default; opacity: .85; }
-.hc-resultado { margin: 12px 0 0; font-size: 15px; }
+.hc-pasaje .hc-boton:disabled { cursor: default; opacity: .8; }
+.hc-resultado { margin: 14px 0 0; padding: 10px 12px; font-size: 15px; line-height: 1.45; border-radius: var(--hc-radio-campo); }
 .hc-resultado:empty { display: none; }
-.hc-resultado.hc-ok { color: #166534; }
-.hc-resultado.hc-error { color: var(--hc-peligro); }
-.hc-otras { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 16px; font-size: 14px; }
-.hc-otras a { color: var(--hc-tenue); text-underline-offset: 3px; }
+.hc-resultado.hc-ok { color: #166534; background: #f0fdf4; border: 1px solid #bbf7d0; }
+.hc-resultado.hc-error { color: var(--hc-peligro); background: #fef2f2; border: 1px solid #fecaca; }
+.hc-otras { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 18px; font-size: 14px; }
+.hc-otras a { color: var(--hc-tenue); text-decoration: none; }
+.hc-otras a:hover { color: var(--hc-texto); text-decoration: underline; text-underline-offset: 3px; }
 .hc-otras a:first-child { color: var(--hc-azul-fuerte); font-weight: 600; font-size: 15px; }
 
-.hc-enlaces { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: -8px; }
-.hc-enlaces a { color: #fff !important; font-size: 15px; padding: 4px 8px; border-radius: 6px; text-decoration: underline; text-underline-offset: 3px; }
-.hc-enlaces a:hover { background: rgba(255,255,255,.14); }
+/* Los enlaces de abajo, sobre el azul */
+.hc-enlaces { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: -12px; }
+.hc-enlaces a { color: rgba(255,255,255,.92) !important; font-size: 14px; padding: 4px 8px; border-radius: 6px; text-decoration: none; }
+.hc-enlaces a:hover { color: #fff !important; text-decoration: underline; text-underline-offset: 3px; }
 
 @media (max-width: 560px) {
-	.hc-centro { justify-content: flex-start; padding: 28px 16px 36px; }
-	.hc-marca { flex-direction: column; gap: 8px; text-align: center; }
+	.hc-centro { justify-content: flex-start; padding: 32px 16px 40px; }
+	.hc-marca { flex-direction: column; gap: 10px; text-align: center; }
+	.hc-tarjeta { padding: 22px 20px 20px; }
 	.hc-pagina .hy-pie { padding: 20px 16px; }
 	.hc-pagina .hy-pie-inst img { height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+	.hc-boton, .hc-tarjeta .ef-input, .hc-viejo-tit::after { transition: none; }
 }
 </style>
 CSS;
