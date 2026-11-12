@@ -22,9 +22,21 @@ class catedras_contexto_ejecucion extends toba_contexto_ejecucion
 	// item => url
 	private static $menu_externo = array(
 		'3516' => 'https://huayca.crub.uncoma.edu.ar/programas/',	// APROBADOS CRUB > Ver Programas Aprobados
-		// DOCENTES > Salidas: las salidas de campo de deptos (Tus salidas y "Nueva
-		// salida"). La sesion Huayca es la misma: no pide la contrasena.
-		'3535' => 'https://huayca.crub.uncoma.edu.ar/deptos/salidas-de-campo/',
+	);
+
+	// Opciones del menu que por ahora solo muestran un aviso (la ventana de
+	// notificacion de Toba), sin ir a ningun lado. item => array(titulo, texto).
+	// Va dentro de onclick='...' y de un string JS con comillas dobles: sin
+	// comillas de ningun tipo, y los acentos como \u00e1.
+	//
+	// DOCENTES > Salidas: en 2027 pasa a $menu_externo con
+	// 'https://huayca.crub.uncoma.edu.ar/deptos/salidas-de-campo/' (las salidas
+	// de campo de deptos, con la misma sesion Huayca).
+	private static $menu_aviso = array(
+		'3535' => array(
+			'Salidas de campo',
+			'A partir de 2027, las salidas planificadas y los formularios de salidas deber\u00e1n gestionarse por este medio.',
+		),
 	);
 
 	function conf__inicial()
@@ -47,6 +59,13 @@ class catedras_contexto_ejecucion extends toba_contexto_ejecucion
 			// Va dentro de onclick='...': sin comillas simples
 			$menu->set_datos_opcion($item, array(
 				'js' => 'window.open("' . $url . '", "_blank", "noopener"); return false;',
+			));
+		}
+		foreach (self::$menu_aviso as $item => $aviso) {
+			list($titulo, $texto) = $aviso;
+			$menu->set_datos_opcion($item, array(
+				'js' => 'notificacion.limpiar(); notificacion.agregar("' . $texto . '", "info");'
+					. ' notificacion.set_titulo_ventana("' . $titulo . '"); notificacion.mostrar(); return false;',
 			));
 		}
 	}
