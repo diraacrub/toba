@@ -22,6 +22,9 @@ class catedras_contexto_ejecucion extends toba_contexto_ejecucion
 	// item => url
 	private static $menu_externo = array(
 		'3516' => 'https://huayca.crub.uncoma.edu.ar/programas/',	// APROBADOS CRUB > Ver Programas Aprobados
+		// ADMINISTRACION > Exportar programas: deptos arma los programas del anio
+		// desde la planilla de cargos y baja el CSV para Importar programas.
+		'3538' => 'https://huayca.crub.uncoma.edu.ar/deptos/programas',
 	);
 
 	// Opciones del menu que por ahora solo muestran un aviso (la ventana de
