@@ -3,8 +3,9 @@
  * Pantalla de inicio de catedras.
  *
  * Saludo, la guia de uso que corresponde a cada perfil (www/ayuda/: docentes,
- * departamentos, Secretaria Academica; admin ve las tres) y las fechas de las
- * Obligaciones Docentes (Anexo I del Calendario Academico CRUB 1719/25).
+ * departamentos, Secretaria Academica; admin ve las tres), el acceso a Gestion
+ * Academica (departamentos y Secretaria) y las fechas de las Obligaciones
+ * Docentes (Anexo I del Calendario Academico CRUB 1719/25).
  *
  * Los estilos estan en www/css/huayca.css (seccion "Inicio"), con el resto del
  * tema. Archivo en ASCII: los acentos van como entidades HTML.
@@ -49,6 +50,29 @@ if ($guias) {
 	foreach ($guias as $archivo => $titulo) {
 		echo '<a href="' . $url_ayuda . $archivo . '" target="_blank" rel="noopener" class="hy-boton-primario">' . $titulo . ' <span aria-hidden="true">&#8599;</span></a>';
 	}
+	echo '</div>';
+	echo '</section>';
+}
+
+if ($es_admin || $es_depto || $es_sac) {
+	// --- Gestion Academica: la otra aplicacion de Huayca, con la misma cuenta.
+	// Un departamento tiene ahi redesignaciones, ayudantes estudiantes y
+	// licencias; Secretaria, su panel con todo lo pendiente.
+	$url_gestion = 'https://huayca.crub.uncoma.edu.ar/gestion-academica/';
+	if ($es_sac || $es_admin) {
+		$texto_gestion = 'El panel de Secretar&iacute;a: lo pendiente de redesignaciones, conjuntos de materias, ayudantes estudiantes y programas del a&ntilde;o.';
+		$boton_gestion = 'Panel de Secretar&iacute;a';
+	} else {
+		$texto_gestion = 'Las redesignaciones, los ayudantes estudiantes y las licencias a renovar de tu departamento.';
+		$boton_gestion = 'Ir a Gesti&oacute;n Acad&eacute;mica';
+	}
+	echo '<section class="hy-tarjeta hy-instructivo">';
+	echo '<div>';
+	echo '<h2>Gesti&oacute;n Acad&eacute;mica</h2>';
+	echo '<p>' . $texto_gestion . ' Se entra con la misma cuenta Huayca.</p>';
+	echo '</div>';
+	echo '<div class="hy-guias">';
+	echo '<a href="' . $url_gestion . '" target="_blank" rel="noopener" class="hy-boton-primario">' . $boton_gestion . ' <span aria-hidden="true">&#8599;</span></a>';
 	echo '</div>';
 	echo '</section>';
 }

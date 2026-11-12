@@ -22,9 +22,10 @@ class catedras_contexto_ejecucion extends toba_contexto_ejecucion
 	// item => url
 	private static $menu_externo = array(
 		'3516' => 'https://huayca.crub.uncoma.edu.ar/programas/',	// APROBADOS CRUB > Ver Programas Aprobados
-		// ADMINISTRACION > Exportar programas: deptos arma los programas del anio
-		// desde la planilla de cargos y baja el CSV para Importar programas.
-		'3538' => 'https://huayca.crub.uncoma.edu.ar/deptos/programas',
+		// ADMINISTRACION > Exportar programas: Gestion Academica arma los
+		// programas del anio desde la planilla de cargos y baja el CSV para
+		// Importar programas.
+		'3538' => 'https://huayca.crub.uncoma.edu.ar/gestion-academica/programas',
 	);
 
 	// Opciones del menu que por ahora solo muestran un aviso (la ventana de
@@ -33,8 +34,8 @@ class catedras_contexto_ejecucion extends toba_contexto_ejecucion
 	// comillas de ningun tipo, y los acentos como \u00e1.
 	//
 	// DOCENTES > Salidas: en 2027 pasa a $menu_externo con
-	// 'https://huayca.crub.uncoma.edu.ar/deptos/salidas-de-campo/' (las salidas
-	// de campo de deptos, con la misma sesion Huayca).
+	// 'https://huayca.crub.uncoma.edu.ar/gestion-academica/salidas-de-campo/'
+	// (las salidas de campo de Gestion Academica, con la misma sesion Huayca).
 	private static $menu_aviso = array(
 		'3535' => array(
 			'Salidas de campo',
