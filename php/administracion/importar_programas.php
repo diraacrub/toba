@@ -2,14 +2,17 @@
 /**
  * Administracion > Importar programas (CSV)
  *
- * Da de alta los programas de un anio a partir del CSV que arma deptos
- * (/deptos/programas: la planilla de cargos, con los dobles ya resueltos).
+ * Da de alta los programas de un anio, cada uno con su planificacion, a
+ * partir de lo que arma deptos (/deptos/programas: el informe de Mocovi del
+ * anio, con los dobles ya resueltos). deptos lo manda directo por la API
+ * (POST /rest/alta_programas, que usa planificar y aplicar de esta clase);
+ * esta pantalla queda para cargar el CSV a mano.
  *
  *   1. Subir: el CSV de deptos (ano_academico, id_materia, periodo_dictado,
  *      legajo_resp, id_designacion, cargo_resp, apellido_resp, nombre_resp,
  *      equipo_catedra, id_programa_anterior, materia).
  *   2. Vista previa, sin guardar nada: a crear (y si copian contenido), ya
- *      existen y con problemas.
+ *      existen (y si les falta la planificacion) y con problemas.
  *   3. Confirmar: se vuelve a calcular contra la base y se crea todo en una
  *      sola transaccion.
  *
@@ -19,10 +22,15 @@
  *   - Si viene id_programa_anterior, el programa nuevo arranca con su contenido
  *     (fundamentacion, objetivos, programa, bibliografia, metodologia,
  *     evaluacion, distribucion horaria, cronograma y horas). Estado: docente.
- *   - Un programa de ese anio, materia y periodo que ya existe no se toca.
+ *   - Cada programa nuevo lleva su planificacion, como se cargaron en 2026: una
+ *     por programa, del mismo anio, vacia y en estado docente. La operacion
+ *     Programas y Planificaciones la necesita para abrir el programa.
+ *   - Un programa de ese anio, materia y periodo que ya existe no se toca; si
+ *     no tiene planificacion, se le crea la suya.
  *   - Cada alta queda en movimientos.
- *   - Los id_programa nuevos siguen al mas alto (como 2025 y 2026). Los que
- *     existen no se tocan, y tampoco la secuencia de la tabla.
+ *   - Los id_programa e id_planificacion nuevos siguen al mas alto (como 2025
+ *     y 2026). Los que existen no se tocan, y tampoco las secuencias de las
+ *     tablas (estan atrasadas).
  *   - Solo para el perfil admin.
  *
  * Archivo en ASCII: los acentos de la interfaz van como entidades HTML.
@@ -110,7 +118,7 @@ class catedras_importar_programas
 	static function planificar($filas)
 	{
 		$db = self::db();
-		$plan = array('nuevos' => array(), 'existen' => array(), 'problemas' => array());
+		$plan = array('nuevos' => array(), 'existen' => array(), 'sin_planif' => array(), 'problemas' => array());
 
 		$dni_de = array();
 		foreach (toba::instancia()->get_db()->consultar('SELECT usuario, ciu FROM apex_usuario') as $u) {
@@ -125,6 +133,10 @@ class catedras_importar_programas
 		foreach ($db->consultar('SELECT id_programa, id_materia_prog, periodo_dictado, trim(ano_academico) AS ano FROM programas') as $p) {
 			$programas[$p['ano'] . '|' . (int) $p['id_materia_prog'] . '|' . trim($p['periodo_dictado'])] = $p['id_programa'];
 			$ids[(int) $p['id_programa']] = true;
+		}
+		$con_planif = array();
+		foreach ($db->consultar('SELECT DISTINCT id_prog_planif FROM planificaciones') as $pl) {
+			$con_planif[(int) $pl['id_prog_planif']] = true;
 		}
 
 		$vistos = array();
@@ -159,7 +171,12 @@ class catedras_importar_programas
 			if ($prob) {
 				$plan['problemas'][] = array('fila' => $f, 'motivos' => $prob);
 			} elseif (isset($programas[$clave])) {
-				$plan['existen'][] = array('fila' => $f, 'id' => $programas[$clave]);
+				$existe = array('fila' => $f, 'id' => $programas[$clave]);
+				if (isset($con_planif[(int) $programas[$clave]])) {
+					$plan['existen'][] = $existe;
+				} else {
+					$plan['sin_planif'][] = $existe;
+				}
 			} else {
 				$plan['nuevos'][] = array('fila' => $f);
 			}
@@ -171,20 +188,37 @@ class catedras_importar_programas
 	// Aplicar (una sola transaccion)
 	// ------------------------------------------------------------------
 
-	static function aplicar($plan)
+	/** La planificacion vacia de un programa: del mismo anio, en estado docente. */
+	static function crear_planificacion($db, $id, $id_programa, $ano, $usuario, $obs)
+	{
+		$db->ejecutar('INSERT INTO planificaciones (id_planificacion, ano_acad_planif, id_prog_planif, estado_planificacion) VALUES ('
+			. (int) $id . ', ' . (int) $ano . ', ' . (int) $id_programa . ", 'docente')");
+		$db->ejecutar("INSERT INTO movimientos (nombre_tabla, id_tabla, tipo_movimiento, usuario_movimiento, observaciones, estado_mov) VALUES ('planificaciones', "
+			. (int) $id . ", 'Alta', " . $db->quote($usuario) . ', ' . $db->quote($obs) . ", 'docente')");
+	}
+
+	/**
+	 * Crea lo planificado. Devuelve lo creado: array de
+	 * array(linea, id_programa, id_planificacion, nuevo_programa).
+	 * $usuario es quien queda en movimientos (por omision, el de la sesion).
+	 */
+	static function aplicar($plan, $usuario = null, $origen = 'deptos')
 	{
 		$db = self::db();
-		$usuario = toba::usuario()->get_id();
+		$usuario = $usuario !== null ? $usuario : toba::usuario()->get_id();
+		$creados = array();
 		$copiar = implode(', ', self::$CONTENIDO);
 		$db->abrir_transaccion();
 		try {
-			// El id de cada programa nuevo lo pone el importador: el siguiente al
-			// mas alto, como se cargaron 2025 y 2026. No se usa ni se toca la
-			// secuencia de la tabla (esta atrasada). La tabla queda bloqueada
-			// hasta el final, para que nadie tome el mismo numero en el medio.
-			$db->ejecutar('LOCK TABLE programas IN SHARE ROW EXCLUSIVE MODE');
+			// Los ids nuevos los pone el importador: el siguiente al mas alto,
+			// como se cargaron 2025 y 2026. No se usan ni se tocan las
+			// secuencias (estan atrasadas). Las tablas quedan bloqueadas hasta
+			// el final, para que nadie tome el mismo numero en el medio.
+			$db->ejecutar('LOCK TABLE programas, planificaciones IN SHARE ROW EXCLUSIVE MODE');
 			$max = $db->consultar_fila('SELECT coalesce(max(id_programa), 0) AS n FROM programas');
 			$siguiente = (int) $max['n'];
+			$max = $db->consultar_fila('SELECT coalesce(max(id_planificacion), 0) AS n FROM planificaciones');
+			$siguiente_planif = (int) $max['n'];
 			foreach ($plan['nuevos'] as $p) {
 				$siguiente++;
 				$f = $p['fila'];
@@ -215,8 +249,20 @@ class catedras_importar_programas
 				$r = $db->consultar_fila($sql);
 				$db->ejecutar("INSERT INTO movimientos (nombre_tabla, id_tabla, tipo_movimiento, usuario_movimiento, observaciones, estado_mov) VALUES ('programas', "
 					. (int) $r['id_programa'] . ", 'Alta', " . $db->quote($usuario) . ', '
-					. $db->quote('Importado desde la planilla' . ($f['anterior'] !== '' ? ', con el contenido del programa ' . (int) $f['anterior'] : ''))
+					. $db->quote('Importado desde ' . $origen . ' (informe de Mocovi)' . ($f['anterior'] !== '' ? ', con el contenido del programa ' . (int) $f['anterior'] : ''))
 					. ", 'docente')");
+				$siguiente_planif++;
+				self::crear_planificacion($db, $siguiente_planif, (int) $r['id_programa'], (int) $f['ano'], $usuario,
+					'Importado desde ' . $origen . ' con el programa ' . (int) $r['id_programa']);
+				$creados[] = array('linea' => $f['linea'], 'id_programa' => (int) $r['id_programa'],
+					'id_planificacion' => $siguiente_planif, 'nuevo_programa' => true);
+			}
+			foreach ($plan['sin_planif'] as $p) {
+				$siguiente_planif++;
+				self::crear_planificacion($db, $siguiente_planif, (int) $p['id'], (int) $p['fila']['ano'], $usuario,
+					'Importado desde ' . $origen . ': el programa ' . (int) $p['id'] . ' no tenia planificacion');
+				$creados[] = array('linea' => $p['fila']['linea'], 'id_programa' => (int) $p['id'],
+					'id_planificacion' => $siguiente_planif, 'nuevo_programa' => false);
 			}
 			$db->cerrar_transaccion();
 		} catch (Exception $e) {
@@ -224,7 +270,9 @@ class catedras_importar_programas
 			toba::logger()->error('IMPORTAR PROGRAMAS: ' . $e->getMessage());
 			throw $e;
 		}
-		toba::logger()->notice('IMPORTAR PROGRAMAS por ' . $usuario . ': ' . count($plan['nuevos']) . ' nuevos');
+		toba::logger()->notice('IMPORTAR PROGRAMAS por ' . $usuario . ': ' . count($plan['nuevos']) . ' nuevos con planificacion, '
+			. count($plan['sin_planif']) . ' planificaciones para programas que ya estaban');
+		return $creados;
 	}
 
 	// ------------------------------------------------------------------
@@ -250,14 +298,14 @@ class catedras_importar_programas
 	{
 		echo '<section class="hy-tarjeta">';
 		echo '<h2>1. Elegir el archivo</h2>';
-		echo '<p>El CSV que se descarga de <strong>deptos &rarr; Programas</strong>: los programas del a&ntilde;o armados desde la planilla de cargos, con los casos de dos responsables ya resueltos.</p>';
+		echo '<p>El CSV que se descarga de <strong>deptos &rarr; Programas</strong>: los programas del a&ntilde;o armados desde el informe de Mocovi, con los casos de dos responsables ya resueltos.</p>';
 		echo '<form method="post" enctype="multipart/form-data" action="' . self::h(self::url()) . '" class="hy-import-form">';
 		self::campo_csrf();
 		echo '<input type="hidden" name="paso" value="previa">';
 		echo '<input type="file" name="csv" accept=".csv,.txt,text/csv" required>';
 		echo '<button type="submit" class="hy-boton-primario">Ver qu&eacute; va a pasar</button>';
 		echo '</form>';
-		echo '<p class="hy-nota">Los programas nuevos arrancan en estado <strong>docente</strong> con el contenido del programa del a&ntilde;o anterior, si lo hay. El DNI del responsable sale de su usuario. Un programa que ya existe no se toca.</p>';
+		echo '<p class="hy-nota">Cada programa nuevo arranca en estado <strong>docente</strong> con el contenido del programa del a&ntilde;o anterior, si lo hay, y con su planificaci&oacute;n vac&iacute;a. El DNI del responsable sale de su usuario. Un programa que ya existe no se toca; si no tiene planificaci&oacute;n, se le crea.</p>';
 		echo '</section>';
 	}
 
@@ -277,7 +325,7 @@ class catedras_importar_programas
 			} elseif (isset($p['id'])) {
 				echo 'Ya existe (programa ' . (int) $p['id'] . ')';
 			} else {
-				echo $f['anterior'] !== '' ? 'Copia el programa ' . (int) $f['anterior'] : 'Vac&iacute;o';
+				echo ($f['anterior'] !== '' ? 'Copia el programa ' . (int) $f['anterior'] : 'Vac&iacute;o') . ' &middot; con planificaci&oacute;n';
 			}
 			echo '</td></tr>';
 		}
@@ -288,17 +336,21 @@ class catedras_importar_programas
 	{
 		echo '<section class="hy-tarjeta">';
 		echo '<h2>2. Revisar</h2>';
-		echo '<p><strong>' . count($plan['nuevos']) . '</strong> a crear &middot; ' . count($plan['existen']) . ' ya existen &middot; '
+		echo '<p><strong>' . count($plan['nuevos']) . '</strong> programas a crear, cada uno con su planificaci&oacute;n &middot; '
+			. count($plan['existen']) . ' ya existen &middot; '
+			. ($plan['sin_planif'] ? count($plan['sin_planif']) . ' ya existen sin planificaci&oacute;n &middot; ' : '')
 			. count($plan['problemas']) . ' con problemas.</p>';
 		self::tabla('Con problemas: no se cargan', $plan['problemas'], true);
-		self::tabla('A crear', $plan['nuevos']);
+		self::tabla('A crear: programa y planificaci&oacute;n', $plan['nuevos']);
+		self::tabla('Ya existen sin planificaci&oacute;n: se crea solo la planificaci&oacute;n', $plan['sin_planif']);
 		self::tabla('Ya existen: no se tocan', $plan['existen']);
 		echo '<div class="hy-import-acciones">';
-		if ($plan['nuevos']) {
+		if ($plan['nuevos'] || $plan['sin_planif']) {
 			echo '<form method="post" action="' . self::h(self::url()) . '">';
 			self::campo_csrf();
 			echo '<input type="hidden" name="paso" value="confirmar">';
-			echo '<button type="submit" class="hy-boton-primario">Confirmar: crear ' . count($plan['nuevos']) . ' programas</button>';
+			echo '<button type="submit" class="hy-boton-primario">Confirmar: crear ' . count($plan['nuevos']) . ' programas'
+				. ($plan['sin_planif'] ? ' y ' . count($plan['sin_planif']) . ' planificaciones sueltas' : ' con su planificaci&oacute;n') . '</button>';
 			echo '</form>';
 		} else {
 			echo '<p>No hay nada para crear.</p>';
@@ -312,7 +364,7 @@ class catedras_importar_programas
 	{
 		$perfiles = array_map('strtolower', toba::usuario()->get_perfiles_funcionales());
 		echo '<div class="hy-inicio hy-import">';
-		echo '<header class="hy-inicio-saludo"><p class="hy-inicio-bajada">Dar de alta los programas de un a&ntilde;o desde el CSV de deptos. Primero se ve qu&eacute; va a pasar; no se guarda nada hasta confirmar.</p></header>';
+		echo '<header class="hy-inicio-saludo"><p class="hy-inicio-bajada">Dar de alta los programas de un a&ntilde;o, con sus planificaciones, desde el CSV de deptos. Primero se ve qu&eacute; va a pasar; no se guarda nada hasta confirmar.</p></header>';
 		if (!in_array('admin', $perfiles)) {
 			self::aviso('Esta secci&oacute;n es solo para administradores.');
 			echo '</div>';
@@ -343,9 +395,10 @@ class catedras_importar_programas
 			} else {
 				$plan = self::planificar($filas);
 				try {
-					self::aplicar($plan);
+					self::aplicar($plan, null, 'el CSV de deptos');
 					toba::memoria()->eliminar_dato_operacion(self::MEMORIA);
-					self::aviso('Listo: se crearon <strong>' . count($plan['nuevos']) . '</strong> programas.'
+					self::aviso('Listo: se crearon <strong>' . count($plan['nuevos']) . '</strong> programas, cada uno con su planificaci&oacute;n.'
+						. ($plan['sin_planif'] ? ' Y ' . count($plan['sin_planif']) . ' planificaciones de programas que ya estaban.' : '')
 						. ($plan['problemas'] ? ' ' . count($plan['problemas']) . ' filas con problemas no se cargaron.' : ''), 'ok');
 				} catch (Exception $e) {
 					self::aviso('No se pudo guardar y no se cre&oacute; nada. Detalle en el log de Toba.');
