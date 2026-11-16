@@ -19,6 +19,11 @@
  * El estado del pedido (state, nonce, code_verifier) y el id_token (para el
  * cierre de sesion) viven en $_SESSION['catedras_huayca'], fuera de lo de Toba.
  *
+ * Si se pidio una operacion (?ai=catedras||3472, como los enlaces de Gestion
+ * Academica) sin sesion abierta, se guarda ahi mismo ('destino'): Keycloak
+ * vuelve a ?huayca=vuelta, sin el ai, y sin esto se caeria en el Inicio. Al
+ * abrir la sesion se entra en esa operacion (ver recordar_destino y tomar_destino).
+ *
  * El id_token se recibe directo del endpoint de tokens, por TLS y con el secreto
  * del cliente: alcanza con verificar iss, aud, nonce y vencimiento (OIDC Core
  * 3.1.3.7, punto 6). Por eso verify_ssl tiene que estar en 1 en produccion.
@@ -33,6 +38,7 @@ class catedras_huayca_sso
 	const PARAM = 'huayca';
 	const TIEMPO_LIMITE = 15;
 	const TIEMPO_CHEQUEO = 3;	// para ver si Keycloak contesta antes de la consulta silenciosa
+	const VIGENCIA_DESTINO = 900;	// segundos que vale la operacion pedida antes de entrar
 
 	/** Mensaje para la pantalla (lo muestra ci_login con toba::notificacion). */
 	private static $mensaje = null;
@@ -71,6 +77,7 @@ class catedras_huayca_sso
 		if (toba::manejador_sesiones()->existe_usuario_activo()) {
 			return;
 		}
+		self::recordar_destino();
 		$accion = $_GET[self::PARAM] ?? null;
 		switch ($accion) {
 			case 'entrar':
@@ -104,6 +111,44 @@ class catedras_huayca_sso
 			return;
 		}
 		self::redirigir_a_keycloak(false);
+	}
+
+	/**
+	 * Guarda la operacion pedida (?ai=proyecto||item) para entrar en ella al
+	 * volver de Keycloak. Solo un item numerico de este proyecto que no sea el
+	 * login. Queda aunque la vuelta silenciosa diga que no hay sesion Huayca:
+	 * vale tambien para quien despues aprieta el boton.
+	 */
+	private static function recordar_destino()
+	{
+		$ai = $_GET[apex_hilo_qs_item] ?? null;
+		if (! is_string($ai)) {
+			return;
+		}
+		$partes = explode(apex_qs_separador, $ai);
+		if (count($partes) !== 2 || $partes[0] !== toba::proyecto()->get_id()
+				|| ! preg_match('/^[0-9]{1,9}$/', $partes[1])
+				|| $partes[1] == toba::proyecto()->get_parametro('item_pre_sesion')) {
+			return;
+		}
+		$_SESSION[self::SESION]['destino'] = array('item' => $partes[1], 'hora' => time());
+	}
+
+	/**
+	 * La operacion guardada, si sigue vigente: array(proyecto, item) o null.
+	 * Se lee una sola vez. Va en el toba_reset_nucleo del login, y el nucleo
+	 * carga esa operacion en lugar de la de inicio, solo en este pedido. Si la
+	 * persona no tiene permiso sobre ella, Toba lo dice igual que con la sesion
+	 * abierta.
+	 */
+	private static function tomar_destino()
+	{
+		$destino = $_SESSION[self::SESION]['destino'] ?? null;
+		unset($_SESSION[self::SESION]['destino']);
+		if (is_array($destino) && time() - (int) $destino['hora'] <= self::VIGENCIA_DESTINO) {
+			return array(toba::proyecto()->get_id(), $destino['item']);
+		}
+		return null;
 	}
 
 	/** true si se muestra el formulario de legajo y clave de Toba. */
@@ -202,9 +247,16 @@ class catedras_huayca_sso
 
 		toba::logger()->info("LOGIN HUAYCA: DNI $dni entra como $legajo");
 		catedras_autenticacion_keycloak::marcar_verificado($legajo);
+		$destino = self::tomar_destino();
 		try {
 			// La clave no se usa: la persona ya se autentico en Keycloak.
 			toba::manejador_sesiones()->login($legajo, self::aleatorio(16));
+		} catch (toba_reset_nucleo $e) {
+			// El exito: entra en la operacion que habia pedido, si pidio una.
+			if ($destino !== null) {
+				$e->set_item($destino);
+			}
+			throw $e;
 		} catch (toba_error_autenticacion $e) {
 			self::$mensaje = $e->getMessage();
 		} catch (toba_error $e) {
