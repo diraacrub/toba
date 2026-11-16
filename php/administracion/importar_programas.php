@@ -22,11 +22,16 @@
  *     usuario o sin DNI, la fila no se carga: primero Importar usuarios.
  *   - Si viene id_programa_anterior, el programa nuevo arranca con su contenido
  *     (fundamentacion, objetivos, programa, bibliografia, metodologia,
- *     evaluacion, distribucion horaria, cronograma y horas). Estado: docente.
- *   - Cada programa nuevo lleva su planificacion y su informe, como se
- *     cargaron en 2026: uno de cada uno por programa, vacios y en estado
- *     docente (la planificacion, del mismo anio; el informe no tiene anio, es
- *     el del programa). La operacion Programas y Planificaciones necesita la
+ *     evaluacion, distribucion horaria y horas), sin el cronograma, que es de
+ *     cada anio. Estado: docente.
+ *   - Cada programa nuevo lleva su planificacion y su informe: uno de cada uno
+ *     por programa, en estado docente (la planificacion, del mismo anio; el
+ *     informe no tiene anio, es el del programa). La planificacion arranca con
+ *     lo de la planificacion del programa anterior que no es de cada anio
+ *     (self::$CONTENIDO_PLANIF: distribucion horaria, horarios de consulta,
+ *     otras tareas, bibliografia pedida, actividades y publicaciones); el
+ *     equipo (sale del programa), las opiniones, observaciones, comentarios y
+ *     firmas no. El informe, vacio. La operacion Programas y Planificaciones necesita la
  *     planificacion para abrir el programa.
  *   - Un programa de ese anio, materia y periodo que ya existe no se toca; si
  *     le falta la planificacion o el informe, se le crea.
@@ -45,10 +50,17 @@ class catedras_importar_programas
 	const MAX_BYTES = 2097152;
 	const MEMORIA = 'importar_programas_filas';
 
-	// Lo que se copia del programa del anio anterior.
+	// Lo que se copia del programa del anio anterior (el cronograma no: es de cada anio).
 	static $CONTENIDO = array('fundamentacion', 'objetivos', 'programa_analitico', 'bibliografia',
-		'propuesta_metodologica', 'evaluacion_acreditacion', 'distribucion_horaria', 'cronograma_tentativo',
+		'propuesta_metodologica', 'evaluacion_acreditacion', 'distribucion_horaria',
 		'horas_teoricas', 'horas_practicas', 'horas_teoricopracticas');
+
+	// Lo que se copia de la planificacion del programa anterior. No: el equipo
+	// (equipo_catedra_planif; la operacion conjunta lo toma del programa), las
+	// opiniones, observaciones, comentarios, firmas y el estado.
+	static $CONTENIDO_PLANIF = array('dist_horaria_planif', 'horarios_consulta', 'otras_tareas',
+		'bibliografia_pedida', 'actividades_internas', 'actividades_externas', 'libros_pub', 'apuntes_pub',
+		'guia_trabajos_pub', 'publicaciones_periodicas');
 
 	static function h($texto)
 	{
@@ -204,13 +216,31 @@ class catedras_importar_programas
 	// Aplicar (una sola transaccion)
 	// ------------------------------------------------------------------
 
-	/** La planificacion vacia de un programa: del mismo anio, en estado docente. */
-	static function crear_planificacion($db, $id, $id_programa, $ano, $usuario, $obs)
+	/**
+	 * La planificacion de un programa: del mismo anio, en estado docente, con
+	 * lo que no es de cada anio de la planificacion del programa anterior (si
+	 * lo hay y tiene planificacion; si tiene dos, la mas nueva). Devuelve el
+	 * id de la planificacion copiada, o null si arranca vacia.
+	 */
+	static function crear_planificacion($db, $id, $id_programa, $ano, $usuario, $obs, $anterior = '')
 	{
-		$db->ejecutar('INSERT INTO planificaciones (id_planificacion, ano_acad_planif, id_prog_planif, estado_planificacion) VALUES ('
-			. (int) $id . ', ' . (int) $ano . ', ' . (int) $id_programa . ", 'docente')");
+		$copia = null;
+		if ($anterior !== '' && ctype_digit((string) $anterior)) {
+			$r = $db->consultar_fila('SELECT max(id_planificacion) AS id FROM planificaciones WHERE id_prog_planif = ' . (int) $anterior);
+			$copia = (isset($r['id']) && $r['id'] !== null) ? (int) $r['id'] : null;
+		}
+		$vals = (int) $id . ', ' . (int) $ano . ', ' . (int) $id_programa . ", 'docente'";
+		if ($copia !== null) {
+			$cols = implode(', ', self::$CONTENIDO_PLANIF);
+			$db->ejecutar("INSERT INTO planificaciones (id_planificacion, ano_acad_planif, id_prog_planif, estado_planificacion, $cols) "
+				. "SELECT $vals, $cols FROM planificaciones WHERE id_planificacion = $copia");
+			$obs .= ', con lo de la planificacion ' . $copia;
+		} else {
+			$db->ejecutar("INSERT INTO planificaciones (id_planificacion, ano_acad_planif, id_prog_planif, estado_planificacion) VALUES ($vals)");
+		}
 		$db->ejecutar("INSERT INTO movimientos (nombre_tabla, id_tabla, tipo_movimiento, usuario_movimiento, observaciones, estado_mov) VALUES ('planificaciones', "
 			. (int) $id . ", 'Alta', " . $db->quote($usuario) . ', ' . $db->quote($obs) . ", 'docente')");
+		return $copia;
 	}
 
 	/** El informe de catedra vacio de un programa, en estado docente. */
@@ -287,7 +317,7 @@ class catedras_importar_programas
 					. ", 'docente')");
 				$siguiente_planif++;
 				self::crear_planificacion($db, $siguiente_planif, (int) $r['id_programa'], (int) $f['ano'], $usuario,
-					'Importado desde ' . $origen . ' con el programa ' . (int) $r['id_programa']);
+					'Importado desde ' . $origen . ' con el programa ' . (int) $r['id_programa'], $f['anterior']);
 				$siguiente_informe++;
 				self::crear_informe($db, $siguiente_informe, (int) $r['id_programa'], $usuario,
 					'Importado desde ' . $origen . ' con el programa ' . (int) $r['id_programa']);
@@ -300,7 +330,7 @@ class catedras_importar_programas
 				if (in_array('planificacion', $p['falta'])) {
 					$c['id_planificacion'] = ++$siguiente_planif;
 					self::crear_planificacion($db, $siguiente_planif, (int) $p['id'], (int) $p['fila']['ano'], $usuario,
-						'Importado desde ' . $origen . ': el programa ' . (int) $p['id'] . ' no tenia planificacion');
+						'Importado desde ' . $origen . ': el programa ' . (int) $p['id'] . ' no tenia planificacion', $p['fila']['anterior']);
 				}
 				if (in_array('informe', $p['falta'])) {
 					$c['id_informe'] = ++$siguiente_informe;
@@ -352,7 +382,7 @@ class catedras_importar_programas
 		echo '<input type="file" name="csv" accept=".csv,.txt,text/csv" required>';
 		echo '<button type="submit" class="hy-boton-primario">Ver qu&eacute; va a pasar</button>';
 		echo '</form>';
-		echo '<p class="hy-nota">Cada programa nuevo arranca en estado <strong>docente</strong> con el contenido del programa del a&ntilde;o anterior, si lo hay, y con su planificaci&oacute;n y su informe vac&iacute;os. El DNI del responsable sale de su usuario. Un programa que ya existe no se toca; si le falta la planificaci&oacute;n o el informe, se le crea.</p>';
+		echo '<p class="hy-nota">Cada programa nuevo arranca en estado <strong>docente</strong> con el contenido del programa del a&ntilde;o anterior (menos el cronograma), si lo hay, y con su planificaci&oacute;n (con lo de la del a&ntilde;o anterior, menos el equipo, las opiniones y las firmas) y su informe vac&iacute;o. El DNI del responsable sale de su usuario. Un programa que ya existe no se toca; si le falta la planificaci&oacute;n o el informe, se le crea.</p>';
 		echo '</section>';
 	}
 
