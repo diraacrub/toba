@@ -22,9 +22,10 @@ require_once __DIR__ . '/../modelos/modelo_programa.php';
  * Las filas de programa traen ademas el equipo de catedra, para la ficha de
  * la catedra en Gestion Academica: equipo_catedra (texto, una persona por
  * linea en los del formulario integrado) y equipo_catedra_lista
- * ([{apellido, nombre, cargo, dedicacion}], o null si es texto libre), como
- * /rest/programas (modelo_programa::normalizar_programa). Todas traen
- * cargo_resp.
+ * ([{apellido, nombre, legajo, cargo, dedicacion}], o null si es texto
+ * libre). El texto, como en /rest/programas
+ * (modelo_programa::normalizar_programa); la lista trae ademas el legajo.
+ * Todas traen cargo_resp.
  *
  * El anio es el del programa (el de la planificacion casi siempre coincide;
  * el informe no tiene). Los programas ocultos (observaciones con "[ocultar]",
@@ -150,15 +151,33 @@ class recurso_documentos implements modelable
 			}
 			// El equipo, solo en la fila del programa (normalizar trabaja en LATIN1).
 			if ($f['tipo'] === 'programa') {
+				$f['equipo_catedra_crudo'] = $f['equipo_catedra'];
 				$eq = modelo_programa::normalizar_programa(array('equipo_catedra' => $f['equipo_catedra']));
 				$f['equipo_catedra'] = self::utf8($eq['equipo_catedra']);
+				// La lista, con el legajo de cada uno (a diferencia de /rest/programas):
+				// con el Gestion Academica le muestra la catedra a quien integra el equipo.
 				$f['equipo_catedra_lista'] = null;
-				if (is_array($eq['equipo_catedra_lista'])) {
+				$crudas = modelo_programa::equipo_desde_json($f['equipo_catedra_crudo']);
+				if (is_array($crudas)) {
 					$f['equipo_catedra_lista'] = array();
-					foreach ($eq['equipo_catedra_lista'] as $persona) {
-						$f['equipo_catedra_lista'][] = array_map(array(__CLASS__, 'utf8'), $persona);
+					foreach ($crudas as $fila) {
+						if (! is_array($fila)) {
+							continue;
+						}
+						$persona = array(
+							'apellido' => trim((string) ($fila[0] ?? '')),
+							'nombre' => trim((string) ($fila[1] ?? '')),
+							'legajo' => preg_replace('/[^0-9]/', '', (string) ($fila[2] ?? '')),
+							'cargo' => trim((string) ($fila[3] ?? '')),
+							'dedicacion' => trim((string) ($fila[4] ?? '')),
+						);
+						if ($persona['apellido'] === '' && $persona['nombre'] === '') {
+							continue;
+						}
+						$f['equipo_catedra_lista'][] = $persona;	// ya en UTF-8: salen del JSON
 					}
 				}
+				unset($f['equipo_catedra_crudo']);
 			} else {
 				unset($f['equipo_catedra']);
 			}
