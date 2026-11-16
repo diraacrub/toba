@@ -27,11 +27,9 @@
  *   - Cada programa nuevo lleva su planificacion y su informe: uno de cada uno
  *     por programa, en estado docente (la planificacion, del mismo anio; el
  *     informe no tiene anio, es el del programa). La planificacion arranca con
- *     lo de la planificacion del programa anterior que no es de cada anio
- *     (self::$CONTENIDO_PLANIF: distribucion horaria, horarios de consulta,
- *     otras tareas, bibliografia pedida, actividades y publicaciones); el
- *     equipo (sale del programa), las opiniones, observaciones, comentarios y
- *     firmas no. El informe, vacio. La operacion Programas y Planificaciones necesita la
+ *     las publicaciones de la planificacion del programa anterior
+ *     (self::$CONTENIDO_PLANIF: libros, apuntes, guias y publicaciones
+ *     periodicas); lo demas es de cada anio y arranca vacio. El informe, vacio. La operacion Programas y Planificaciones necesita la
  *     planificacion para abrir el programa.
  *   - Un programa de ese anio, materia y periodo que ya existe no se toca; si
  *     le falta la planificacion o el informe, se le crea.
@@ -55,12 +53,12 @@ class catedras_importar_programas
 		'propuesta_metodologica', 'evaluacion_acreditacion', 'distribucion_horaria',
 		'horas_teoricas', 'horas_practicas', 'horas_teoricopracticas');
 
-	// Lo que se copia de la planificacion del programa anterior. No: el equipo
-	// (equipo_catedra_planif; la operacion conjunta lo toma del programa), las
-	// opiniones, observaciones, comentarios, firmas y el estado.
-	static $CONTENIDO_PLANIF = array('dist_horaria_planif', 'horarios_consulta', 'otras_tareas',
-		'bibliografia_pedida', 'actividades_internas', 'actividades_externas', 'libros_pub', 'apuntes_pub',
-		'guia_trabajos_pub', 'publicaciones_periodicas');
+	// Lo que se copia de la planificacion del programa anterior: las
+	// publicaciones de la catedra. Lo demas es de cada anio y arranca vacio:
+	// distribucion horaria, horarios de consulta, otras tareas, bibliografia
+	// pedida, actividades internas y externas, el equipo (la operacion conjunta
+	// lo toma del programa), opiniones, observaciones, comentarios y firmas.
+	static $CONTENIDO_PLANIF = array('libros_pub', 'apuntes_pub', 'guia_trabajos_pub', 'publicaciones_periodicas');
 
 	static function h($texto)
 	{
@@ -382,7 +380,7 @@ class catedras_importar_programas
 		echo '<input type="file" name="csv" accept=".csv,.txt,text/csv" required>';
 		echo '<button type="submit" class="hy-boton-primario">Ver qu&eacute; va a pasar</button>';
 		echo '</form>';
-		echo '<p class="hy-nota">Cada programa nuevo arranca en estado <strong>docente</strong> con el contenido del programa del a&ntilde;o anterior (menos el cronograma), si lo hay, y con su planificaci&oacute;n (con lo de la del a&ntilde;o anterior, menos el equipo, las opiniones y las firmas) y su informe vac&iacute;o. El DNI del responsable sale de su usuario. Un programa que ya existe no se toca; si le falta la planificaci&oacute;n o el informe, se le crea.</p>';
+		echo '<p class="hy-nota">Cada programa nuevo arranca en estado <strong>docente</strong> con el contenido del programa del a&ntilde;o anterior (menos el cronograma), si lo hay, y con su planificaci&oacute;n (con las publicaciones de la del a&ntilde;o anterior) y su informe vac&iacute;o. El DNI del responsable sale de su usuario. Un programa que ya existe no se toca; si le falta la planificaci&oacute;n o el informe, se le crea.</p>';
 		echo '</section>';
 	}
 
