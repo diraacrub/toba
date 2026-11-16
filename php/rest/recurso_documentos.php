@@ -3,6 +3,8 @@ use SIUToba\rest\rest;
 use SIUToba\rest\lib\modelable;
 use SIUToba\rest\lib\rest_error;
 
+require_once __DIR__ . '/../modelos/modelo_programa.php';
+
 /**
  * @description Programas, planificaciones e informes de un anio, con su estado
  *
@@ -16,6 +18,13 @@ use SIUToba\rest\lib\rest_error;
  * para que Gestion Academica le muestre a cada uno lo que espera de el: al
  * docente lo suyo sin presentar, al departamento lo que tiene que avalar.
  * Solo lo necesario para eso, sin el contenido de los documentos.
+ *
+ * Las filas de programa traen ademas el equipo de catedra, para la ficha de
+ * la catedra en Gestion Academica: equipo_catedra (texto, una persona por
+ * linea en los del formulario integrado) y equipo_catedra_lista
+ * ([{apellido, nombre, cargo, dedicacion}], o null si es texto libre), como
+ * /rest/programas (modelo_programa::normalizar_programa). Todas traen
+ * cargo_resp.
  *
  * El anio es el del programa (el de la planificacion casi siempre coincide;
  * el informe no tiene). Los programas ocultos (observaciones con "[ocultar]",
@@ -108,6 +117,7 @@ class recurso_documentos implements modelable
 		// Lo comun de las tres: el programa y su materia.
 		$comun = 'p.id_programa, p.id_materia_prog AS id_materia, trim(p.ano_academico) AS ano_academico,
 			p.periodo_dictado, p.legajo_resp, p.dni_resp, p.apellido_resp, p.nombre_resp,
+			p.cargo_resp, p.equipo_catedra,
 			m.nombre_materia, m.cod_carrera, m.depto_principal';
 		$desde = 'FROM programas p JOIN materias m ON m.id_materia = p.id_materia_prog';
 		$filtro = implode(' AND ', $where);
@@ -138,8 +148,22 @@ class recurso_documentos implements modelable
 			foreach (array('id', 'id_programa', 'id_materia', 'legajo_resp', 'dni_resp') as $c) {
 				$f[$c] = ($f[$c] === null || $f[$c] === '') ? null : (int) $f[$c];
 			}
+			// El equipo, solo en la fila del programa (normalizar trabaja en LATIN1).
+			if ($f['tipo'] === 'programa') {
+				$eq = modelo_programa::normalizar_programa(array('equipo_catedra' => $f['equipo_catedra']));
+				$f['equipo_catedra'] = self::utf8($eq['equipo_catedra']);
+				$f['equipo_catedra_lista'] = null;
+				if (is_array($eq['equipo_catedra_lista'])) {
+					$f['equipo_catedra_lista'] = array();
+					foreach ($eq['equipo_catedra_lista'] as $persona) {
+						$f['equipo_catedra_lista'][] = array_map(array(__CLASS__, 'utf8'), $persona);
+					}
+				}
+			} else {
+				unset($f['equipo_catedra']);
+			}
 			// La base es LATIN1: los textos salen en UTF-8, como en /rest/materias.
-			foreach (array('apellido_resp', 'nombre_resp', 'nombre_materia', 'cod_carrera', 'depto_principal', 'periodo_dictado', 'estado') as $c) {
+			foreach (array('cargo_resp', 'apellido_resp', 'nombre_resp', 'nombre_materia', 'cod_carrera', 'depto_principal', 'periodo_dictado', 'estado') as $c) {
 				$f[$c] = self::utf8($f[$c]);
 			}
 			// El departamento se compara aca, sin acentos ni mayusculas ni
