@@ -9,7 +9,7 @@ if (!defined('CATEDRAS_IMPORTAR_PROGRAMAS_SIN_EJECUTAR')) {
 require_once dirname(__FILE__) . '/../administracion/importar_programas.php';
 
 /**
- * @description Alta de los programas del anio, cada uno con su planificacion
+ * @description Alta de los programas del anio, con su planificacion y su informe
  *
  * POST /rest/alta_programas
  *   {"simular": true|false, "quien": "Nombre de quien lo hace en deptos",
@@ -23,8 +23,9 @@ require_once dirname(__FILE__) . '/../administracion/importar_programas.php';
  * son las mismas columnas del CSV de Administracion > Importar programas, y las
  * reglas son las de esa pantalla (catedras_importar_programas): el DNI sale del
  * usuario de ese legajo, el contenido se copia del programa anterior, cada
- * programa nuevo lleva su planificacion vacia, lo que existe no se toca (si le
- * falta la planificacion, se le crea), ids siguientes al mas alto.
+ * programa nuevo lleva su planificacion y su informe vacios, lo que existe no
+ * se toca (si le falta la planificacion o el informe, se le crea), ids
+ * siguientes al mas alto.
  *
  * Con "simular" no guarda nada: devuelve lo que pasaria. Sin "simular" vuelve a
  * planificar contra la base y crea todo en una transaccion; devuelve lo creado.
@@ -59,6 +60,9 @@ class recurso_alta_programas implements modelable
 			'id_programa_anterior' => $f['anterior'] !== '' ? (int) $f['anterior'] : null);
 		if (isset($p['id'])) {
 			$r['id_programa'] = (int) $p['id'];
+		}
+		if (isset($p['falta'])) {
+			$r['falta'] = $p['falta'];
 		}
 		if (isset($p['motivos'])) {
 			$r['motivos'] = array_map(array('recurso_alta_programas', 'plano'), $p['motivos']);
@@ -104,7 +108,7 @@ class recurso_alta_programas implements modelable
 		}
 		$plan = catedras_importar_programas::planificar($filas);
 		$salida = array('simulado' => !empty($cuerpo['simular']));
-		foreach (array('nuevos', 'sin_planif', 'existen', 'problemas') as $k) {
+		foreach (array('nuevos', 'incompletos', 'existen', 'problemas') as $k) {
 			$salida[$k] = array_map(array('recurso_alta_programas', 'fila_salida'), $plan[$k]);
 		}
 		if (empty($cuerpo['simular'])) {
