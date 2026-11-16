@@ -6,7 +6,7 @@
  * informe de catedra, a
  * partir de lo que arma deptos (/deptos/programas: el informe de Mocovi del
  * anio, con los dobles ya resueltos). deptos lo manda directo por la API
- * (POST /rest/alta_programas, que usa planificar y aplicar de esta clase);
+ * (POST /rest/alta-programas, que usa planificar y aplicar de esta clase);
  * esta pantalla queda para cargar el CSV a mano.
  *
  *   1. Subir: el CSV de deptos (ano_academico, id_materia, periodo_dictado,

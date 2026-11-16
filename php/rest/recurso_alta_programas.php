@@ -11,7 +11,8 @@ require_once dirname(__FILE__) . '/../administracion/importar_programas.php';
 /**
  * @description Alta de los programas del anio, con su planificacion y su informe
  *
- * POST /rest/alta_programas
+ * POST /rest/alta-programas (con guion: el ruteador de Toba no acepta "_" en la
+ * URL y pasa los "-" a "_" para encontrar este archivo)
  *   {"simular": true|false, "quien": "Nombre de quien lo hace en deptos",
  *    "filas": [{"ano_academico": "2027", "id_materia": 1, "periodo_dictado": "1CUAT",
  *               "legajo_resp": "57390", "id_designacion": "53241", "cargo_resp": "PAD3",
