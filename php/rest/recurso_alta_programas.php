@@ -9,7 +9,7 @@ if (!defined('CATEDRAS_IMPORTAR_PROGRAMAS_SIN_EJECUTAR')) {
 require_once dirname(__FILE__) . '/../administracion/importar_programas.php';
 
 /**
- * @description Alta de los programas del anio, con su planificacion y su informe
+ * @description Alta de los programas del anio, con su planificacion
  *
  * POST /rest/alta-programas (con guion: el ruteador de Toba no acepta "_" en la
  * URL y pasa los "-" a "_" para encontrar este archivo)
@@ -24,8 +24,8 @@ require_once dirname(__FILE__) . '/../administracion/importar_programas.php';
  * son las mismas columnas del CSV de Administracion > Importar programas, y las
  * reglas son las de esa pantalla (catedras_importar_programas): el DNI sale del
  * usuario de ese legajo, el contenido se copia del programa anterior, cada
- * programa nuevo lleva su planificacion y su informe vacios, lo que existe no
- * se toca (si le falta la planificacion o el informe, se le crea), ids
+ * programa nuevo lleva su planificacion (el informe se crea despues), lo que existe no
+ * se toca (si le falta la planificacion, se le crea), ids
  * siguientes al mas alto.
  *
  * Con "simular" no guarda nada: devuelve lo que pasaria. Sin "simular" vuelve a

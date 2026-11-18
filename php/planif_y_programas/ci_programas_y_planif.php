@@ -468,10 +468,13 @@ function edicion_cargar_multilinea(
 
 function conf__equipo_de_catedra(toba_ei_formulario_ml $form)
 {
-	// Si hay filas pendientes, mostrarlas sin recargar las originales.
-	$datos_pendientes = toba::memoria()->get_dato_operacion(
-		'datos_equipo_de_catedra_pendientes'
-	);
+	// El equipo de catedra no se edita aca: sale de Mocovi (lo pone deptos al
+	// crear y al actualizar los programas, ver administracion/actualizar_catedras.php).
+	// Se muestra de la base, en solo lectura y sin agregar filas.
+	$form->set_solo_lectura();
+	$form->desactivar_agregado_filas();
+	toba::memoria()->eliminar_dato_operacion('datos_equipo_de_catedra_pendientes');
+	$datos_pendientes = null;
 
 	if (is_array($datos_pendientes)) {
 		$form->set_datos($datos_pendientes);
@@ -594,81 +597,8 @@ function conf__equipo_de_catedra(toba_ei_formulario_ml $form)
 	
 function evt__equipo_de_catedra__modificacion($datos)
 {
-		toba::logger()->info(
-		'DIAGNOSTICO: INICIO evt__equipo_de_catedra_modificacion'
-	);
-	// Conservar temporalmente todas las filas ingresadas,
-	// incluida la primera fila del responsable.
-	toba::memoria()->set_dato_operacion(
-		'datos_equipo_de_catedra_pendientes',
-		$datos
-	);
-	$equipo_utf8 = array();
-	$indice = 0;
-	foreach ($datos as $fila) {
-
-		// La primera fila corresponde al responsable.
-		// No debe guardarse en equipo_catedra.
-		if ($indice == 0) {
-			$indice++;
-			continue;
-		}
-		$fila_utf8 = array();
-		foreach ($fila as $campo => $valor) {
-			if ($campo == 'x_dbr_clave') {
-				continue;
-			}
-			if (is_string($valor)) {
-				$valor = mb_convert_encoding(
-					$valor,
-					'UTF-8',
-					'ISO-8859-1'
-				);
-			}
-
-			$fila_utf8[$campo] = $valor;
-		}
-
-		$equipo_utf8[] = array(
-			$fila_utf8['apellido'],
-			$fila_utf8['nombre'],
-			$fila_utf8['legajo'],
-			$fila_utf8['cargo'],
-			$fila_utf8['dedicacion']
-		);
-
-		$indice++;
-	}
-
-	$equipo_json_utf8 = json_encode(
-		$equipo_utf8,
-		JSON_UNESCAPED_UNICODE
-	);
-
-	if ($equipo_json_utf8 === false) {
-		throw new toba_error(
-			"Error al generar JSON: " . json_last_error_msg()
-		);
-	}
-
-	$equipo_json_latin1 = mb_convert_encoding(
-		$equipo_json_utf8,
-		'ISO-8859-1',
-		'UTF-8'
-	);
-
-	$datos_programa = $this->dep('datos')
-		->tabla('programas')
-		->get();
-
-	$datos_programa['equipo_catedra'] = $equipo_json_latin1;
-
-	$this->dep('datos')->tabla('programas')->set($datos_programa);
-	$this->dep('datos')->tabla('programas')->sincronizar();
-
-		toba::logger()->info(
-		'DIAGNOSTICO: FIN evt__equipo_de_catedra_modificacion'
-	);
+	// El equipo no se edita en esta operacion (ver conf__equipo_de_catedra): lo
+	// que mande el navegador se ignora y programas.equipo_catedra no se toca.
 }
 	
 	

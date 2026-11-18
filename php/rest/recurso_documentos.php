@@ -129,7 +129,7 @@ class recurso_documentos implements modelable
 				FROM planificaciones pl JOIN programas p ON p.id_programa = pl.id_prog_planif
 				JOIN materias m ON m.id_materia = p.id_materia_prog WHERE $filtro",
 			'informe' => "SELECT 'informe' AS tipo, i.id_informe AS id, i.estado_informe AS estado, $comun
-				FROM informes i JOIN programas p ON p.id_programa = i.id_prog_informe
+				FROM informes i JOIN informes_programas p ON p.id_informe_programa = i.id_informe
 				JOIN materias m ON m.id_materia = p.id_materia_prog WHERE $filtro",
 		);
 		$sql = array();

@@ -19,7 +19,7 @@ class dt_informes extends catedras_datos_tabla
 			t_m.*  
 		FROM  
 			informes AS t_i  
-		JOIN programas AS t_p ON t_i.id_prog_informe = t_p.id_programa  
+		JOIN informes_programas AS t_p ON t_p.id_informe_programa = t_i.id_informe  
 		JOIN materias AS t_m ON t_p.id_materia_prog = t_m.id_materia  
 		ORDER BY t_m.nombre_materia";
 		if (count($where)>0) {
@@ -48,7 +48,7 @@ class dt_informes extends catedras_datos_tabla
 			t_m.*  
 		FROM  
 			informes AS t_i  
-		JOIN programas AS t_p ON t_i.id_prog_informe = t_p.id_programa  
+		JOIN informes_programas AS t_p ON t_p.id_informe_programa = t_i.id_informe  
 		JOIN materias AS t_m ON t_p.id_materia_prog = t_m.id_materia 
 		WHERE t_i.estado_informe IN ('aprobado')      
 		ORDER BY t_m.nombre_materia";
@@ -120,7 +120,7 @@ class dt_informes extends catedras_datos_tabla
 			t_m.*  
 		FROM  
 			informes AS t_i  
-		JOIN programas AS t_p ON t_i.id_prog_informe = t_p.id_programa  
+		JOIN informes_programas AS t_p ON t_p.id_informe_programa = t_i.id_informe  
 		JOIN materias AS t_m ON t_p.id_materia_prog = t_m.id_materia  
 		ORDER BY t_m.nombre_materia";
 		if (count($where)>0) {
@@ -196,7 +196,7 @@ class dt_informes extends catedras_datos_tabla
 			t_m.*  
 		FROM  
 			informes AS t_i  
-		JOIN programas AS t_p ON t_i.id_prog_informe = t_p.id_programa  
+		JOIN informes_programas AS t_p ON t_p.id_informe_programa = t_i.id_informe  
 		JOIN materias AS t_m ON t_p.id_materia_prog = t_m.id_materia  
 		ORDER BY t_m.nombre_materia";
 		if (count($where)>0) {
@@ -222,7 +222,7 @@ class dt_informes extends catedras_datos_tabla
 			t_m.*  
 		FROM  
 			informes AS t_i  
-		JOIN programas AS t_p ON t_i.id_prog_informe = t_p.id_programa  
+		JOIN informes_programas AS t_p ON t_p.id_informe_programa = t_i.id_informe  
 		JOIN materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE t_i.estado_informe IN ('depto','aprobado')   
 		ORDER BY t_m.nombre_materia";
@@ -249,7 +249,7 @@ class dt_informes extends catedras_datos_tabla
 			t_m.*  
 		FROM  
 			informes AS t_i  
-		JOIN programas AS t_p ON t_i.id_prog_informe = t_p.id_programa  
+		JOIN informes_programas AS t_p ON t_p.id_informe_programa = t_i.id_informe  
 		JOIN materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE t_i.estado_informe IN ('depto','aprobado')   
 		ORDER BY t_m.nombre_materia";
@@ -275,7 +275,7 @@ class dt_informes extends catedras_datos_tabla
 			t_m.*  
 		FROM  
 			informes AS t_i  
-		JOIN programas AS t_p ON t_i.id_prog_informe = t_p.id_programa  
+		JOIN informes_programas AS t_p ON t_p.id_informe_programa = t_i.id_informe  
 		JOIN materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE t_i.estado_informe = 'docente'   
 		ORDER BY t_m.nombre_materia";
@@ -302,7 +302,7 @@ class dt_informes extends catedras_datos_tabla
 			t_m.*  
 		FROM  
 			informes AS t_i  
-		JOIN programas AS t_p ON t_i.id_prog_informe = t_p.id_programa  
+		JOIN informes_programas AS t_p ON t_p.id_informe_programa = t_i.id_informe  
 		JOIN materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE t_i.estado_informe IN ('depto','docente')   
 		ORDER BY t_m.nombre_materia";
@@ -329,7 +329,7 @@ class dt_informes extends catedras_datos_tabla
 			t_m.*  
 		FROM  
 			informes AS t_i  
-		JOIN programas AS t_p ON t_i.id_prog_informe = t_p.id_programa  
+		JOIN informes_programas AS t_p ON t_p.id_informe_programa = t_i.id_informe  
 		JOIN materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE t_i.estado_informe = 'depto'   
 		ORDER BY t_m.nombre_materia";
@@ -356,7 +356,7 @@ class dt_informes extends catedras_datos_tabla
 			t_m.*  
 		FROM  
 			informes AS t_i  
-		JOIN programas AS t_p ON t_i.id_prog_informe = t_p.id_programa  
+		JOIN informes_programas AS t_p ON t_p.id_informe_programa = t_i.id_informe  
 		JOIN materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE t_i.estado_informe = 'aprobado'   
 		ORDER BY t_m.nombre_materia";
@@ -379,7 +379,7 @@ function get_datos_informe($id_informe_seleccionado)
 		FROM
 			informes AS t_i
 		JOIN
-			programas AS t_p ON t_i.id_prog_informe = t_p.id_programa
+			informes_programas AS t_p ON t_p.id_informe_programa = t_i.id_informe
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
@@ -419,7 +419,7 @@ function get_datos_informe($id_informe_seleccionado)
 		FROM
 			informes AS t_i
 		JOIN
-			programas AS t_p ON t_i.id_prog_informe = t_p.id_programa
+			informes_programas AS t_p ON t_p.id_informe_programa = t_i.id_informe
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
@@ -441,7 +441,7 @@ function get_datos_informe($id_informe_seleccionado)
 		FROM
 			informes AS t_i
 		JOIN
-			programas AS t_p ON t_i.id_prog_informe = t_p.id_programa
+			informes_programas AS t_p ON t_p.id_informe_programa = t_i.id_informe
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
@@ -465,7 +465,7 @@ function get_datos_informe($id_informe_seleccionado)
 		FROM
 			informes AS t_i
 		JOIN
-			programas AS t_p ON t_i.id_prog_informe = t_p.id_programa
+			informes_programas AS t_p ON t_p.id_informe_programa = t_i.id_informe
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
@@ -485,7 +485,7 @@ function get_datos_informe($id_informe_seleccionado)
 		FROM
 			informes AS t_i
 		JOIN
-			programas AS t_p ON t_i.id_prog_informe = t_p.id_programa
+			informes_programas AS t_p ON t_p.id_informe_programa = t_i.id_informe
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
@@ -506,7 +506,7 @@ function get_datos_informe($id_informe_seleccionado)
 		FROM
 			informes AS t_i
 		JOIN
-			programas AS t_p ON t_i.id_prog_informe = t_p.id_programa
+			informes_programas AS t_p ON t_p.id_informe_programa = t_i.id_informe
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
@@ -572,7 +572,7 @@ function get_datos_informe($id_informe_seleccionado)
 		FROM
 			informes AS t_i
 		JOIN
-			programas AS t_p ON t_i.id_prog_informe = t_p.id_programa
+			informes_programas AS t_p ON t_p.id_informe_programa = t_i.id_informe
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
@@ -615,7 +615,7 @@ function get_datos_informe($id_informe_seleccionado)
 		FROM
 			informes as t_i
 		JOIN
-			programas AS t_p ON t_i.id_prog_informe = t_p.id_programa
+			informes_programas AS t_p ON t_p.id_informe_programa = t_i.id_informe
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
@@ -654,7 +654,7 @@ function get_datos_informe($id_informe_seleccionado)
 		FROM
 			informes as t_i
 		JOIN
-			programas AS t_p ON t_i.id_prog_informe = t_p.id_programa
+			informes_programas AS t_p ON t_p.id_informe_programa = t_i.id_informe
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
@@ -694,7 +694,7 @@ function get_datos_informe($id_informe_seleccionado)
 		FROM
 			informes as t_i
 		JOIN
-			programas AS t_p ON t_i.id_prog_informe = t_p.id_programa
+			informes_programas AS t_p ON t_p.id_informe_programa = t_i.id_informe
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
@@ -761,7 +761,7 @@ function get_datos_informe($id_informe_seleccionado)
 		FROM
 			informes as t_i
 		JOIN
-			programas AS t_p ON t_i.id_prog_informe = t_p.id_programa
+			informes_programas AS t_p ON t_p.id_informe_programa = t_i.id_informe
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
