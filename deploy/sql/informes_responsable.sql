@@ -3,7 +3,7 @@
 -- Hasta ahora el informe era del responsable de su programa. Pero el programa
 -- se envía en marzo (o agosto) y ya no se toca, y el informe se completa en
 -- diciembre: si en Mocovi cambió el responsable, el informe tiene que pasar al
--- nuevo. Lo escribe POST /rest/actualizar-informes
+-- nuevo. Lo escribe POST /rest/mocovi-anio
 -- (php/administracion/actualizar_catedras.php), solo si el informe está en
 -- estado docente y no venció su plazo.
 --

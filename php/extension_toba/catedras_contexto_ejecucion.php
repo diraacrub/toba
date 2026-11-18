@@ -23,8 +23,8 @@ class catedras_contexto_ejecucion extends toba_contexto_ejecucion
 	private static $menu_externo = array(
 		'3516' => 'https://huayca.crub.uncoma.edu.ar/programas/',	// APROBADOS CRUB > Ver Programas Aprobados
 		// ADMINISTRACION > Exportar programas: Gestion Academica arma los
-		// programas del anio desde la planilla de cargos y baja el CSV para
-		// Importar programas.
+		// programas del anio desde el informe de Mocovi y los crea aca
+		// (POST /rest/mocovi-anio).
 		'3538' => 'https://huayca.crub.uncoma.edu.ar/gestion-academica/programas',
 	);
 

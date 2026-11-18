@@ -947,6 +947,7 @@ function get_listado_para_imprimir_publico($filtro = "")
 		WHERE
 			t_p.legajo_resp = " . quote($usuario_id) . " 
 			AND t_p.estado = 'docente'
+			AND t_p.publicado
 			AND t_m.cod_carrera NOT LIKE 'I%'
 			AND (t_p.observaciones IS NULL
 				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                

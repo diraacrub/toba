@@ -1,4 +1,5 @@
 <?php
+require_once 'informes/materias_equipo.php';
 class dt_informes extends catedras_datos_tabla
 {
 	
@@ -389,11 +390,36 @@ function get_datos_informe($id_informe_seleccionado)
 	if (is_array($fila)) {
 		$fila = $this->agregar_html_por_cargo(array($fila));
 		$fila = $fila[0];
-		// El equipo del programa, legible en el formulario (ef_fijo con HTML).
-		$fila['equipo_catedra'] = self::equipo_catedra_html(isset($fila['equipo_catedra']) ? $fila['equipo_catedra'] : null);
+		// El equipo, legible en el formulario (ef_fijo con HTML): ver equipo_del_informe.
+		$fila['equipo_catedra'] = self::equipo_catedra_html(self::equipo_del_informe($fila));
 	}
 	return $fila;
 }
+
+	/**
+	 * El equipo que muestra el encabezado del informe (JSON o texto). Desde
+	 * 2027 (materias_equipo::DESDE): en borrador, el vigente (los activos de
+	 * huayca.materias_equipo para ese dictado); enviado, la foto que se guardo
+	 * al enviarlo (informes.equipo_inf). Si la materia no esta en esa tabla o
+	 * el informe se envio sin foto, y antes de 2027, el del programa.
+	 */
+	static function equipo_del_informe($fila)
+	{
+		$del_programa = isset($fila['equipo_catedra']) ? $fila['equipo_catedra'] : null;
+		if ((int) (isset($fila['ano_academico']) ? $fila['ano_academico'] : 0) < materias_equipo::DESDE) {
+			return $del_programa;
+		}
+		if ((isset($fila['estado_informe']) ? $fila['estado_informe'] : '') !== 'docente') {
+			return (isset($fila['equipo_inf']) && trim((string) $fila['equipo_inf']) !== '') ? $fila['equipo_inf'] : $del_programa;
+		}
+		$vigentes = materias_equipo::vigentes_de($fila['cod_guarani'], $fila['cod_carrera'], $fila['plan_mocovi'],
+			$fila['ano_academico'], $fila['periodo_dictado']);
+		if (!$vigentes) {
+			return $del_programa;
+		}
+		$json = json_encode(materias_equipo::a_utf8($vigentes));
+		return $json === false ? $del_programa : mb_convert_encoding($json, 'ISO-8859-1', 'UTF-8');
+	}
 
 	/**
 	 * programas.equipo_catedra para mostrar: desde 2027 es JSON
@@ -470,6 +496,7 @@ function get_datos_informe($id_informe_seleccionado)
 		WHERE
 			t_p.legajo_resp = " . quote($usuario_id) . "
 			AND t_i.estado_informe = 'docente'
+			AND t_i.publicado
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 	}    

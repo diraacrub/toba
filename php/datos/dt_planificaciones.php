@@ -161,6 +161,7 @@ class dt_planificaciones extends catedras_datos_tabla
 		WHERE
 			t_p.legajo_resp = " . quote($usuario_id) . " 
 			AND t_pl.estado_planificacion = 'docente'
+			AND t_p.publicado
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 	}

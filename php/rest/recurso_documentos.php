@@ -4,6 +4,7 @@ use SIUToba\rest\lib\modelable;
 use SIUToba\rest\lib\rest_error;
 
 require_once __DIR__ . '/../modelos/modelo_programa.php';
+require_once __DIR__ . '/../informes/materias_equipo.php';
 
 /**
  * @description Programas, planificaciones e informes de un anio, con su estado
@@ -26,6 +27,17 @@ require_once __DIR__ . '/../modelos/modelo_programa.php';
  * libre). El texto, como en /rest/programas
  * (modelo_programa::normalizar_programa); la lista trae ademas el legajo.
  * Todas traen cargo_resp.
+ *
+ * Desde 2027 (materias_equipo::DESDE) traen ademas:
+ *   - publicado: si el docente lo ve (el programa vale tambien para su
+ *     planificacion). Lo de antes siempre esta publicado.
+ *   - el responsable vigente del programa (dni_vigente, legajo_vigente,
+ *     apellido_vigente, nombre_vigente, cargo_vigente): el que dice Mocovi
+ *     hoy, aunque el documento este firmado con otro. Igual al del programa
+ *     si no cambio.
+ *   - en la fila del programa, equipo_vigente: [{apellido, nombre, legajo,
+ *     cargo, dedicacion}], los activos de huayca.materias_equipo para ese
+ *     dictado (null antes de 2027 o si la materia no esta en esa tabla).
  *
  * El anio es el del programa (el de la planificacion casi siempre coincide;
  * el informe no tiene). Los programas ocultos (observaciones con "[ocultar]",
@@ -119,18 +131,26 @@ class recurso_documentos implements modelable
 		$comun = 'p.id_programa, p.id_materia_prog AS id_materia, trim(p.ano_academico) AS ano_academico,
 			p.periodo_dictado, p.legajo_resp, p.dni_resp, p.apellido_resp, p.nombre_resp,
 			p.cargo_resp, p.equipo_catedra,
-			m.nombre_materia, m.cod_carrera, m.depto_principal';
+			m.nombre_materia, m.cod_carrera, m.depto_principal, m.cod_guarani, m.plan_mocovi,
+			coalesce(v.legajo_resp_vig, v.legajo_resp) AS legajo_vigente,
+			coalesce(v.dni_resp_vig, v.dni_resp) AS dni_vigente,
+			CASE WHEN v.legajo_resp_vig IS NULL THEN v.apellido_resp ELSE v.apellido_resp_vig END AS apellido_vigente,
+			CASE WHEN v.legajo_resp_vig IS NULL THEN v.nombre_resp ELSE v.nombre_resp_vig END AS nombre_vigente,
+			CASE WHEN v.legajo_resp_vig IS NULL THEN v.cargo_resp ELSE v.cargo_resp_vig END AS cargo_vigente';
+		// v: el programa mismo (en el informe, p es la vista con el responsable del informe).
+		$vig = 'JOIN programas v ON v.id_programa = p.id_programa';
 		$desde = 'FROM programas p JOIN materias m ON m.id_materia = p.id_materia_prog';
 		$filtro = implode(' AND ', $where);
 		$partes = array(
-			'programa' => "SELECT 'programa' AS tipo, p.id_programa AS id, p.estado, $comun
-				$desde WHERE $filtro",
-			'planificacion' => "SELECT 'planificacion' AS tipo, pl.id_planificacion AS id, pl.estado_planificacion AS estado, $comun
+			'programa' => "SELECT 'programa' AS tipo, p.id_programa AS id, p.estado, v.publicado, $comun
+				$desde $vig WHERE $filtro",
+			'planificacion' => "SELECT 'planificacion' AS tipo, pl.id_planificacion AS id, pl.estado_planificacion AS estado,
+				v.publicado, $comun
 				FROM planificaciones pl JOIN programas p ON p.id_programa = pl.id_prog_planif
-				JOIN materias m ON m.id_materia = p.id_materia_prog WHERE $filtro",
-			'informe' => "SELECT 'informe' AS tipo, i.id_informe AS id, i.estado_informe AS estado, $comun
+				JOIN materias m ON m.id_materia = p.id_materia_prog $vig WHERE $filtro",
+			'informe' => "SELECT 'informe' AS tipo, i.id_informe AS id, i.estado_informe AS estado, i.publicado, $comun
 				FROM informes i JOIN informes_programas p ON p.id_informe_programa = i.id_informe
-				JOIN materias m ON m.id_materia = p.id_materia_prog WHERE $filtro",
+				JOIN materias m ON m.id_materia = p.id_materia_prog $vig WHERE $filtro",
 		);
 		$sql = array();
 		foreach ($partes as $tipo => $s) {
@@ -145,10 +165,23 @@ class recurso_documentos implements modelable
 		$sql .= ' ORDER BY d.id_programa, d.tipo';
 
 		$salida = array();
+		// El equipo vigente sale de materias_equipo (una consulta para el anio).
+		$equipos = ((int) $ano >= materias_equipo::DESDE) ? materias_equipo::del_anio($ano) : array();
 		foreach (toba::db()->consultar($sql) as $f) {
-			foreach (array('id', 'id_programa', 'id_materia', 'legajo_resp', 'dni_resp') as $c) {
+			foreach (array('id', 'id_programa', 'id_materia', 'legajo_resp', 'dni_resp', 'legajo_vigente', 'dni_vigente') as $c) {
 				$f[$c] = ($f[$c] === null || $f[$c] === '') ? null : (int) $f[$c];
 			}
+			$f['publicado'] = in_array($f['publicado'], array(true, 't', '1', 1), true);
+			$f['equipo_vigente'] = null;
+			$k = materias_equipo::clave_materia($f['cod_guarani'], $f['cod_carrera'], $f['plan_mocovi']);
+			if ($f['tipo'] === 'programa' && isset($equipos[$k])) {
+				$f['equipo_vigente'] = array();
+				foreach (materias_equipo::vigentes($equipos[$k], $f['periodo_dictado']) as $e) {
+					$f['equipo_vigente'][] = array('apellido' => self::utf8($e[0]), 'nombre' => self::utf8($e[1]),
+						'legajo' => $e[2], 'cargo' => $e[3], 'dedicacion' => $e[4]);
+				}
+			}
+			unset($f['cod_guarani'], $f['plan_mocovi']);
 			// El equipo, solo en la fila del programa (normalizar trabaja en LATIN1).
 			if ($f['tipo'] === 'programa') {
 				$f['equipo_catedra_crudo'] = $f['equipo_catedra'];
@@ -182,7 +215,8 @@ class recurso_documentos implements modelable
 				unset($f['equipo_catedra']);
 			}
 			// La base es LATIN1: los textos salen en UTF-8, como en /rest/materias.
-			foreach (array('cargo_resp', 'apellido_resp', 'nombre_resp', 'nombre_materia', 'cod_carrera', 'depto_principal', 'periodo_dictado', 'estado') as $c) {
+			foreach (array('cargo_resp', 'apellido_resp', 'nombre_resp', 'nombre_materia', 'cod_carrera', 'depto_principal', 'periodo_dictado', 'estado',
+				'apellido_vigente', 'nombre_vigente', 'cargo_vigente') as $c) {
 				$f[$c] = self::utf8($f[$c]);
 			}
 			// El departamento se compara aca, sin acentos ni mayusculas ni

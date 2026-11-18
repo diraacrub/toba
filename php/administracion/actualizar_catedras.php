@@ -1,32 +1,34 @@
 <?php
-if (!defined('CATEDRAS_IMPORTAR_PROGRAMAS_SIN_EJECUTAR')) {
-	define('CATEDRAS_IMPORTAR_PROGRAMAS_SIN_EJECUTAR', true);
-}
 require_once dirname(__FILE__) . '/importar_programas.php';
 
 /**
  * Actualizar desde Mocovi lo que ya existe en Catedras (desde 2027). Lo usa
- * deptos (/programas), que arma con el informe de Mocovi del anio quien es
- * el responsable de cada dictado y su equipo, y dice si el plazo de cada
- * documento sigue vigente segun el calendario academico (que esta en deptos).
+ * catedras_mocovi (php/administracion/mocovi_anio.php, POST /rest/mocovi-anio):
+ * deptos arma con el informe de Mocovi del anio quien es el responsable de
+ * cada dictado y su equipo, y dice si el plazo de cada documento sigue
+ * vigente segun el calendario academico (que esta en deptos).
  *
- * Programas (POST /rest/actualizar-programas): el responsable (legajo, DNI,
- * apellido, nombre, cargo, designacion) y el equipo de catedra del programa,
- * que la planificacion toma del programa. Solo si el programa y su
- * planificacion estan en estado docente y el plazo del programa no vencio.
- * Si el responsable cambia y el informe ya se envio con el responsable
- * anterior, el informe se queda con el anterior (se le fija).
+ * Programas: el responsable (legajo, DNI, apellido, nombre, cargo,
+ * designacion) y el equipo de catedra del programa, que la planificacion toma
+ * del programa. Solo si el programa y su planificacion estan en estado docente
+ * y el plazo del programa no vencio. Si el responsable cambia y el informe ya
+ * se envio con el responsable anterior, el informe se queda con el anterior
+ * (se le fija).
  *
- * Informes (POST /rest/actualizar-informes): crea el informe de catedra de
- * los programas que no lo tienen (vacio, en estado docente) y pone el
- * responsable del informe (informes.*_resp_inf, ver
- * deploy/sql/informes_responsable.sql), que puede no ser el del programa: el
- * programa se envio en marzo y el informe se completa en diciembre. Solo si
- * el informe esta en estado docente y su plazo no vencio. Si coincide con el
- * del programa, las columnas quedan en NULL (el del programa).
+ * Responsable vigente (programas.*_resp_vig, ver
+ * deploy/sql/publicar_y_vigente.sql): el que Mocovi dice hoy, aunque el
+ * programa ya este firmado con otro. Se actualiza siempre (no mira estado ni
+ * plazo). NULL si es el del programa.
  *
- * planificar_* no guarda nada; aplicar_* vuelve a planificar con las tablas
- * bloqueadas y guarda todo en una transaccion. Mandar lo mismo dos veces no
+ * Informes: crea el informe de catedra de los programas que no lo tienen
+ * (vacio, en estado docente, sin publicar) y pone el responsable del informe
+ * (informes.*_resp_inf, ver deploy/sql/informes_responsable.sql), que puede no
+ * ser el del programa: el programa se envio en marzo y el informe se completa
+ * en diciembre. Solo si el informe esta en estado docente y su plazo no
+ * vencio. Si coincide con el del programa, las columnas quedan en NULL.
+ *
+ * planificar_* no guarda nada; aplicar_*_en vuelve a planificar y guarda,
+ * dentro de la transaccion de catedras_mocovi. Mandar lo mismo dos veces no
  * cambia nada la segunda.
  *
  * Los textos van en LATIN1, como la base (la API REST ya convierte el JSON).
@@ -133,7 +135,8 @@ class catedras_actualizar
 			return $salida;
 		}
 		$sql = 'SELECT p.id_programa, trim(p.ano_academico) AS ano, p.estado, p.legajo_resp, p.dni_resp, p.id_designacion,
-				p.cargo_resp, p.apellido_resp, p.nombre_resp, p.equipo_catedra,
+				p.cargo_resp, p.apellido_resp, p.nombre_resp, p.equipo_catedra, p.id_materia_prog, p.periodo_dictado,
+				p.legajo_resp_vig, p.dni_resp_vig, p.id_designacion_vig, p.cargo_resp_vig, p.apellido_resp_vig, p.nombre_resp_vig,
 				(SELECT string_agg(DISTINCT pl.estado_planificacion, \',\') FROM planificaciones pl
 					WHERE pl.id_prog_planif = p.id_programa) AS estados_planif
 			FROM programas p WHERE p.id_programa IN (' . implode(', ', array_unique($ids)) . ')';
@@ -242,66 +245,55 @@ class catedras_actualizar
 		return $plan;
 	}
 
-	static function aplicar_programas($filas, $usuario)
+	static function aplicar_programas_en($db, $filas, $usuario)
 	{
-		$db = self::db();
-		$db->abrir_transaccion();
-		try {
-			$db->ejecutar('LOCK TABLE programas, planificaciones, informes IN SHARE ROW EXCLUSIVE MODE');
-			$plan = self::planificar_programas($filas);
-			$q = function ($v) use ($db) {
-				return ($v === null || $v === '') ? 'NULL' : $db->quote($v);
-			};
-			$informes = self::informes_de(array_map(function ($a) {
-				return $a['id'];
-			}, $plan['actualizar']));
-			foreach ($plan['actualizar'] as $a) {
-				$f = $a['fila'];
-				$p = $a['antes'];
-				$set = array();
-				if (isset($a['cambios']['legajo_resp'])) {
-					$set[] = 'legajo_resp = ' . (int) $f['legajo_resp'];
-					$set[] = 'dni_resp = ' . (int) $f['dni_resp'];
-				}
-				foreach (array('id_designacion') as $k) {
-					if (isset($a['cambios'][$k])) {
-						$set[] = "$k = " . (self::entero($f[$k]) === null ? 'NULL' : (string) self::entero($f[$k]));
-					}
-				}
-				foreach (array('cargo_resp', 'apellido_resp', 'nombre_resp', 'equipo_catedra') as $k) {
-					if (isset($a['cambios'][$k])) {
-						$set[] = "$k = " . $q($f[$k]);
-					}
-				}
-				$db->ejecutar('UPDATE programas SET ' . implode(', ', $set) . ' WHERE id_programa = ' . (int) $a['id']
-					. " AND estado = 'docente'");
-				// Un informe ya enviado con el responsable anterior se queda con ese.
-				if (isset($a['cambios']['legajo_resp'])) {
-					foreach ($informes[$a['id']] ?? array() as $inf) {
-						if ($inf['legajo_resp_inf'] === null && $inf['estado_informe'] !== 'docente') {
-							$db->ejecutar('UPDATE informes SET legajo_resp_inf = ' . (int) $p['legajo_resp']
-								. ', dni_resp_inf = ' . (self::entero($p['dni_resp']) === null ? 'NULL' : (int) $p['dni_resp'])
-								. ', id_designacion_inf = ' . (self::entero($p['id_designacion']) === null ? 'NULL' : (int) $p['id_designacion'])
-								. ', cargo_resp_inf = ' . $q($p['cargo_resp']) . ', apellido_resp_inf = ' . $q($p['apellido_resp'])
-								. ', nombre_resp_inf = ' . $q($p['nombre_resp']) . ', resp_inf_actualizado = now(), resp_inf_por = '
-								. $q(substr($usuario, 0, 100)) . ' WHERE id_informe = ' . (int) $inf['id_informe']);
-						}
-					}
-				}
-				$obs = 'Actualizado desde Mocovi: ' . implode(', ', array_map(function ($k) use ($a) {
-					return $k === 'equipo_catedra' ? 'equipo de c&aacute;tedra'
-						: $k . ' ' . $a['cambios'][$k][0] . ' &rarr; ' . $a['cambios'][$k][1];
-				}, array_keys($a['cambios'])));
-				$db->ejecutar("INSERT INTO movimientos (nombre_tabla, id_tabla, tipo_movimiento, usuario_movimiento, observaciones, estado_mov) VALUES ('programas', "
-					. (int) $a['id'] . ", 'Actualizacion', " . $db->quote($usuario) . ', ' . $db->quote($obs) . ", 'docente')");
+		$plan = self::planificar_programas($filas);
+		$q = function ($v) use ($db) {
+			return ($v === null || $v === '') ? 'NULL' : $db->quote($v);
+		};
+		$informes = self::informes_de(array_map(function ($a) {
+			return $a['id'];
+		}, $plan['actualizar']));
+		foreach ($plan['actualizar'] as $a) {
+			$f = $a['fila'];
+			$p = $a['antes'];
+			$set = array();
+			if (isset($a['cambios']['legajo_resp'])) {
+				$set[] = 'legajo_resp = ' . (int) $f['legajo_resp'];
+				$set[] = 'dni_resp = ' . (int) $f['dni_resp'];
 			}
-			$db->cerrar_transaccion();
-		} catch (Exception $e) {
-			$db->abortar_transaccion();
-			toba::logger()->error('ACTUALIZAR PROGRAMAS: ' . $e->getMessage());
-			throw $e;
+			foreach (array('id_designacion') as $k) {
+				if (isset($a['cambios'][$k])) {
+					$set[] = "$k = " . (self::entero($f[$k]) === null ? 'NULL' : (string) self::entero($f[$k]));
+				}
+			}
+			foreach (array('cargo_resp', 'apellido_resp', 'nombre_resp', 'equipo_catedra') as $k) {
+				if (isset($a['cambios'][$k])) {
+					$set[] = "$k = " . $q($f[$k]);
+				}
+			}
+			$db->ejecutar('UPDATE programas SET ' . implode(', ', $set) . ' WHERE id_programa = ' . (int) $a['id']
+				. " AND estado = 'docente'");
+			// Un informe ya enviado con el responsable anterior se queda con ese.
+			if (isset($a['cambios']['legajo_resp'])) {
+				foreach ($informes[$a['id']] ?? array() as $inf) {
+					if ($inf['legajo_resp_inf'] === null && $inf['estado_informe'] !== 'docente') {
+						$db->ejecutar('UPDATE informes SET legajo_resp_inf = ' . (int) $p['legajo_resp']
+							. ', dni_resp_inf = ' . (self::entero($p['dni_resp']) === null ? 'NULL' : (int) $p['dni_resp'])
+							. ', id_designacion_inf = ' . (self::entero($p['id_designacion']) === null ? 'NULL' : (int) $p['id_designacion'])
+							. ', cargo_resp_inf = ' . $q($p['cargo_resp']) . ', apellido_resp_inf = ' . $q($p['apellido_resp'])
+							. ', nombre_resp_inf = ' . $q($p['nombre_resp']) . ', resp_inf_actualizado = now(), resp_inf_por = '
+							. $q(substr($usuario, 0, 100)) . ' WHERE id_informe = ' . (int) $inf['id_informe']);
+					}
+				}
+			}
+			$obs = 'Actualizado desde Mocovi: ' . implode(', ', array_map(function ($k) use ($a) {
+				return $k === 'equipo_catedra' ? 'equipo de c&aacute;tedra'
+					: $k . ' ' . $a['cambios'][$k][0] . ' &rarr; ' . $a['cambios'][$k][1];
+			}, array_keys($a['cambios'])));
+			$db->ejecutar("INSERT INTO movimientos (nombre_tabla, id_tabla, tipo_movimiento, usuario_movimiento, observaciones, estado_mov) VALUES ('programas', "
+				. (int) $a['id'] . ", 'Actualizacion', " . $db->quote($usuario) . ', ' . $db->quote($obs) . ", 'docente')");
 		}
-		toba::logger()->notice('ACTUALIZAR PROGRAMAS por ' . $usuario . ': ' . count($plan['actualizar']) . ' actualizados');
 		return $plan;
 	}
 
@@ -407,49 +399,158 @@ class catedras_actualizar
 		return $vals;
 	}
 
-	static function aplicar_informes($filas, $usuario)
+	static function aplicar_informes_en($db, $filas, $usuario)
 	{
-		$db = self::db();
 		$creados = array();
-		$db->abrir_transaccion();
-		try {
-			$db->ejecutar('LOCK TABLE programas, informes IN SHARE ROW EXCLUSIVE MODE');
-			$plan = self::planificar_informes($filas);
-			$max = $db->consultar_fila('SELECT coalesce(max(id_informe), 0) AS n FROM informes');
-			$siguiente = (int) $max['n'];
-			foreach ($plan['crear'] as $c) {
-				$siguiente++;
-				catedras_importar_programas::crear_informe($db, $siguiente, (int) $c['id'], $usuario,
-					'Creado desde deptos para el programa ' . (int) $c['id']);
-				if (!$c['del_programa']) {
-					$vals = self::set_resp_informe($db, $c['fila'], false, $usuario);
-					$db->ejecutar('UPDATE informes SET ' . implode(', ', array_map(function ($k, $v) {
-						return "$k = $v";
-					}, array_keys($vals), $vals)) . ' WHERE id_informe = ' . $siguiente);
-				}
-				$creados[] = array('linea' => $c['fila']['linea'], 'id_programa' => (int) $c['id'], 'id_informe' => $siguiente);
-			}
-			foreach ($plan['actualizar'] as $a) {
-				$vals = self::set_resp_informe($db, $a['fila'], $a['del_programa'], $usuario);
+		$plan = self::planificar_informes($filas);
+		$max = $db->consultar_fila('SELECT coalesce(max(id_informe), 0) AS n FROM informes');
+		$siguiente = (int) $max['n'];
+		foreach ($plan['crear'] as $c) {
+			$siguiente++;
+			catedras_importar_programas::crear_informe($db, $siguiente, (int) $c['id'], $usuario,
+				'Creado desde deptos para el programa ' . (int) $c['id']);
+			if (!$c['del_programa']) {
+				$vals = self::set_resp_informe($db, $c['fila'], false, $usuario);
 				$db->ejecutar('UPDATE informes SET ' . implode(', ', array_map(function ($k, $v) {
 					return "$k = $v";
-				}, array_keys($vals), $vals)) . ' WHERE id_informe = ' . (int) $a['id_informe'] . " AND estado_informe = 'docente'");
-				$obs = 'Responsable desde Mocovi: ' . implode(', ', array_map(function ($k) use ($a) {
-					return $k . ' ' . $a['cambios'][$k][0] . ' &rarr; ' . $a['cambios'][$k][1];
-				}, array_keys($a['cambios'])));
-				$db->ejecutar("INSERT INTO movimientos (nombre_tabla, id_tabla, tipo_movimiento, usuario_movimiento, observaciones, estado_mov) VALUES ('informes', "
-					. (int) $a['id_informe'] . ", 'Actualizacion', " . $db->quote($usuario) . ', ' . $db->quote($obs) . ", 'docente')");
+				}, array_keys($vals), $vals)) . ' WHERE id_informe = ' . $siguiente);
 			}
-			catedras_importar_programas::adelantar_secuencia($db, 'informes_id_informe_seq', 'informes', 'id_informe');
-			$db->cerrar_transaccion();
-		} catch (Exception $e) {
-			$db->abortar_transaccion();
-			toba::logger()->error('ACTUALIZAR INFORMES: ' . $e->getMessage());
-			throw $e;
+			$creados[] = array('linea' => $c['fila']['linea'], 'id_programa' => (int) $c['id'], 'id_informe' => $siguiente);
 		}
-		toba::logger()->notice('ACTUALIZAR INFORMES por ' . $usuario . ': ' . count($creados) . ' creados, '
-			. count($plan['actualizar']) . ' con otro responsable');
+		foreach ($plan['actualizar'] as $a) {
+			$vals = self::set_resp_informe($db, $a['fila'], $a['del_programa'], $usuario);
+			$db->ejecutar('UPDATE informes SET ' . implode(', ', array_map(function ($k, $v) {
+				return "$k = $v";
+			}, array_keys($vals), $vals)) . ' WHERE id_informe = ' . (int) $a['id_informe'] . " AND estado_informe = 'docente'");
+			$obs = 'Responsable desde Mocovi: ' . implode(', ', array_map(function ($k) use ($a) {
+				return $k . ' ' . $a['cambios'][$k][0] . ' &rarr; ' . $a['cambios'][$k][1];
+			}, array_keys($a['cambios'])));
+			$db->ejecutar("INSERT INTO movimientos (nombre_tabla, id_tabla, tipo_movimiento, usuario_movimiento, observaciones, estado_mov) VALUES ('informes', "
+				. (int) $a['id_informe'] . ", 'Actualizacion', " . $db->quote($usuario) . ', ' . $db->quote($obs) . ", 'docente')");
+		}
 		$plan['creados'] = $creados;
 		return $plan;
+	}
+
+	//-------------------------------------------------------------------------
+	// El responsable vigente
+	//-------------------------------------------------------------------------
+
+	/** El responsable vigente que tiene hoy un programa: el suyo (*_resp_vig) o el del programa. */
+	static function resp_vigente($prog)
+	{
+		$propio = $prog['legajo_resp_vig'] !== null && $prog['legajo_resp_vig'] !== '';
+		$r = array();
+		foreach (self::$RESP as $k) {
+			$r[$k] = $propio ? $prog[$k . '_vig'] : $prog[$k];
+		}
+		return $r;
+	}
+
+	/**
+	 * array('cambia' => [...], 'sin_cambios' => [...], 'no_se_tocan' => [...],
+	 * 'problemas' => [...]). Las filas son las de los programas (las mismas que
+	 * planificar_programas): el responsable que Mocovi dice hoy. 'cambia' trae
+	 * 'antes' y 'despues' (las columnas de self::$RESP, con el DNI).
+	 */
+	static function planificar_vigente($filas)
+	{
+		$plan = array('cambia' => array(), 'sin_cambios' => array(), 'no_se_tocan' => array(), 'problemas' => array());
+		$progs = self::programas($filas);
+		$dni_de = null;
+		$vistos = array();
+		foreach ($filas as $f) {
+			$id = (int) $f['id_programa'];
+			if (isset($vistos[$id]) || !isset($progs[$id])) {
+				continue;		// planificar_programas ya lo cuenta como problema
+			}
+			$vistos[$id] = true;
+			$p = $progs[$id];
+			if ((int) $p['ano'] < self::DESDE) {
+				$plan['no_se_tocan'][] = array('fila' => $f, 'id' => $id, 'motivo' => 'es de ' . $p['ano'] . ': solo desde ' . self::DESDE);
+				continue;
+			}
+			$antes = self::resp_vigente($p);
+			$cambios = self::cambios_resp($antes, $f);
+			if (!$cambios) {
+				$plan['sin_cambios'][] = array('fila' => $f, 'id' => $id);
+				continue;
+			}
+			$f['dni_resp'] = $antes['dni_resp'];
+			if (isset($cambios['legajo_resp'])) {
+				if ($dni_de === null) {
+					$dni_de = self::dnis();
+				}
+				$dni = $dni_de[$f['legajo_resp']] ?? null;
+				if ($dni === null || $dni === '') {
+					$plan['problemas'][] = array('fila' => $f, 'id' => $id, 'cambios' => $cambios, 'motivos' => array(
+						$dni === null ? 'el legajo ' . $f['legajo_resp'] . ' no tiene usuario en C&aacute;tedras'
+							: 'el usuario ' . $f['legajo_resp'] . ' no tiene DNI cargado'));
+					continue;
+				}
+				$f['dni_resp'] = $dni;
+			}
+			$despues = array();
+			foreach (self::$RESP as $k) {
+				$despues[$k] = $f[$k];
+			}
+			$plan['cambia'][] = array('fila' => $f, 'id' => $id, 'cambios' => $cambios, 'antes' => $antes,
+				'despues' => $despues, 'id_materia' => (int) $p['id_materia_prog'], 'periodo' => $p['periodo_dictado']);
+		}
+		return $plan;
+	}
+
+	static function aplicar_vigente_en($db, $filas, $usuario)
+	{
+		$plan = self::planificar_vigente($filas);
+		$q = function ($v) use ($db) {
+			return ($v === null || $v === '') ? 'NULL' : $db->quote($v);
+		};
+		$n = function ($v) {
+			$v = self::entero($v);
+			return $v === null ? 'NULL' : (string) $v;
+		};
+		$progs = self::programas(array_map(function ($c) {
+			return $c['fila'];
+		}, $plan['cambia']));
+		foreach ($plan['cambia'] as $c) {
+			$d = $c['despues'];
+			// Si es el mismo del programa, NULL: vale el del programa.
+			if (!self::cambios_resp($progs[$c['id']], $d)) {
+				$set = 'legajo_resp_vig = NULL, dni_resp_vig = NULL, id_designacion_vig = NULL, cargo_resp_vig = NULL,
+					apellido_resp_vig = NULL, nombre_resp_vig = NULL';
+			} else {
+				$set = 'legajo_resp_vig = ' . $n($d['legajo_resp']) . ', dni_resp_vig = ' . $n($d['dni_resp'])
+					. ', id_designacion_vig = ' . $n($d['id_designacion']) . ', cargo_resp_vig = ' . $q($d['cargo_resp'])
+					. ', apellido_resp_vig = ' . $q($d['apellido_resp']) . ', nombre_resp_vig = ' . $q($d['nombre_resp']);
+			}
+			$db->ejecutar('UPDATE programas SET ' . $set . ', resp_vig_actualizado = now(), resp_vig_por = '
+				. $q(substr($usuario, 0, 100)) . ' WHERE id_programa = ' . (int) $c['id']);
+			$obs = 'Responsable vigente desde Mocovi: ' . implode(', ', array_map(function ($k) use ($c) {
+				return $k . ' ' . $c['cambios'][$k][0] . ' &rarr; ' . $c['cambios'][$k][1];
+			}, array_keys($c['cambios'])));
+			$db->ejecutar("INSERT INTO movimientos (nombre_tabla, id_tabla, tipo_movimiento, usuario_movimiento, observaciones, estado_mov) VALUES ('programas', "
+				. (int) $c['id'] . ", 'Responsable vigente', " . $db->quote($usuario) . ', ' . $db->quote($obs) . ', NULL)');
+		}
+		return $plan;
+	}
+
+	/**
+	 * El responsable vigente de cada programa del anio (para deptos, despues de
+	 * aplicar): array de array(id_programa, id_materia, periodo, legajo, dni).
+	 */
+	static function vigentes_del_anio($ano)
+	{
+		$salida = array();
+		$sql = "SELECT p.id_programa, p.id_materia_prog AS id_materia, p.periodo_dictado AS periodo,
+				coalesce(p.legajo_resp_vig, p.legajo_resp) AS legajo, coalesce(p.dni_resp_vig, p.dni_resp) AS dni
+			FROM programas p WHERE trim(p.ano_academico) = " . self::db()->quote((string) (int) $ano)
+			. " AND (p.observaciones IS NULL OR p.observaciones NOT ILIKE '%[ocultar]%') ORDER BY p.id_programa";
+		foreach (self::db()->consultar($sql) as $f) {
+			$salida[] = array('id_programa' => (int) $f['id_programa'], 'id_materia' => (int) $f['id_materia'],
+				'periodo' => trim((string) $f['periodo']), 'legajo' => $f['legajo'] === null ? null : (int) $f['legajo'],
+				'dni' => $f['dni'] === null ? null : (int) $f['dni']);
+		}
+		return $salida;
 	}
 }

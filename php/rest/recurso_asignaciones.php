@@ -16,6 +16,11 @@ use SIUToba\rest\lib\rest_error;
  * Lo usa deptos (salidas de campo): el docente elige entre las materias de las
  * que es responsable ese anio. id_materia es el mismo de /rest/materias.
  *
+ * dni_resp y legajo_resp son los del programa (quien lo firma); dni_vigente y
+ * legajo_vigente, los del responsable vigente (programas.*_resp_vig, el que
+ * dice Mocovi hoy; igual al del programa si no cambio). Con &dni= se filtra
+ * por el vigente.
+ *
  * Los programas ocultos (observaciones con "[ocultar]", como en dt_programas)
  * no cuentan.
  *
@@ -43,16 +48,17 @@ class recurso_asignaciones implements modelable
 			if ($dni === '') {
 				throw new rest_error(400, 'El dni tiene que ser numerico.');
 			}
-			$where[] = 'p.dni_resp = ' . quote($dni);
+			$where[] = 'coalesce(p.dni_resp_vig, p.dni_resp) = ' . quote($dni);
 		}
 		$sql = 'SELECT p.id_programa, p.id_materia_prog AS id_materia, trim(p.ano_academico) AS ano_academico,
-				p.periodo_dictado, p.dni_resp, p.legajo_resp, p.estado
+				p.periodo_dictado, p.dni_resp, p.legajo_resp, p.estado,
+				coalesce(p.dni_resp_vig, p.dni_resp) AS dni_vigente, coalesce(p.legajo_resp_vig, p.legajo_resp) AS legajo_vigente
 			FROM programas p
 			WHERE ' . implode(' AND ', $where) . '
 			ORDER BY p.id_programa';
 		$filas = toba::db()->consultar($sql);
 		foreach ($filas as &$f) {
-			foreach (array('id_programa', 'id_materia', 'dni_resp', 'legajo_resp') as $c) {
+			foreach (array('id_programa', 'id_materia', 'dni_resp', 'legajo_resp', 'dni_vigente', 'legajo_vigente') as $c) {
 				$f[$c] = ($f[$c] === null) ? null : (int) $f[$c];
 			}
 		}

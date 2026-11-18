@@ -1,6 +1,6 @@
 -- El equipo de cada materia por año, tal como lo trae el informe de Mocovi
 -- (el que se sube en deptos /programas: una fila por materia, carrera, plan y
--- docente, con su rol). Lo escribe POST /rest/equipo-mocovi
+-- docente, con su rol). Lo escribe POST /rest/mocovi-anio
 -- (php/informes/materias_equipo.php) cada vez que Secretaría sube el informe:
 --   - una fila idéntica (mismas columnas de Mocovi y mismo año) se deja como está;
 --   - una que ya no viene pasa a 'borrado' (con la fecha de baja);

@@ -3,15 +3,18 @@
  * El equipo de cada materia por anio (huayca.materias_equipo, ver
  * deploy/sql/materias_equipo.sql), tal como lo trae el informe de Mocovi.
  *
- * Lo escribe POST /rest/equipo-mocovi cada vez que Secretaria sube el informe
- * en deptos (siempre completo, siempre simulado antes). Por anio:
+ * Lo escribe POST /rest/mocovi-anio (catedras_mocovi, primer paso) cada vez
+ * que Secretaria aplica el informe en deptos (siempre completo, siempre
+ * simulado antes). Por anio:
  *   - fila identica (las columnas de Mocovi y el anio) y activa: no se toca;
  *   - fila de la tabla que no viene en el informe: pasa a 'borrado';
  *   - fila borrada que vuelve identica: se reactiva (conserva observaciones);
  *   - fila nueva: se agrega.
  *
- * Lo lee el informe de catedra (punto 11): opciones() da los docentes de un
- * dictado para el select del ML, activos y dados de baja en el anio.
+ * Lo lee el informe de catedra: opciones() da los docentes de un dictado para
+ * el select del punto 11, activos y dados de baja en el anio; vigentes() da el
+ * equipo vigente (los activos), que muestra el encabezado del informe en
+ * borrador y /rest/documentos (Mis catedras, en deptos).
  *
  * Los textos van en LATIN1, como la base (la API REST ya convierte el JSON).
  * Archivo en ASCII.
@@ -19,6 +22,8 @@
 class materias_equipo
 {
 	const TABLA = 'huayca.materias_equipo';
+	/** Desde que anio el equipo vigente sale de esta tabla (como catedras_actualizar::DESDE). */
+	const DESDE = 2027;
 
 	/** Columna de la tabla => clave de la fila que manda deptos (la de programa_mocovi). */
 	static $COLUMNAS = array(
@@ -155,58 +160,168 @@ class materias_equipo
 	}
 
 	/**
-	 * Aplica el informe: vuelve a planificar con la tabla bloqueada (lo que se
-	 * simulo puede haber cambiado) y escribe todo en una transaccion.
-	 * Devuelve el plan aplicado.
+	 * Aplica el informe dentro de una transaccion que ya abrio quien llama
+	 * (catedras_mocovi::aplicar): vuelve a planificar (lo que se simulo puede
+	 * haber cambiado) y escribe. Devuelve el plan aplicado.
 	 */
-	static function aplicar($ano, $filas, $usuario)
+	static function aplicar_en($db, $ano, $filas, $usuario)
 	{
-		$db = self::db();
 		$ano = (int) $ano;
 		$usuario = substr((string) $usuario, 0, 100);
-		$db->abrir_transaccion();
-		try {
-			$db->ejecutar('LOCK TABLE ' . self::TABLA . ' IN SHARE ROW EXCLUSIVE MODE');
-			$plan = self::planificar($ano, $filas);
-			$q = function ($v) use ($db) {
-				return $v === null ? 'NULL' : $db->quote($v);
-			};
-			$columnas = array_keys(self::$COLUMNAS);
-			foreach ($plan['agregar'] as $f) {
-				$valores = array((string) $ano);
-				foreach ($columnas as $c) {
-					$valores[] = $q($f[$c]);
-				}
-				$valores[] = $f['id_materia'] === null ? 'NULL' : (string) (int) $f['id_materia'];
-				$valores[] = $q($usuario);
-				$db->ejecutar('INSERT INTO ' . self::TABLA . ' (ano_academico, ' . implode(', ', $columnas)
-					. ', id_materia, actualizado_por) VALUES (' . implode(', ', $valores) . ')');
+		$plan = self::planificar($ano, $filas);
+		$q = function ($v) use ($db) {
+			return $v === null ? 'NULL' : $db->quote($v);
+		};
+		$columnas = array_keys(self::$COLUMNAS);
+		foreach ($plan['agregar'] as $f) {
+			$valores = array((string) $ano);
+			foreach ($columnas as $c) {
+				$valores[] = $q($f[$c]);
 			}
-			$ids = function ($lista) {
-				return implode(', ', array_map(function ($f) {
-					return (string) (int) $f['id_materia_equipo'];
-				}, $lista));
-			};
-			if (!empty($plan['reactivar'])) {
-				$db->ejecutar('UPDATE ' . self::TABLA . " SET estado = 'activo', baja = NULL, actualizado = now(),
-					actualizado_por = " . $q($usuario) . ' WHERE id_materia_equipo IN (' . $ids($plan['reactivar']) . ')');
-			}
-			if (!empty($plan['borrar'])) {
-				$db->ejecutar('UPDATE ' . self::TABLA . " SET estado = 'borrado', baja = now(), actualizado = now(),
-					actualizado_por = " . $q($usuario) . ' WHERE id_materia_equipo IN (' . $ids($plan['borrar']) . ')');
-			}
+			$valores[] = $f['id_materia'] === null ? 'NULL' : (string) (int) $f['id_materia'];
+			$valores[] = $q($usuario);
+			$db->ejecutar('INSERT INTO ' . self::TABLA . ' (ano_academico, ' . implode(', ', $columnas)
+				. ', id_materia, actualizado_por) VALUES (' . implode(', ', $valores) . ')');
+		}
+		$ids = function ($lista) {
+			return implode(', ', array_map(function ($f) {
+				return (string) (int) $f['id_materia_equipo'];
+			}, $lista));
+		};
+		if (!empty($plan['reactivar'])) {
+			$db->ejecutar('UPDATE ' . self::TABLA . " SET estado = 'activo', baja = NULL, actualizado = now(),
+				actualizado_por = " . $q($usuario) . ' WHERE id_materia_equipo IN (' . $ids($plan['reactivar']) . ')');
+		}
+		if (!empty($plan['borrar'])) {
+			$db->ejecutar('UPDATE ' . self::TABLA . " SET estado = 'borrado', baja = now(), actualizado = now(),
+				actualizado_por = " . $q($usuario) . ' WHERE id_materia_equipo IN (' . $ids($plan['borrar']) . ')');
+		}
+		if ($plan['agregar'] || $plan['reactivar'] || $plan['borrar']) {
 			$obs = 'Informe de Mocovi ' . $ano . ': ' . count($plan['agregar']) . ' agregadas, '
 				. count($plan['reactivar']) . ' reactivadas, ' . count($plan['borrar']) . ' borradas, '
 				. $plan['iguales'] . ' sin cambios';
 			$db->ejecutar('INSERT INTO huayca.movimientos (nombre_tabla, id_tabla, fecha_movimiento, tipo_movimiento,
 				usuario_movimiento, observaciones, estado_mov) VALUES (' . $q('materias_equipo') . ', ' . $ano
 				. ', now(), ' . $q('Informe de Mocovi') . ', ' . $q($usuario) . ', ' . $q($obs) . ', NULL)');
-			$db->cerrar_transaccion();
-		} catch (Exception $e) {
-			$db->abortar_transaccion();
-			throw $e;
 		}
 		return $plan;
+	}
+
+	//-------------------------------------------------------------------------
+	// El equipo vigente: los activos de cada dictado
+	//-------------------------------------------------------------------------
+
+	/**
+	 * Las filas de ese anio por materia: {cod_guarani|cod_carrera|plan_mocovi =>
+	 * filas (activas y borradas)}. Una sola consulta para todos los programas.
+	 */
+	static function del_anio($ano)
+	{
+		$salida = array();
+		$filas = self::db()->consultar('SELECT cod_guarani, cod_carrera, plan_mocovi, docente, legajo, categoria,
+				rol, periodo, estado FROM ' . self::TABLA . ' WHERE ano_academico = ' . (int) $ano
+			. ' ORDER BY id_materia_equipo');
+		foreach ($filas as $f) {
+			$salida[self::clave_materia($f['cod_guarani'], $f['cod_carrera'], $f['plan_mocovi'])][] = $f;
+		}
+		return $salida;
+	}
+
+	static function clave_materia($cod_guarani, $cod_carrera, $plan_mocovi)
+	{
+		return self::limpio($cod_guarani) . '|' . self::limpio($cod_carrera) . '|' . self::limpio($plan_mocovi);
+	}
+
+	/**
+	 * Las filas del periodo del dictado; si en ese periodo no hay nadie (ni
+	 * activo ni de baja), las de cualquier periodo del anio. Como opciones().
+	 */
+	static function del_periodo($filas, $periodo)
+	{
+		$periodo = strtoupper(self::limpio($periodo));
+		$del_periodo = array_filter($filas, function ($f) use ($periodo) {
+			return strtoupper(self::limpio($f['periodo'])) === $periodo;
+		});
+		return empty($del_periodo) ? $filas : $del_periodo;
+	}
+
+	/**
+	 * El equipo vigente de un dictado, de las filas de la materia (del_anio):
+	 * los activos del periodo, los responsables primero, una vez cada legajo y
+	 * categoria. Como guarda el equipo programas.equipo_catedra: lista de
+	 * array(apellido, nombre, legajo, cargo, dedicacion). Vacio si no hay nadie.
+	 */
+	static function vigentes($filas, $periodo)
+	{
+		$activos = array_filter(self::del_periodo($filas, $periodo), function ($f) {
+			return $f['estado'] === 'activo';
+		});
+		usort($activos, function ($a, $b) {
+			$ra = stripos((string) $a['rol'], 'RES') === 0 ? 0 : 1;
+			$rb = stripos((string) $b['rol'], 'RES') === 0 ? 0 : 1;
+			return $ra !== $rb ? $ra - $rb : strcmp(self::limpio($a['docente']), self::limpio($b['docente']));
+		});
+		$salida = array();
+		$vistos = array();
+		foreach ($activos as $f) {
+			$k = self::clave_opcion($f['legajo'], $f['categoria']);
+			if (isset($vistos[$k])) {
+				continue;
+			}
+			$vistos[$k] = true;
+			$partes = explode(',', self::limpio($f['docente']), 2);
+			list($cargo, $ded) = self::cargo_dedicacion($f['categoria']);
+			$salida[] = array(trim($partes[0]), isset($partes[1]) ? trim($partes[1]) : '',
+				self::limpio($f['legajo']), $cargo, $ded);
+		}
+		return $salida;
+	}
+
+	/** El equipo vigente de un dictado (una consulta: para un solo programa). */
+	static function vigentes_de($cod_guarani, $cod_carrera, $plan_mocovi, $ano, $periodo)
+	{
+		$db = self::db();
+		$filas = $db->consultar('SELECT docente, legajo, categoria, rol, periodo, estado FROM ' . self::TABLA
+			. ' WHERE ano_academico = ' . (int) $ano
+			. ' AND cod_guarani = ' . $db->quote(self::limpio($cod_guarani))
+			. ' AND cod_carrera = ' . $db->quote(self::limpio($cod_carrera))
+			. ' AND plan_mocovi = ' . $db->quote(self::limpio($plan_mocovi))
+			. ' ORDER BY id_materia_equipo');
+		return self::vigentes($filas, $periodo);
+	}
+
+	/**
+	 * La foto del equipo de un informe al enviarlo (informes.equipo_inf): el
+	 * vigente de su dictado, desde catedras_actualizar::DESDE. JSON en ASCII
+	 * (\uXXXX), como programas.equipo_catedra. Sin filas en la tabla (materias
+	 * que no estan en Mocovi), no guarda nada: queda el equipo del programa.
+	 */
+	static function guardar_foto_informe($id_informe)
+	{
+		$db = self::db();
+		$i = $db->consultar_fila('SELECT m.cod_guarani, m.cod_carrera, m.plan_mocovi, trim(p.ano_academico) AS ano,
+				p.periodo_dictado FROM huayca.informes i JOIN huayca.programas p ON p.id_programa = i.id_prog_informe
+				JOIN huayca.materias m ON m.id_materia = p.id_materia_prog WHERE i.id_informe = ' . (int) $id_informe);
+		if (!$i || (int) $i['ano'] < self::DESDE) {
+			return;
+		}
+		$equipo = self::vigentes_de($i['cod_guarani'], $i['cod_carrera'], $i['plan_mocovi'], $i['ano'], $i['periodo_dictado']);
+		if (!$equipo) {
+			return;
+		}
+		$json = json_encode(self::a_utf8($equipo));
+		if ($json !== false) {
+			$db->ejecutar('UPDATE huayca.informes SET equipo_inf = ' . $db->quote($json) . ' WHERE id_informe = ' . (int) $id_informe);
+		}
+	}
+
+	/** De LATIN1 (la base) a UTF-8, para json_encode. */
+	static function a_utf8($v)
+	{
+		if (is_array($v)) {
+			return array_map(array('materias_equipo', 'a_utf8'), $v);
+		}
+		return mb_convert_encoding((string) $v, 'UTF-8', 'ISO-8859-1');
 	}
 
 	//-------------------------------------------------------------------------

@@ -469,6 +469,11 @@ class ci_informes extends ci_base_operaciones
 		// Guardar finalmente los datos en informes
 		$tabla->set($datos);
 		$tabla->sincronizar();
+		// Al enviarlo, la foto del equipo vigente (desde 2027): el encabezado
+		// del informe enviado muestra esa, aunque despues cambie el equipo.
+		if (isset($datos['estado_informe']) && $datos['estado_informe'] === 'depto' && !empty($datos['id_informe'])) {
+			materias_equipo::guardar_foto_informe($datos['id_informe']);
+		}
 		toba::notificacion()->agregar("Su informe ha sido guardado correctamente", 'info');
 
 		// ---- REGISTRO DE MOVIMIENTOS ----
