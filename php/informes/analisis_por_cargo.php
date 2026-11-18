@@ -22,6 +22,10 @@ class analisis_por_cargo
 		'trabajo', 'institucionales', 'otro'
 	);
 
+	// Columnas que se guardan en el JSON pero no se muestran: de que docente del
+	// equipo (huayca.materias_equipo) es la fila, cuando se eligio del select.
+	static $ocultas = array('legajo', 'categoria');
+
 	// Columnas que se califican de 1 a 4
 	static $criterios = array(
 		'respeta_plazos', 'respeta_jerarquia', 'asistencia', 'puntualidad',
@@ -96,7 +100,7 @@ class analisis_por_cargo
 				continue;
 			}
 			$limpia = array();
-			foreach (self::$columnas as $columna) {
+			foreach (array_merge(self::$columnas, self::$ocultas) as $columna) {
 				$limpia[$columna] = isset($fila[$columna]) ? $fila[$columna] : null;
 			}
 			$salida[] = $limpia;
@@ -113,7 +117,7 @@ class analisis_por_cargo
 		$salida = array();
 		foreach ((array) $filas as $fila) {
 			$limpia = array();
-			foreach (self::$columnas as $columna) {
+			foreach (array_merge(self::$columnas, self::$ocultas) as $columna) {
 				$v = isset($fila[$columna]) ? $fila[$columna] : null;
 				if (is_string($v)) {
 					$v = trim($v);
