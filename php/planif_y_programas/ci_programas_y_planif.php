@@ -1,5 +1,7 @@
 <?php
 require_once 'ci_base_operaciones.php';
+require_once 'informes/materias_equipo.php';
+require_once 'administracion/actualizar_catedras.php';
 class ci_programas_y_planif extends ci_base_operaciones
 {
 	
@@ -404,7 +406,8 @@ function edicion_cargar_multilinea(
 	$form,
 	$columna,
 	$campos,
-	$clave_pendientes
+	$clave_pendientes,
+	$preparar = null
 )
 {
 	$datos_pendientes = toba::memoria()->get_dato_operacion(
@@ -412,7 +415,7 @@ function edicion_cargar_multilinea(
 	);
 
 	if (is_array($datos_pendientes)) {
-		$form->set_datos($datos_pendientes);
+		$form->set_datos($preparar ? call_user_func($preparar, $datos_pendientes) : $datos_pendientes);
 		return;
 	}
 
@@ -457,8 +460,220 @@ function edicion_cargar_multilinea(
 	}
 
 	if (!empty($datos_ml)) {
-		$form->set_datos($datos_ml);
+		$form->set_datos($preparar ? call_user_func($preparar, $datos_ml) : $datos_ml);
 	}
+}
+
+
+//-----------------------------------------------------------------------------------
+//---- El docente de horarios de consulta y otras tareas: del equipo del programa ---
+//-----------------------------------------------------------------------------------
+//
+// Desde 2027, en esos dos multilinea el docente se elige del equipo de catedra
+// del programa (el responsable y programas.equipo_catedra, que salen de Mocovi):
+// columna 'docente_equipo' (select). Lo que va a la planificacion no cambia de
+// formato: [docente, legajo, ...] en horarios_consulta y [apellido, nombre, ...]
+// en otras_tareas. Antes de 2027 (equipo en texto), texto libre como siempre.
+// Una fila ya cargada que no es del equipo queda como opcion "(cargado antes)".
+
+private $equipo_planif;
+
+/**
+ * El equipo del programa en edicion, en LATIN1, el responsable primero:
+ * array(clave => array('apellido', 'nombre', 'legajo', 'cargo')); la clave es
+ * el legajo (o 'n:' y un hash del nombre si no tiene). array() antes de 2027.
+ */
+protected function equipo_planif()
+{
+	if (isset($this->equipo_planif)) {
+		return $this->equipo_planif;
+	}
+	$this->equipo_planif = array();
+	$p = $this->edicion_obtener_datos_programa(null);
+	if (!$p || (int) trim((string) $p['ano_academico']) < catedras_actualizar::DESDE) {
+		return $this->equipo_planif;
+	}
+	$latin1 = function ($v) {
+		return mb_convert_encoding((string) $v, 'ISO-8859-1', 'UTF-8');
+	};
+	$personas = array(array($p['apellido_resp'], $p['nombre_resp'], $p['legajo_resp'], $p['cargo_resp']));
+	$equipo = json_decode(mb_convert_encoding((string) $p['equipo_catedra'], 'UTF-8', 'ISO-8859-1'), true);
+	foreach ((array) $equipo as $f) {
+		if (is_array($f)) {
+			$personas[] = array($latin1($f[0] ?? ''), $latin1($f[1] ?? ''), (string) ($f[2] ?? ''),
+				(string) ($f[3] ?? '') . (string) ($f[4] ?? ''));
+		}
+	}
+	foreach ($personas as $x) {
+		list($apellido, $nombre, $legajo, $cargo) = array_map(function ($v) {
+			return trim(preg_replace('/\s+/', ' ', (string) $v));
+		}, $x);
+		if ($apellido === '' && $nombre === '') {
+			continue;
+		}
+		$legajo = preg_replace('/\D/', '', $legajo);
+		$k = $legajo !== '' ? $legajo : 'n:' . md5(materias_equipo::palabras($apellido . ' ' . $nombre));
+		if (!isset($this->equipo_planif[$k])) {
+			$this->equipo_planif[$k] = array('apellido' => $apellido, 'nombre' => $nombre, 'legajo' => $legajo,
+				'cargo' => $cargo);
+		}
+	}
+	return $this->equipo_planif;
+}
+
+/**
+ * Como se guarda cada multilinea: la columna de planificaciones, sus campos,
+ * la clave de pendientes y como pasar de una persona a la fila y de la fila al
+ * nombre (para reconocer lo ya cargado).
+ */
+protected function ml_equipo_config($ml)
+{
+	if ($ml === 'horario_de_consulta') {
+		return array('columna' => 'horarios_consulta', 'campos' => array('docente', 'legajo', 'dia', 'hora', 'lugar'),
+			'pendientes' => 'datos_horario_de_consulta_pendientes', 'texto' => array('docente', 'legajo'));
+	}
+	return array('columna' => 'otras_tareas', 'campos' => array('apellido', 'nombre', 'actividad', 'horas', 'descripcion'),
+		'pendientes' => 'datos_otras_tareas_pendientes', 'texto' => array('apellido', 'nombre'));
+}
+
+/** Los campos de texto de la fila para una persona del equipo. */
+protected function ml_equipo_campos($ml, $persona)
+{
+	if ($ml === 'horario_de_consulta') {
+		return array('docente' => trim($persona['apellido'] . ', ' . $persona['nombre'], ', '),
+			'legajo' => $persona['legajo']);
+	}
+	return array('apellido' => $persona['apellido'], 'nombre' => $persona['nombre']);
+}
+
+/** La opcion del select que corresponde a una fila ya cargada (sin docente_equipo). */
+protected function ml_equipo_clave_fila($ml, $fila)
+{
+	$equipo = $this->equipo_planif();
+	if ($ml === 'horario_de_consulta') {
+		$legajo = preg_replace('/\D/', '', (string) ($fila['legajo'] ?? ''));
+		if ($legajo !== '' && isset($equipo[$legajo])) {
+			return $legajo;
+		}
+		$nombre = (string) ($fila['docente'] ?? '');
+		$texto = $nombre . '|' . (string) ($fila['legajo'] ?? '');
+	} else {
+		$nombre = trim((string) ($fila['apellido'] ?? '') . ' ' . (string) ($fila['nombre'] ?? ''));
+		$texto = (string) ($fila['apellido'] ?? '') . '|' . (string) ($fila['nombre'] ?? '');
+	}
+	if (trim($nombre) === '') {
+		return null;
+	}
+	$buscado = materias_equipo::palabras($nombre);
+	$iguales = array();
+	foreach ($equipo as $k => $x) {
+		if (materias_equipo::palabras($x['apellido'] . ' ' . $x['nombre']) === $buscado) {
+			$iguales[] = $k;
+		}
+	}
+	return count($iguales) === 1 ? $iguales[0] : 'g:' . md5($texto);
+}
+
+/**
+ * Las opciones del select de un multilinea: el equipo y lo ya cargado que no
+ * es del equipo. array(clave => array('descripcion', 'campos')).
+ */
+protected function ml_equipo_opciones($ml)
+{
+	$opciones = array();
+	foreach ($this->equipo_planif() as $k => $x) {
+		$opciones[$k] = array('descripcion' => trim($x['apellido'] . ', ' . $x['nombre'], ', ')
+			. ($x['cargo'] !== '' ? ' (' . $x['cargo'] . ')' : ''), 'campos' => $this->ml_equipo_campos($ml, $x));
+	}
+	$c = $this->ml_equipo_config($ml);
+	$p = $this->edicion_obtener_datos_programa(null);
+	$guardadas = json_decode(mb_convert_encoding((string) ($p[$c['columna']] ?? ''), 'UTF-8', 'ISO-8859-1'), true);
+	$filas = array();
+	foreach ((array) $guardadas as $f) {
+		if (is_array($f)) {
+			$r = array();
+			foreach ($c['campos'] as $i => $campo) {
+				$r[$campo] = is_string($f[$i] ?? null) ? mb_convert_encoding($f[$i], 'ISO-8859-1', 'UTF-8') : ($f[$i] ?? '');
+			}
+			$filas[] = $r;
+		}
+	}
+	$pendientes = toba::memoria()->get_dato_operacion($c['pendientes']);
+	foreach (array_merge($filas, is_array($pendientes) ? $pendientes : array()) as $f) {
+		if (isset($f['docente_equipo']) && $f['docente_equipo'] !== '') {
+			continue;
+		}
+		$k = $this->ml_equipo_clave_fila($ml, $f);
+		if ($k === null || isset($opciones[$k])) {
+			continue;
+		}
+		$campos = array();
+		foreach ($c['texto'] as $t) {
+			$campos[$t] = (string) ($f[$t] ?? '');
+		}
+		$opciones[$k] = array('descripcion' => trim(implode(' ', $campos)) . ' (cargado antes)', 'campos' => $campos);
+	}
+	return $opciones;
+}
+
+/** carga_metodo del select de horarios de consulta y de otras tareas. */
+function get_opciones_horarios()
+{
+	return $this->ml_equipo_lista('horario_de_consulta');
+}
+
+function get_opciones_otras_tareas()
+{
+	return $this->ml_equipo_lista('otras_tareas');
+}
+
+protected function ml_equipo_lista($ml)
+{
+	$salida = array();
+	foreach ($this->ml_equipo_opciones($ml) as $k => $o) {
+		$salida[] = array('clave' => $k, 'descripcion' => $o['descripcion']);
+	}
+	return $salida;
+}
+
+/** conf de los dos multilinea: el select del equipo o, antes de 2027, texto libre. */
+protected function ml_equipo_conf($form, $ml)
+{
+	$c = $this->ml_equipo_config($ml);
+	if (empty($this->equipo_planif())) {
+		$form->desactivar_efs(array('docente_equipo'));
+		$this->edicion_cargar_multilinea($form, $c['columna'], $c['campos'], $c['pendientes']);
+		return;
+	}
+	$form->desactivar_efs($c['texto']);
+	$this->edicion_cargar_multilinea($form, $c['columna'], $c['campos'], $c['pendientes'], function ($filas) use ($ml) {
+		foreach ($filas as $i => $f) {
+			if (!isset($f['docente_equipo']) || $f['docente_equipo'] === '') {
+				$filas[$i]['docente_equipo'] = $this->ml_equipo_clave_fila($ml, $f);
+			}
+		}
+		return $filas;
+	});
+}
+
+/**
+ * Lo que llega del multilinea: con el select, el docente sale de la opcion
+ * elegida (no de lo que mande el navegador).
+ */
+protected function ml_equipo_desde_post($ml, $datos)
+{
+	if (!is_array($datos) || empty($this->equipo_planif())) {
+		return $datos;
+	}
+	$opciones = $this->ml_equipo_opciones($ml);
+	foreach ($datos as $i => $f) {
+		$k = isset($f['docente_equipo']) ? (string) $f['docente_equipo'] : '';
+		if (!isset($opciones[$k])) {
+			throw new toba_error('Elija de la lista el docente de cada fila.');
+		}
+		$datos[$i] = array_merge($f, $opciones[$k]['campos']);
+	}
+	return $datos;
 }
 
 
@@ -1891,12 +2106,7 @@ function evt__dist_hor_planif__modificacion($datos)
 
 function conf__horario_de_consulta(toba_ei_formulario_ml $form)
 {
-	$this->edicion_cargar_multilinea(
-		$form,
-		'horarios_consulta',
-		array('docente', 'legajo', 'dia', 'hora', 'lugar'),
-		'datos_horario_de_consulta_pendientes'
-	);
+	$this->ml_equipo_conf($form, 'horario_de_consulta');
 }
 
 
@@ -1906,6 +2116,7 @@ function conf__horario_de_consulta(toba_ei_formulario_ml $form)
 
 function evt__horario_de_consulta__modificacion($datos)
 {
+	$datos = $this->ml_equipo_desde_post('horario_de_consulta', $datos);
 
 	toba::logger()->info(
 		'DIAGNOSTICO: INICIO evt__HORARIO_DE_CONSULTA_modificacion'
@@ -2037,24 +2248,14 @@ function evt__horario_de_consulta__modificacion($datos)
 
 function conf__otras_tareas(toba_ei_formulario_ml $form)
 {
-	$this->edicion_cargar_multilinea(
-		$form,
-		'otras_tareas',
-		array(
-			'apellido',
-			'nombre',
-			'actividad',
-			'horas',
-			'descripcion'
-		),
-		'datos_otras_tareas_pendientes'
-	);
+	$this->ml_equipo_conf($form, 'otras_tareas');
 }
 
 
 
 function evt__otras_tareas__modificacion($datos)
 {
+	$datos = $this->ml_equipo_desde_post('otras_tareas', $datos);
 		toba::logger()->info(
 		'DIAGNOSTICO: INICIO evt__OTRAS_TAREAS_modificacion'
 	);    

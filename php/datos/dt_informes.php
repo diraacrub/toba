@@ -389,9 +389,54 @@ function get_datos_informe($id_informe_seleccionado)
 	if (is_array($fila)) {
 		$fila = $this->agregar_html_por_cargo(array($fila));
 		$fila = $fila[0];
+		// El equipo del programa, legible en el formulario (ef_fijo con HTML).
+		$fila['equipo_catedra'] = self::equipo_catedra_html(isset($fila['equipo_catedra']) ? $fila['equipo_catedra'] : null);
 	}
 	return $fila;
 }
+
+	/**
+	 * programas.equipo_catedra para mostrar: desde 2027 es JSON
+	 * ([apellido, nombre, legajo, cargo, dedicacion], de Mocovi) y va una
+	 * persona por renglon; el texto de antes, escapado y con sus saltos de
+	 * linea. En LATIN1, como la pagina.
+	 */
+	static function equipo_catedra_html($valor)
+	{
+		$valor = (string) $valor;
+		$e = function ($v) {
+			return htmlspecialchars((string) $v, ENT_QUOTES, 'ISO-8859-1');
+		};
+		if (trim($valor) === '') {
+			return '<em>Sin cargar</em>';
+		}
+		$lista = json_decode(mb_convert_encoding($valor, 'UTF-8', 'ISO-8859-1'), true);
+		if (!is_array($lista)) {
+			return nl2br($e($valor));
+		}
+		$renglones = array();
+		foreach ($lista as $f) {
+			if (!is_array($f)) {
+				continue;
+			}
+			$t = function ($i) use ($f) {
+				return trim(mb_convert_encoding((string) (isset($f[$i]) ? $f[$i] : ''), 'ISO-8859-1', 'UTF-8'));
+			};
+			$nombre = trim($t(0) . ', ' . $t(1), ', ');
+			if ($nombre === '') {
+				continue;
+			}
+			$partes = array('<strong>' . $e($nombre) . '</strong>');
+			if ($t(3) . $t(4) !== '') {
+				$partes[] = $e($t(3) . $t(4));
+			}
+			if ($t(2) !== '') {
+				$partes[] = 'legajo ' . $e($t(2));
+			}
+			$renglones[] = implode(' &middot; ', $partes);
+		}
+		return $renglones ? implode('<br>', $renglones) : '<em>Sin cargar</em>';
+	}
 
 	/**
 	 * Agrega a cada fila 'analisis_por_cargo_html': el punto 11 (JSON) como tabla

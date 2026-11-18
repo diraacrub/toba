@@ -189,7 +189,7 @@ class ci_informes extends ci_base_operaciones
 
 	// El docente de cada fila sale del equipo de la materia en Mocovi
 	// (huayca.materias_equipo): el ML usa la columna 'docente_equipo' (select) y
-	// cargo y dedicacion salen de la designacion, sin editarse. Si la materia no
+	// cargo y dedicacion salen de la designacion: no se muestran ni se editan. Si la materia no
 	// esta en esa tabla (p. ej. Ingles, que no esta en Mocovi), 'docente' es texto
 	// libre como antes. El modo lo decide opciones_equipo(), igual en el pedido
 	// que muestra la pantalla y en el que la guarda.
@@ -286,9 +286,9 @@ class ci_informes extends ci_base_operaciones
 		if (empty($this->opciones_equipo())) {
 			$form_ml->desactivar_efs(array('docente_equipo'));
 		} else {
-			$form_ml->desactivar_efs(array('docente'));
-			$form_ml->set_solo_lectura(array('cargo', 'dedicacion'));
-			$form_ml->set_efs_obligatorios(array('cargo', 'dedicacion'), false);
+			// Cargo y dedicacion no se muestran: salen de la designacion elegida
+			// (el select la dice) y los pone el servidor al guardar.
+			$form_ml->desactivar_efs(array('docente', 'cargo', 'dedicacion'));
 			foreach ($filas as $i => $f) {
 				$filas[$i]['docente_equipo'] = $this->clave_de_fila($f, $this->opciones_equipo());
 			}
@@ -320,47 +320,6 @@ class ci_informes extends ci_base_operaciones
 		$this->filas_por_cargo = $filas;
 	}
 
-	/**
-	 * En la pantalla de edicion con el select de docentes: al elegir uno, el
-	 * cargo y la dedicacion de la fila se completan con los de su designacion.
-	 */
-	function extender_objeto_js()
-	{
-		if ($this->get_id_pantalla() !== 'pant_edicion') {
-			return;
-		}
-		$op = $this->opciones_equipo();
-		if (empty($op)) {
-			return;
-		}
-		$cargos = array();
-		foreach ($op as $k => $o) {
-			$cargos[$k] = array((string) $o['cargo'], (string) $o['dedicacion']);
-		}
-		$json = json_encode($cargos);
-		if ($json === false) {
-			return;
-		}
-		echo "
-		(function () {
-			var cargos = $json;
-			var ml = {$this->objeto_js}.dep('analisis_por_cargo');
-			if (!ml) { return; }
-			var poner = function (ef, valor) {
-				ef.set_estado(valor);
-				// En solo lectura el combo visible no tiene id: el valor va en el oculto.
-				var oculto = ef.input();
-				if (oculto && window.jQuery) { jQuery(oculto).prev('select').val(valor); }
-			};
-			ml.evt__docente_equipo__procesar = function (es_inicial, fila) {
-				if (es_inicial) { return; }
-				var d = cargos[this.ef('docente_equipo').ir_a_fila(fila).get_estado()] || ['', ''];
-				poner(this.ef('cargo').ir_a_fila(fila), d[0]);
-				poner(this.ef('dedicacion').ir_a_fila(fila), d[1]);
-			};
-		})();
-		";
-	}
 
 	/**
 	 * analisis_por_cargo tal como esta en la base (no en memoria: tras un error
