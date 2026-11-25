@@ -917,9 +917,9 @@ toba::notificacion()->agregar("En esta sección usted puede VER los datos del Pro
 		// Lista de usuarios que no requieren el filtro
 		$excepciones = array('admin');
 		if (array_intersect($perfiles_funcionales, $excepciones)) {
-			$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_docente();
+			$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_docente(false);
 		} else {
-			$datos = $this->dep('datos')->tabla('programas')->get_listado_filtrado($usuario_id);
+			$datos = $this->dep('datos')->tabla('programas')->get_listado_filtrado($usuario_id, false);
 		}
 		
 		foreach ($datos as $key => $registro) {
@@ -968,10 +968,10 @@ toba::notificacion()->agregar("En esta sección usted puede VER los datos del Pro
 		$excepciones = array('admin');
 		if (array_intersect($perfiles_funcionales, $excepciones)) {
 			// Si el usuario es una excepción, obtener todos los datos
-			$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_depto_sac_aprobado();
+			$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_depto_sac_aprobado(false);
 		} else {
 				// Si no es una excepción, aplicar el filtro por legajo_resp y estado
-			$datos = $this->dep('datos')->tabla('programas')->get_listado_enviados($usuario_id);
+			$datos = $this->dep('datos')->tabla('programas')->get_listado_enviados($usuario_id, false);
 		}
 		foreach ($datos as $key => $registro) {
 			if ($registro ['estado'] === 'docente') {

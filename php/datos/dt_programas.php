@@ -1,6 +1,22 @@
 <?php
+require_once 'ingenierias/ingenierias.php';
+
 class dt_programas extends catedras_datos_tabla
 {
+	/**
+	 * Que anios lista una operacion del docente: null, todos (como antes);
+	 * true, los de la operacion conjunta Programas y Planificaciones (desde
+	 * ingenierias::DESDE, todas las carreras); false, los de Programas y
+	 * Planificaciones por separado (hasta el anio anterior, sin ingenierias).
+	 */
+	function sql_anios_docente($conjunta)
+	{
+		if ($conjunta === null) {
+			return 'TRUE';
+		}
+		return ingenierias::sql_desde('t_p', $conjunta) . ' AND ' . ingenierias::sql_visible();
+	}
+
 
 	function get_listado($filtro=array())
 	{
@@ -393,7 +409,7 @@ END AS f_sac
 		WHERE
 				t_p.id_materia_prog = t_m.id_materia  
 				AND t_p.estado IN ('docente', 'depto')
-				AND t_m.cod_carrera NOT LIKE 'I%'
+				AND " . ingenierias::sql_visible() . "
 				AND (t_p.observaciones IS NULL
 				OR t_p.observaciones NOT ILIKE '%[ocultar]%')
 		ORDER BY nombre_materia";
@@ -475,7 +491,7 @@ END AS f_sac
 			WHERE
 				t_p.estado IN ('docente','depto')
 				AND $filtro_deptos
-				AND t_m.cod_carrera NOT LIKE 'I%'
+				AND " . ingenierias::sql_visible() . "
 				AND (t_p.observaciones IS NULL
 					OR t_p.observaciones NOT ILIKE '%[ocultar]%')
 			ORDER BY nombre_materia";
@@ -589,7 +605,7 @@ END AS f_sac
 			WHERE
 				replace(translate(lower(t_m.depto_principal), '·ÈÌÛ˙¡…Õ”⁄', 'aeiouaeiou'), ' ', '')
 				ILIKE replace(translate(lower($perfilLiteral), '·ÈÌÛ˙¡…Õ”⁄', 'aeiouaeiou'), ' ', '')
-				AND t_m.cod_carrera NOT LIKE 'I%'
+				AND " . ingenierias::sql_visible() . "
 				AND (t_p.observaciones IS NULL
 					OR t_p.observaciones NOT ILIKE '%[ocultar]%')
 			ORDER BY
@@ -652,7 +668,7 @@ function get_listado_control_depto_excepciones($filtro=array())
 			materias as t_m
 		WHERE
 				t_p.id_materia_prog = t_m.id_materia  
-				AND t_m.cod_carrera NOT LIKE 'I%'
+				AND " . ingenierias::sql_visible() . "
 				AND (t_p.observaciones IS NULL
 					OR t_p.observaciones NOT ILIKE '%[ocultar]%')
 			
@@ -688,7 +704,7 @@ function get_listado_control_depto_excepciones($filtro=array())
 	// todos los programas con estado docente
 	//SE PUEDEN VER LAS INGENIERIAS OJO
 	// AGREGAR ESTE AND:  AND t_m.cod_carrera NOT LIKE 'I%'                  
-	function get_listado_estado_docente()
+	function get_listado_estado_docente($conjunta = null)
 	{
 			$sql = "SELECT
 			t_p.*,
@@ -698,7 +714,8 @@ function get_listado_control_depto_excepciones($filtro=array())
 		JOIN
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			t_p.estado = 'docente'
+			" . $this->sql_anios_docente($conjunta) . "
+			AND t_p.estado = 'docente'
 			AND (t_p.observaciones IS NULL
 			OR t_p.observaciones NOT ILIKE '%[ocultar]%')
 		ORDER BY legajo_resp";
@@ -718,7 +735,7 @@ function get_listado_control_depto_excepciones($filtro=array())
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
 			t_p.estado = 'depto'
-			AND t_m.cod_carrera NOT LIKE 'I%'    
+			AND " . ingenierias::sql_visible() . "    
 			AND (t_p.observaciones IS NULL
 				OR t_p.observaciones NOT ILIKE '%[ocultar]%')
 		ORDER BY legajo_resp";
@@ -737,7 +754,7 @@ function get_listado_control_depto_excepciones($filtro=array())
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
 			t_p.estado = 'sac'
-			AND t_m.cod_carrera NOT LIKE 'I%'    
+			AND " . ingenierias::sql_visible() . "    
 			AND (t_p.observaciones IS NULL
 				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
 		ORDER BY legajo_resp";
@@ -756,7 +773,7 @@ function get_listado_control_depto_excepciones($filtro=array())
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
 			t_p.estado = 'aprobado'
-			AND t_m.cod_carrera NOT LIKE 'I%'
+			AND " . ingenierias::sql_visible() . "
 			AND (t_p.observaciones IS NULL
 				OR t_p.observaciones NOT ILIKE '%[ocultar]%')
 		ORDER BY legajo_resp";
@@ -764,7 +781,7 @@ function get_listado_control_depto_excepciones($filtro=array())
 	}
 	
 	// todos los programas con estado depto o sac
-	function get_listado_estado_depto_sac()
+	function get_listado_estado_depto_sac($conjunta = null)
 	{
 			$sql = "SELECT
 			t_p.*,
@@ -774,8 +791,9 @@ function get_listado_control_depto_excepciones($filtro=array())
 		JOIN
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			t_p.estado IN ('depto', 'sac')
-			AND t_m.cod_carrera NOT LIKE 'I%'   
+			" . $this->sql_anios_docente($conjunta) . "
+			AND t_p.estado IN ('depto', 'sac')
+			AND " . ingenierias::sql_visible() . "   
 			AND (t_p.observaciones IS NULL
 				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
 		ORDER BY legajo_resp";
@@ -784,7 +802,7 @@ function get_listado_control_depto_excepciones($filtro=array())
 	
 	
 	// todos los programas con estado depto, sac o aprobado
-	function get_listado_estado_depto_sac_aprobado()
+	function get_listado_estado_depto_sac_aprobado($conjunta = null)
 	{
 			$sql = "SELECT
 			t_p.*,
@@ -794,8 +812,9 @@ function get_listado_control_depto_excepciones($filtro=array())
 		JOIN
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			t_p.estado IN ('depto', 'sac', 'aprobado')
-			AND t_m.cod_carrera NOT LIKE 'I%'   
+			" . $this->sql_anios_docente($conjunta) . "
+			AND t_p.estado IN ('depto', 'sac', 'aprobado')
+			AND " . ingenierias::sql_visible() . "   
 			AND (t_p.observaciones IS NULL
 				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
 				
@@ -815,7 +834,7 @@ function get_listado_control_depto_excepciones($filtro=array())
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
 			t_p.estado IN ('sac', 'aprobado')
-			AND t_m.cod_carrera NOT LIKE 'I%'    
+			AND " . ingenierias::sql_visible() . "    
 			AND (t_p.observaciones IS NULL
 				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
 				
@@ -835,7 +854,7 @@ function get_listado_control_depto_excepciones($filtro=array())
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
 			t_p.estado IN ('docente', 'depto')
-			AND t_m.cod_carrera NOT LIKE 'I%'    
+			AND " . ingenierias::sql_visible() . "    
 			AND (t_p.observaciones IS NULL
 				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
 				
@@ -860,7 +879,7 @@ function get_listado_para_imprimir_publico($filtro = "")
 			WHERE
 				t_p.id_materia_prog = t_m.id_materia
 				AND t_p.estado = 'aprobado'
-				AND t_m.cod_carrera NOT LIKE 'I%' 
+				AND " . ingenierias::sql_visible() . " 
 				AND (t_p.observaciones IS NULL
 				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
 					";
@@ -900,7 +919,7 @@ function get_listado_para_imprimir_publico($filtro = "")
 		WHERE
 			t_p.id_materia_prog = t_m.id_materia
 			AND t_p.estado = 'aprobado'
-			AND t_m.cod_carrera NOT LIKE 'I%'
+			AND " . ingenierias::sql_visible() . "
 			AND (t_p.observaciones IS NULL
 				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
 
@@ -935,7 +954,7 @@ function get_listado_para_imprimir_publico($filtro = "")
 /// para DOCENTES
 	
 	///////  listado filtrado para docente
-		function get_listado_filtrado($usuario_id)
+		function get_listado_filtrado($usuario_id, $conjunta = null)
 	{
 		$sql = "SELECT
 			t_p.*,
@@ -945,10 +964,11 @@ function get_listado_para_imprimir_publico($filtro = "")
 		JOIN
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			t_p.legajo_resp = " . quote($usuario_id) . " 
+			" . $this->sql_anios_docente($conjunta) . "
+			AND t_p.legajo_resp = " . quote($usuario_id) . " 
 			AND t_p.estado = 'docente'
 			AND t_p.publicado
-			AND t_m.cod_carrera NOT LIKE 'I%'
+			AND " . ingenierias::sql_visible() . "
 			AND (t_p.observaciones IS NULL
 				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
 
@@ -959,7 +979,7 @@ function get_listado_para_imprimir_publico($filtro = "")
 	
 	
 	//---- Nuevo mÈtodo para obtener datos filtrados por estado para docente ----
-	function get_listado_enviados($usuario_id)
+	function get_listado_enviados($usuario_id, $conjunta = null)
 	{
 		$sql = "SELECT
 			t_p.*,
@@ -969,9 +989,10 @@ function get_listado_para_imprimir_publico($filtro = "")
 		JOIN
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			t_p.legajo_resp = " . quote($usuario_id) . "
+			" . $this->sql_anios_docente($conjunta) . "
+			AND t_p.legajo_resp = " . quote($usuario_id) . "
 			AND t_p.estado IN ('depto', 'sac','aprobado')
-			AND t_m.cod_carrera NOT LIKE 'I%'
+			AND " . ingenierias::sql_visible() . "
 			AND (t_p.observaciones IS NULL
 				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
 						
@@ -1044,7 +1065,7 @@ $perfiles_validos = array(
 				replace(translate(lower(t_m.depto_principal), '·ÈÌÛ˙¡…Õ”⁄', 'aeiouaeiou'), ' ', '')
 				ILIKE replace(translate(lower($perfilLiteral), '·ÈÌÛ˙¡…Õ”⁄', 'aeiouaeiou'), ' ', '')
 				AND t_p.estado = 'depto'
-				AND t_m.cod_carrera NOT LIKE 'I%'
+				AND " . ingenierias::sql_visible() . "
 			AND (t_p.observaciones IS NULL
 				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
 		
@@ -1116,7 +1137,7 @@ function get_listado_enviados_depto($usuario_id, $perfil_usuario)
 				replace(translate(lower(t_m.depto_principal), '·ÈÌÛ˙¡…Õ”⁄', 'aeiouaeiou'), ' ', '')
 				ILIKE replace(translate(lower($perfilLiteral), '·ÈÌÛ˙¡…Õ”⁄', 'aeiouaeiou'), ' ', '')
 				AND t_p.estado = 'sac'
-				AND t_m.cod_carrera NOT LIKE 'I%'  
+				AND " . ingenierias::sql_visible() . "  
 				AND (t_p.observaciones IS NULL
 					OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
 
@@ -1163,7 +1184,7 @@ function get_listado_filtrado_sac($usuario_id, $deptos_principales)
 			WHERE
 				t_p.estado = 'sac'
 				AND $filtro_deptos
-				AND t_m.cod_carrera NOT LIKE 'I%'
+				AND " . ingenierias::sql_visible() . "
 				AND (t_p.observaciones IS NULL
 					OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
 
@@ -1205,7 +1226,7 @@ function get_listado_filtrado_control_sac($usuario_id, $deptos_principales)
 			WHERE
 				t_p.estado IN = ('docente', 'depto')
 				AND $filtro_deptos
-				AND t_m.cod_carrera NOT LIKE 'I%'
+				AND " . ingenierias::sql_visible() . "
 				AND (t_p.observaciones IS NULL
 					OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
 
@@ -1248,7 +1269,7 @@ function get_listado_enviados_sac($usuario_id, $deptos_principales)
 			WHERE
 				t_p.estado IN ('aprobado')
 				AND $filtro_deptos
-				AND t_m.cod_carrera NOT LIKE 'I%'
+				AND " . ingenierias::sql_visible() . "
 				AND (t_p.observaciones IS NULL
 					OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
 
@@ -1406,6 +1427,9 @@ ORDER BY
 			p.horas_teoricas,
 			p.horas_practicas,
 			p.horas_teoricopracticas,
+			p.i_propositos,
+			p.i_competencias_espacio_curricular,
+			p.i_competencias_que_aporta,
 
 			-- MATERIAS
 			m.id_materia,
@@ -1432,6 +1456,10 @@ ORDER BY
 			m.plan_ordenanzas,
 			m.cod_guarani,
 			m.observaciones AS observaciones_materia,
+			m.i_bloque_curricular,
+			m.i_correlativas_anteriores,
+			m.i_correlativas_posteriores,
+			m.i_reconocimiento_t_f,
 
 			-- PLANIFICACIONES
 			pl.id_planificacion,

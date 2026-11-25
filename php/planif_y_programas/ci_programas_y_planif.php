@@ -2,6 +2,7 @@
 require_once 'ci_base_operaciones.php';
 require_once 'informes/materias_equipo.php';
 require_once 'administracion/actualizar_catedras.php';
+require_once 'ingenierias/ingenierias.php';
 class ci_programas_y_planif extends ci_base_operaciones
 {
 	
@@ -71,9 +72,9 @@ private $firma_sac_selec;
 		// Lista de usuarios que no requieren el filtro
 		$excepciones = array('admin');
 		if (array_intersect($perfiles_funcionales, $excepciones)) {
-			$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_docente();
+			$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_docente(true);
 		} else {
-			$datos = $this->dep('datos')->tabla('programas')->get_listado_filtrado($usuario_id);
+			$datos = $this->dep('datos')->tabla('programas')->get_listado_filtrado($usuario_id, true);
 		}
 		
 		foreach ($datos as $key => $registro) {
@@ -122,10 +123,10 @@ private $firma_sac_selec;
 		$excepciones = array('admin');
 		if (array_intersect($perfiles_funcionales, $excepciones)) {
 			// Si el usuario es una excepción, obtener todos los datos
-			$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_depto_sac();
+			$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_depto_sac(true);
 		} else {
 				// Si no es una excepción, aplicar el filtro por legajo_resp y estado
-			$datos = $this->dep('datos')->tabla('programas')->get_listado_enviados($usuario_id);
+			$datos = $this->dep('datos')->tabla('programas')->get_listado_enviados($usuario_id, true);
 		}
 		foreach ($datos as $key => $registro) {
 			if ($registro ['estado'] === 'docente') {
@@ -616,6 +617,86 @@ protected function ml_equipo_opciones($ml)
 	return $opciones;
 }
 
+// --------------------------------------------------------------------------
+// Ingenierias desde 2027 (php/ingenierias/ingenierias.php): campos propios de
+// materias (sin editar) y de programas. En los demas programas sus efs se
+// desactivan y la seccion de la plantilla no se muestra.
+// --------------------------------------------------------------------------
+
+/**
+ * Activa o desactiva en $form los campos de ingenierias ($campos) segun el
+ * programa ($datos, o false si no hay). Devuelve si el programa los lleva.
+ */
+protected function conf_ingenierias($form, $datos, $campos)
+{
+	$con = is_array($datos) && ingenierias::con_campos(
+		isset($datos['cod_carrera']) ? $datos['cod_carrera'] : '',
+		isset($datos['ano_academico']) ? $datos['ano_academico'] : 0);
+	if ($form instanceof catedras_ei_formulario) {
+		$form->mostrar_seccion('ingenierias', $con);
+	}
+	if (!$con) {
+		$presentes = array();
+		foreach ($campos as $campo) {
+			if ($form->existe_ef($campo)) {
+				$presentes[] = $campo;
+			}
+		}
+		if ($presentes) {
+			$form->desactivar_efs($presentes);
+		}
+	}
+	return $con;
+}
+
+/** carga_metodo del checkbox i_competencias_que_aporta: las de la carrera del programa. */
+function get_opciones_competencias()
+{
+	$id_programa = $this->ver_obtener_id_programa();
+	$datos = $id_programa
+		? $this->dep('datos')->tabla('programas')->get_datos_programa_integrado($id_programa) : false;
+	$salida = array();
+	foreach (ingenierias::opciones_competencias($datos ? $datos['cod_carrera'] : '') as $clave => $texto) {
+		$salida[] = array('clave' => $clave, 'descripcion' => $texto);
+	}
+	return $salida;
+}
+
+/**
+ * Los campos de ingenierias que faltan para enviar el programa al
+ * departamento (nada si el programa no los lleva). El valor es el de este
+ * formulario, el de otro de la pantalla o el de la base.
+ */
+protected function faltantes_ingenierias($programa, $datos)
+{
+	if (!ingenierias::con_campos($programa['cod_carrera'], $programa['ano_academico'])) {
+		return array();
+	}
+	$faltan = array();
+	foreach (ingenierias::$OBLIGATORIOS as $campo) {
+		if (array_key_exists($campo, $datos)) {
+			$valor = $datos[$campo];
+		} else {
+			$valor = isset($programa[$campo]) ? $programa[$campo] : '';
+			foreach ($_POST as $clave_post => $valor_post) {
+				if (strpos($clave_post, 'ef_form_') === 0
+					&& substr($clave_post, -strlen($campo)) === $campo) {
+					$valor = $valor_post;
+				}
+			}
+		}
+		if ($campo === 'i_competencias_que_aporta') {
+			$vacio = !ingenierias::codigos($valor);
+		} else {
+			$vacio = is_array($valor) || trim((string) $valor) === '';
+		}
+		if ($vacio) {
+			$faltan[] = $campo;
+		}
+	}
+	return $faltan;
+}
+
 /** carga_metodo del select de horarios de consulta y de otras tareas. */
 function get_opciones_horarios()
 {
@@ -836,6 +917,7 @@ function evt__equipo_de_catedra__modificacion($datos)
 function conf__form_datos_materia(catedras_ei_formulario $form)
 {
 	$datos = $this->edicion_obtener_datos_programa(null);
+	$this->conf_ingenierias($form, $datos, ingenierias::$CAMPOS_MATERIA);
 
 	if (!$datos) {
 		return;
@@ -948,6 +1030,14 @@ function conf__formulario_con_todo(toba_ei_formulario $form)
 			toba::memoria()->set_dato_operacion('firma_dto_selec', $this->firma_dto_selec);
 			toba::memoria()->set_dato_operacion('firma_sac_selec', $this->firma_sac_selec);
 
+			// Ingenierias desde 2027: sus campos y las competencias marcadas
+			// (en la base, JSON; en el checkbox, la lista de codigos).
+			if ($this->conf_ingenierias($form, $datos_programa, ingenierias::$CAMPOS_PROGRAMA)) {
+				$datos_programa['i_competencias_que_aporta'] = ingenierias::codigos(
+					isset($datos_programa['i_competencias_que_aporta'])
+						? $datos_programa['i_competencias_que_aporta'] : '');
+			}
+
 			// Establecer los datos en el formulario.
 			$form->set_datos($datos_programa);
 
@@ -962,6 +1052,7 @@ function conf__formulario_con_todo(toba_ei_formulario $form)
 				$form->set_solo_lectura(array('horas_teoricopracticas'), false);
 			}
 	} else {
+		$this->conf_ingenierias($form, false, ingenierias::$CAMPOS_PROGRAMA);
 		// Si no se pudieron recuperar los datos, eliminar el evento de eliminar.
 		$this->pantalla()->eliminar_evento('eliminar');
 	}
@@ -1476,6 +1567,10 @@ if (!is_array($datos_pendientes)) {
 				}
 			}
 
+			// Ingenierias desde 2027: sus campos propios.
+			$faltantes = array_merge($faltantes,
+				$this->faltantes_ingenierias($programa, $datos));
+
 			// Buscar la planificacion vinculada al programa.
 			$sql = "
 				SELECT dist_horaria_planif,
@@ -1732,6 +1827,12 @@ if ($comentario_nuevo !== '') {
 		// Para las carreras CONEAU, no guardar horas teorico-practicas.
 		if (in_array($cod_carrera, $carreras_coneau)) {
 			$datos['horas_teoricopracticas'] = 0;
+		}
+
+		// Ingenierias: las competencias marcadas se guardan como JSON.
+		if (array_key_exists('i_competencias_que_aporta', $datos)) {
+			$datos['i_competencias_que_aporta'] = ingenierias::a_json(
+				$datos['i_competencias_que_aporta'], $programa['cod_carrera']);
 		}
 
 		// Guardar los datos del programa en programas.
@@ -2970,6 +3071,10 @@ function evt__bibliografia_pedida__modificacion($datos)
 				}
 			}
 
+			// Ingenierias desde 2027: sus campos propios.
+			$faltantes = array_merge($faltantes,
+				$this->faltantes_ingenierias($programa, $datos));
+
 			if (!empty($faltantes)) {
 
 				// Conservar el comentario para no perderlo.
@@ -3225,6 +3330,7 @@ function conf__ver_form_datos_materia(
 	$datos = $this->dep('datos')
 		->tabla('programas')
 		->get_datos_programa_integrado($id_programa);
+	$this->conf_ingenierias($form, $datos, ingenierias::$CAMPOS_MATERIA);
 
 	if (!$datos) {
 		return;
@@ -3252,6 +3358,10 @@ function conf__ver_formulario_con_todo(
 	$datos = $this->dep('datos')
 		->tabla('programas')
 		->get_datos_programa_integrado($id_programa);
+
+	if ($this->conf_ingenierias($form, $datos, ingenierias::$CAMPOS_PROGRAMA)) {
+		$datos['i_competencias_que_aporta'] = ingenierias::codigos($datos['i_competencias_que_aporta']);
+	}
 
 	if (!$datos) {
 		return;
