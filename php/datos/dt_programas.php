@@ -4,15 +4,16 @@ require_once 'ingenierias/ingenierias.php';
 class dt_programas extends catedras_datos_tabla
 {
 	/**
-	 * Que anios lista una operacion del docente: null, todos (como antes);
-	 * true, los de la operacion conjunta Programas y Planificaciones (desde
-	 * ingenierias::DESDE, todas las carreras); false, los de Programas y
-	 * Planificaciones por separado (hasta el anio anterior, sin ingenierias).
+	 * Que anios lista una operacion (docente, departamento o SAC): null, todos
+	 * (como antes; las ingenierias desde ingenierias::DESDE); true, los de las
+	 * operaciones conjuntas de programa y planificacion (desde DESDE, todas
+	 * las carreras); false, los de las operaciones por separado (hasta el
+	 * anio anterior, sin ingenierias).
 	 */
-	function sql_anios_docente($conjunta)
+	function sql_anios($conjunta)
 	{
 		if ($conjunta === null) {
-			return 'TRUE';
+			return ingenierias::sql_visible();
 		}
 		return ingenierias::sql_desde('t_p', $conjunta) . ' AND ' . ingenierias::sql_visible();
 	}
@@ -714,7 +715,7 @@ function get_listado_control_depto_excepciones($filtro=array())
 		JOIN
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			" . $this->sql_anios_docente($conjunta) . "
+			" . $this->sql_anios($conjunta) . "
 			AND t_p.estado = 'docente'
 			AND (t_p.observaciones IS NULL
 			OR t_p.observaciones NOT ILIKE '%[ocultar]%')
@@ -724,7 +725,7 @@ function get_listado_control_depto_excepciones($filtro=array())
 		
 	}
 	// todos los programas con estado depto
-	function get_listado_estado_depto()
+	function get_listado_estado_depto($conjunta = null)
 	{
 			$sql = "SELECT
 			t_p.*,
@@ -735,7 +736,7 @@ function get_listado_control_depto_excepciones($filtro=array())
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
 			t_p.estado = 'depto'
-			AND " . ingenierias::sql_visible() . "    
+			AND " . $this->sql_anios($conjunta) . "    
 			AND (t_p.observaciones IS NULL
 				OR t_p.observaciones NOT ILIKE '%[ocultar]%')
 		ORDER BY legajo_resp";
@@ -743,7 +744,7 @@ function get_listado_control_depto_excepciones($filtro=array())
 	}
 		// todos los programas con estado sac
 	
-	function get_listado_estado_sac()
+	function get_listado_estado_sac($conjunta = null)
 	{
 			$sql = "SELECT
 			t_p.*,
@@ -754,7 +755,7 @@ function get_listado_control_depto_excepciones($filtro=array())
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
 			t_p.estado = 'sac'
-			AND " . ingenierias::sql_visible() . "    
+			AND " . $this->sql_anios($conjunta) . "    
 			AND (t_p.observaciones IS NULL
 				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
 		ORDER BY legajo_resp";
@@ -762,7 +763,7 @@ function get_listado_control_depto_excepciones($filtro=array())
 		
 	}
 		// todos los programas con estado aprobado
-	function get_listado_estado_aprobado()
+	function get_listado_estado_aprobado($conjunta = null)
 	{
 		$sql = "SELECT
 			t_p.*,
@@ -773,7 +774,7 @@ function get_listado_control_depto_excepciones($filtro=array())
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
 			t_p.estado = 'aprobado'
-			AND " . ingenierias::sql_visible() . "
+			AND " . $this->sql_anios($conjunta) . "
 			AND (t_p.observaciones IS NULL
 				OR t_p.observaciones NOT ILIKE '%[ocultar]%')
 		ORDER BY legajo_resp";
@@ -791,7 +792,7 @@ function get_listado_control_depto_excepciones($filtro=array())
 		JOIN
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			" . $this->sql_anios_docente($conjunta) . "
+			" . $this->sql_anios($conjunta) . "
 			AND t_p.estado IN ('depto', 'sac')
 			AND " . ingenierias::sql_visible() . "   
 			AND (t_p.observaciones IS NULL
@@ -812,7 +813,7 @@ function get_listado_control_depto_excepciones($filtro=array())
 		JOIN
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			" . $this->sql_anios_docente($conjunta) . "
+			" . $this->sql_anios($conjunta) . "
 			AND t_p.estado IN ('depto', 'sac', 'aprobado')
 			AND " . ingenierias::sql_visible() . "   
 			AND (t_p.observaciones IS NULL
@@ -823,7 +824,7 @@ function get_listado_control_depto_excepciones($filtro=array())
 	}
 	
 	// todos los programas con estado sac o aprobado
-	function get_listado_estado_sac_aprobado()
+	function get_listado_estado_sac_aprobado($conjunta = null)
 	{
 			$sql = "SELECT
 			t_p.*,
@@ -834,7 +835,7 @@ function get_listado_control_depto_excepciones($filtro=array())
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
 			t_p.estado IN ('sac', 'aprobado')
-			AND " . ingenierias::sql_visible() . "    
+			AND " . $this->sql_anios($conjunta) . "    
 			AND (t_p.observaciones IS NULL
 				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
 				
@@ -964,7 +965,7 @@ function get_listado_para_imprimir_publico($filtro = "")
 		JOIN
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			" . $this->sql_anios_docente($conjunta) . "
+			" . $this->sql_anios($conjunta) . "
 			AND t_p.legajo_resp = " . quote($usuario_id) . " 
 			AND t_p.estado = 'docente'
 			AND t_p.publicado
@@ -989,7 +990,7 @@ function get_listado_para_imprimir_publico($filtro = "")
 		JOIN
 			materias as t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			" . $this->sql_anios_docente($conjunta) . "
+			" . $this->sql_anios($conjunta) . "
 			AND t_p.legajo_resp = " . quote($usuario_id) . "
 			AND t_p.estado IN ('depto', 'sac','aprobado')
 			AND " . ingenierias::sql_visible() . "
@@ -1005,7 +1006,7 @@ function get_listado_para_imprimir_publico($filtro = "")
 
 	
 		///// listado filtrado para depto para firmar
-function get_listado_filtrado_depto($usuario_id, $perfil_usuario)
+function get_listado_filtrado_depto($usuario_id, $perfil_usuario, $conjunta = null)
 {
 
 $perfiles_validos = array(
@@ -1065,7 +1066,7 @@ $perfiles_validos = array(
 				replace(translate(lower(t_m.depto_principal), 'áéíóúÁÉÍÓÚ', 'aeiouaeiou'), ' ', '')
 				ILIKE replace(translate(lower($perfilLiteral), 'áéíóúÁÉÍÓÚ', 'aeiouaeiou'), ' ', '')
 				AND t_p.estado = 'depto'
-				AND " . ingenierias::sql_visible() . "
+				AND " . $this->sql_anios($conjunta) . "
 			AND (t_p.observaciones IS NULL
 				OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
 		
@@ -1081,7 +1082,7 @@ $perfiles_validos = array(
 	
 	
 		//---- listado para depto firmados
-function get_listado_enviados_depto($usuario_id, $perfil_usuario)
+function get_listado_enviados_depto($usuario_id, $perfil_usuario, $conjunta = null)
 {
 	// Definir los perfiles válidos
 	$perfiles_validos = array(
@@ -1137,7 +1138,7 @@ function get_listado_enviados_depto($usuario_id, $perfil_usuario)
 				replace(translate(lower(t_m.depto_principal), 'áéíóúÁÉÍÓÚ', 'aeiouaeiou'), ' ', '')
 				ILIKE replace(translate(lower($perfilLiteral), 'áéíóúÁÉÍÓÚ', 'aeiouaeiou'), ' ', '')
 				AND t_p.estado = 'sac'
-				AND " . ingenierias::sql_visible() . "  
+				AND " . $this->sql_anios($conjunta) . "  
 				AND (t_p.observaciones IS NULL
 					OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
 
@@ -1152,7 +1153,7 @@ function get_listado_enviados_depto($usuario_id, $perfil_usuario)
 
 	
 		///// listado filtrado para sac para firmar
-function get_listado_filtrado_sac($usuario_id, $deptos_principales)
+function get_listado_filtrado_sac($usuario_id, $deptos_principales, $conjunta = null)
 {
 	// Si la lista está vacía, podrías optar por no filtrar o devolver un conjunto vacío.
 	if (empty($deptos_principales)) {
@@ -1184,7 +1185,7 @@ function get_listado_filtrado_sac($usuario_id, $deptos_principales)
 			WHERE
 				t_p.estado = 'sac'
 				AND $filtro_deptos
-				AND " . ingenierias::sql_visible() . "
+				AND " . $this->sql_anios($conjunta) . "
 				AND (t_p.observaciones IS NULL
 					OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
 
@@ -1242,7 +1243,7 @@ function get_listado_filtrado_control_sac($usuario_id, $deptos_principales)
 
 	
 		//---- listado para sac aprobados
-function get_listado_enviados_sac($usuario_id, $deptos_principales)
+function get_listado_enviados_sac($usuario_id, $deptos_principales, $conjunta = null)
 {
 	// --- Preparar el filtro por departamentos principales ---
 	if (empty($deptos_principales)) {
@@ -1269,7 +1270,7 @@ function get_listado_enviados_sac($usuario_id, $deptos_principales)
 			WHERE
 				t_p.estado IN ('aprobado')
 				AND $filtro_deptos
-				AND " . ingenierias::sql_visible() . "
+				AND " . $this->sql_anios($conjunta) . "
 				AND (t_p.observaciones IS NULL
 					OR t_p.observaciones NOT ILIKE '%[ocultar]%')                
 

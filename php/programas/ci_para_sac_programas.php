@@ -545,10 +545,10 @@ function conf__cuadro(toba_ei_cuadro $cuadro)
 	$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
 	$excepciones = array('admin');
 	if (array_intersect($perfiles_funcionales, $excepciones)) {
-		$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_sac();
+		$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_sac(false);
 	} else {
 		// Pasamos la lista de deptos_principales a la consulta filtrada
-		$datos = $this->dep('datos')->tabla('programas')->get_listado_filtrado_sac($usuario_id, $deptos_principales);
+		$datos = $this->dep('datos')->tabla('programas')->get_listado_filtrado_sac($usuario_id, $deptos_principales, false);
 	}
 
 	// Ajustar el texto del campo 'estado' según corresponda
@@ -611,11 +611,11 @@ function conf__enviados(catedras_ei_cuadro $cuadro)
 	$excepciones = array('admin');
 	if (array_intersect($perfiles_funcionales, $excepciones)) {
 		// Si el usuario es una excepción, se obtienen todos los datos
-		$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_aprobado();
+		$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_aprobado(false);
 	} else {
 		// Si el usuario no es excepción, se aplica el filtro por usuario y departamentos principales.
 		// Se asume que existe un método de consulta similar al get_listado_filtrado_sac(), por ejemplo:
-		$datos = $this->dep('datos')->tabla('programas')->get_listado_enviados_sac($usuario_id, $deptos_principales);
+		$datos = $this->dep('datos')->tabla('programas')->get_listado_enviados_sac($usuario_id, $deptos_principales, false);
 	}
 
 	// --- Ajustar el texto del campo 'estado' según corresponda ---

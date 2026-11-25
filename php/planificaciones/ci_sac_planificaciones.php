@@ -51,10 +51,10 @@ function conf__cuadro(toba_ei_cuadro $cuadro)
 	$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
 	$excepciones = array('admin');
 	if (array_intersect($perfiles_funcionales, $excepciones)) {
-		$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_aprobado();
+		$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_aprobado(true);
 	} else {
 		// Pasamos la lista de deptos_principales a la consulta filtrada
-		$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_sac_filtrado_aprobado($usuario_id, $deptos_principales);
+		$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_sac_filtrado_aprobado($usuario_id, $deptos_principales, true);
 	}
 
 	// Ajustar el texto del campo 'estado' según corresponda
@@ -88,9 +88,9 @@ function conf__cuadro(toba_ei_cuadro $cuadro)
 		$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
 		$excepciones = array('admin');
 		if (array_intersect($perfiles_funcionales, $excepciones)) {
-			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_aprobado();
+			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_aprobado(true);
 		} else {
-			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_filtrado_aprobado($usuario_id, $perfil_usuario);
+			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_filtrado_aprobado($usuario_id, $perfil_usuario, true);
 		}
 		
 		foreach ($datos as $key => $registro) {
@@ -146,10 +146,10 @@ function conf__cuadro(toba_ei_cuadro $cuadro)
 		$excepciones = array('admin');
 		if (array_intersect($perfiles_funcionales, $excepciones)) {
 			// Si el usuario es una excepción, obtener todos los datos
-			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_depto();
+			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_depto(true);
 		} else {
 				// Si no es una excepción, aplicar el filtro por legajo_resp y estado
-			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_sac_filtrado_depto($usuario_id, $perfil_usuario);
+			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_sac_filtrado_depto($usuario_id, $perfil_usuario, true);
 		}
 		foreach ($datos as $key => $registro) {
 			if ($registro ['estado_planificacion'] === 'docente') {
@@ -186,10 +186,10 @@ function conf__cuadro(toba_ei_cuadro $cuadro)
 		$excepciones = array('admin');
 		if (array_intersect($perfiles_funcionales, $excepciones)) {
 				// Si el usuario es una excepción, obtener todos los datos
-			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_docente();
+			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_docente(true);
 		} else {
 				// Si no es una excepción, aplicar el filtro por legajo_resp y estado
-			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_sac_filtrado_docente($usuario_id, $perfil_usuario);
+			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_sac_filtrado_docente($usuario_id, $perfil_usuario, true);
 		}
 		foreach ($datos as $key => $registro) {
 			if ($registro ['estado_planificacion'] === 'docente') {

@@ -1,5 +1,5 @@
 ------------------------------------------------------------
---[3478]--  SAC Aval Programas 
+--[3478]--  SAC Aval Programas (2025-2026) 
 ------------------------------------------------------------
 
 ------------------------------------------------------------
@@ -23,7 +23,7 @@ INSERT INTO apex_item (item_id, proyecto, item, padre_id, padre_proyecto, padre,
 	NULL, --actividad_buffer
 	NULL, --actividad_patron_proyecto
 	NULL, --actividad_patron
-	'SAC Aval Programas', --nombre
+	'SAC Aval Programas (2025-2026)', --nombre
 	NULL, --descripcion
 	'13', --punto_montaje
 	NULL, --actividad_accion

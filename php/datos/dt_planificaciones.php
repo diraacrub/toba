@@ -180,7 +180,7 @@ class dt_planificaciones extends catedras_datos_tabla
 	}
 	
 //----------------
-	function get_listado_filtrado_depto($usuario_id, $perfil_usuario)
+	function get_listado_filtrado_depto($usuario_id, $perfil_usuario, $hasta_antes = false)
 	{
 		
 	$perfiles_validos = array(
@@ -238,7 +238,8 @@ class dt_planificaciones extends catedras_datos_tabla
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			replace(translate(lower(t_m.depto_principal), 'áéíóúÁÉÍÓÚ', 'aeiouaeiou'), ' ', '')
+			" . $this->sql_hasta_antes_conjunta($hasta_antes) . "
+			AND replace(translate(lower(t_m.depto_principal), 'áéíóúÁÉÍÓÚ', 'aeiouaeiou'), ' ', '')
 			ILIKE replace(translate(lower($perfilLiteral), 'áéíóúÁÉÍÓÚ', 'aeiouaeiou'), ' ', '')
 		AND t_pl.estado_planificacion = 'depto'
 		ORDER BY nombre_materia";
@@ -265,7 +266,7 @@ class dt_planificaciones extends catedras_datos_tabla
 	}
 	
 //---------------- este creo que ya no se usa
-	function get_listado_filtrado_aprobado($usuario_id)
+	function get_listado_filtrado_aprobado($usuario_id, $hasta_antes = false)
 	{
 		$sql = "SELECT
 			t_pl.*,
@@ -278,14 +279,15 @@ class dt_planificaciones extends catedras_datos_tabla
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			t_p.legajo_resp = " . quote($usuario_id) . " AND t_pl.estado_planificacion = 'aprobado'
+			" . $this->sql_hasta_antes_conjunta($hasta_antes) . "
+			AND t_p.legajo_resp = " . quote($usuario_id) . " AND t_pl.estado_planificacion = 'aprobado'
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 	}
 	
 //----- SELECTS para SAC 
 	
-	function get_listado_sac_filtrado_docente($usuario_id, $perfil_usuario)
+	function get_listado_sac_filtrado_docente($usuario_id, $perfil_usuario, $hasta_antes = false)
 	{
 	// Si la lista está vacía, podrías optar por no filtrar o devolver un conjunto vacío.
 	if (empty($deptos_principales)) {
@@ -318,13 +320,14 @@ class dt_planificaciones extends catedras_datos_tabla
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			t_pl.estado_planificacion = 'docente'
+			" . $this->sql_hasta_antes_conjunta($hasta_antes) . "
+			AND t_pl.estado_planificacion = 'docente'
 			AND $filtro_deptos
 		ORDER BY nombre_materia";
 		return toba::db('catedras')->consultar($sql);
 	}
 //-----    
-	function get_listado_sac_filtrado_depto($usuario_id, $perfil_usuario)
+	function get_listado_sac_filtrado_depto($usuario_id, $perfil_usuario, $hasta_antes = false)
 	{
 	// Si la lista está vacía, podrías optar por no filtrar o devolver un conjunto vacío.
 	if (empty($deptos_principales)) {
@@ -357,14 +360,15 @@ class dt_planificaciones extends catedras_datos_tabla
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			t_pl.estado_planificacion = 'depto'
+			" . $this->sql_hasta_antes_conjunta($hasta_antes) . "
+			AND t_pl.estado_planificacion = 'depto'
 			AND $filtro_deptos
 		ORDER BY nombre_materia";
 		return toba::db('catedras')->consultar($sql);
 	}
 
 //------
-	function get_listado_sac_filtrado_aprobado($usuario_id, $perfil_usuario)
+	function get_listado_sac_filtrado_aprobado($usuario_id, $perfil_usuario, $hasta_antes = false)
 	{
 	// Si la lista está vacía, podrías optar por no filtrar o devolver un conjunto vacío.
 	if (empty($deptos_principales)) {
@@ -397,7 +401,8 @@ class dt_planificaciones extends catedras_datos_tabla
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			t_pl.estado_planificacion = 'aprobado'
+			" . $this->sql_hasta_antes_conjunta($hasta_antes) . "
+			AND t_pl.estado_planificacion = 'aprobado'
 			AND $filtro_deptos
 		ORDER BY nombre_materia";
 		return toba::db('catedras')->consultar($sql);
@@ -491,7 +496,7 @@ class dt_planificaciones extends catedras_datos_tabla
 	}
 	//--------------    
 
-	function get_listado_estado_depto()
+	function get_listado_estado_depto($hasta_antes = false)
 	{
 			$sql =
 		"SELECT
@@ -505,13 +510,14 @@ class dt_planificaciones extends catedras_datos_tabla
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			t_pl.estado_planificacion IN ('depto')    
+			" . $this->sql_hasta_antes_conjunta($hasta_antes) . "
+			AND t_pl.estado_planificacion IN ('depto')    
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 		}
 		
 //------------
-			function get_listado_estado_aprobado()
+			function get_listado_estado_aprobado($hasta_antes = false)
 	{
 			$sql =
 		"SELECT
@@ -525,7 +531,8 @@ class dt_planificaciones extends catedras_datos_tabla
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			t_pl.estado_planificacion IN ('aprobado')    
+			" . $this->sql_hasta_antes_conjunta($hasta_antes) . "
+			AND t_pl.estado_planificacion IN ('aprobado')    
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 		}  
@@ -555,7 +562,7 @@ class dt_planificaciones extends catedras_datos_tabla
 	
 //--------------------------    
 	
-	function get_listado_enviados_depto($usuario_id, $perfil_usuario)
+	function get_listado_enviados_depto($usuario_id, $perfil_usuario, $hasta_antes = false)
 	{
 		
 	$perfiles_validos = array(
@@ -613,7 +620,8 @@ class dt_planificaciones extends catedras_datos_tabla
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			replace(translate(lower(t_m.depto_principal), 'áéíóúÁÉÍÓÚ', 'aeiouaeiou'), ' ', '')
+			" . $this->sql_hasta_antes_conjunta($hasta_antes) . "
+			AND replace(translate(lower(t_m.depto_principal), 'áéíóúÁÉÍÓÚ', 'aeiouaeiou'), ' ', '')
 			ILIKE replace(translate(lower($perfilLiteral), 'áéíóúÁÉÍÓÚ', 'aeiouaeiou'), ' ', '')
 		AND t_pl.estado_planificacion = 'aprobado'
 		ORDER BY nombre_materia";

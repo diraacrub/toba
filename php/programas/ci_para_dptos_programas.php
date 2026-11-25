@@ -641,9 +641,9 @@ $perfil_usuario = str_replace(
 		$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
 		$excepciones = array('admin');
 		if (array_intersect($perfiles_funcionales, $excepciones)) {
-			$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_depto();
+			$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_depto(false);
 		} else {
-			$datos = $this->dep('datos')->tabla('programas')->get_listado_filtrado_depto($usuario_id, $perfil_usuario);
+			$datos = $this->dep('datos')->tabla('programas')->get_listado_filtrado_depto($usuario_id, $perfil_usuario, false);
 		}
 		
 		foreach ($datos as $key => $registro) {
@@ -700,10 +700,10 @@ $perfil_usuario = str_replace(
 	$excepciones = array('admin');
 	if (array_intersect($perfiles_funcionales, $excepciones)) {
 		// Si el usuario es una excepción, obtener todos los datos
-		$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_sac_aprobado();
+		$datos = $this->dep('datos')->tabla('programas')->get_listado_estado_sac_aprobado(false);
 	} else {
 		// Si no es una excepción, aplicar el filtro utilizando el perfil del usuario
-		$datos = $this->dep('datos')->tabla('programas')->get_listado_enviados_depto($usuario_id, $perfil_usuario);
+		$datos = $this->dep('datos')->tabla('programas')->get_listado_enviados_depto($usuario_id, $perfil_usuario, false);
 	}
 
 	// Modificamos los estados para que se muestren de forma amigable
