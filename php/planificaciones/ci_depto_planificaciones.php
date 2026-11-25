@@ -45,9 +45,9 @@ class ci_depto_planificaciones extends ci_base_operaciones
 		$perfiles_funcionales = toba::usuario()->get_perfiles_funcionales();
 		$excepciones = array('admin');
 		if (array_intersect($perfiles_funcionales, $excepciones)) {
-			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_depto();
+			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_depto(true);
 		} else {
-			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_filtrado_depto($usuario_id, $perfil_usuario);
+			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_filtrado_depto($usuario_id, $perfil_usuario, true);
 		}
 		
 		foreach ($datos as $key => $registro) {
@@ -108,10 +108,10 @@ class ci_depto_planificaciones extends ci_base_operaciones
 		$excepciones = array('admin');
 		if (array_intersect($perfiles_funcionales, $excepciones)) {
 			// Si el usuario es una excepción, obtener todos los datos
-			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_aprobado();
+			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_estado_aprobado(true);
 		} else {
 				// Si no es una excepción, aplicar el filtro por legajo_resp y estado
-			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_enviados_depto($usuario_id, $perfil_usuario);
+			$datos = $this->dep('datos')->tabla('planificaciones')->get_listado_enviados_depto($usuario_id, $perfil_usuario, true);
 		}
 		foreach ($datos as $key => $registro) {
 			if ($registro ['estado_planificacion'] === 'docente') {
