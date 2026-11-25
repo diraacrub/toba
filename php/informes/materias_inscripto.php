@@ -9,6 +9,11 @@ require_once dirname(__FILE__) . '/materias_equipo.php';
  * (GET /rest/inscriptos) para las salidas de campo. Solo el DNI: ningun otro
  * dato de las personas.
  *
+ * La materia del catalogo (id_materia) es la de huayca.materias con la misma
+ * combinacion exacta de cod_carrera, cod_guarani, plan_guarani y
+ * version_guarani; si no hay ninguna, NULL (el inscripto se guarda igual y se
+ * cuenta en 'sin_materia').
+ *
  * Los textos van en LATIN1, como la base (la API REST ya convierte el JSON).
  * Archivo en ASCII.
  */
@@ -21,7 +26,8 @@ class materias_inscripto
 	static $COLUMNAS = array(
 		'cod_carrera' => 'cod_carrera',
 		'cod_guarani' => 'cod_actividad',
-		'plan_siu' => 'plan_siu',
+		'plan_guarani' => 'plan_guarani',
+		'version_guarani' => 'version_guarani',
 		'materia' => 'materia',
 		'dni' => 'dni',
 	);
@@ -29,6 +35,30 @@ class materias_inscripto
 	static function db()
 	{
 		return toba::db('catedras');
+	}
+
+	/** Clave de una materia: cod_carrera|cod_guarani|plan_guarani|version_guarani. */
+	static function clave_materia($carrera, $guarani, $plan, $version)
+	{
+		return $carrera . '|' . $guarani . '|' . $plan . '|' . $version;
+	}
+
+	/**
+	 * Las materias del catalogo por clave_materia => id_materia. Si dos tienen
+	 * la misma combinacion (no deberia), la de id mas bajo.
+	 */
+	static function indice_materias($db)
+	{
+		$indice = array();
+		$filas = $db->consultar('SELECT id_materia, upper(trim(cod_carrera)) AS k, upper(trim(cod_guarani)) AS c,
+			trim(plan_guarani) AS p, trim(version_guarani) AS v FROM huayca.materias ORDER BY id_materia');
+		foreach ($filas as $m) {
+			$k = self::clave_materia($m['k'], $m['c'], $m['p'], $m['v']);
+			if (!isset($indice[$k])) {
+				$indice[$k] = (int) $m['id_materia'];
+			}
+		}
+		return $indice;
 	}
 
 	/**
@@ -66,7 +96,9 @@ class materias_inscripto
 	/**
 	 * Reemplaza los de ese anio y envio, dentro de una transaccion que abre
 	 * quien llama. Devuelve array('antes' => filas que habia, 'filas' => n,
-	 * 'estudiantes' => DNI distintos, 'materias' => materias distintas).
+	 * 'estudiantes' => DNI distintos, 'materias' => materias distintas,
+	 * 'sin_materia' => las materias (cod_carrera, cod_guarani, plan_guarani,
+	 * version_guarani, materia) que no estan en el catalogo).
 	 */
 	static function aplicar_en($db, $ano, $envio, $filas, $usuario)
 	{
@@ -80,8 +112,10 @@ class materias_inscripto
 		$antes = $db->consultar_fila('SELECT count(*) AS n FROM ' . self::TABLA . $donde);
 		$db->ejecutar('DELETE FROM ' . self::TABLA . $donde);
 		$columnas = array_keys(self::$COLUMNAS);
+		$indice = self::indice_materias($db);
 		$dnis = array();
 		$materias = array();
+		$sin_materia = array();
 		// De a 500 por INSERT: un envio son miles de filas.
 		foreach (array_chunk($filas, 500) as $tanda) {
 			$valores = array();
@@ -90,21 +124,30 @@ class materias_inscripto
 				foreach ($columnas as $c) {
 					$v[] = $q($f[$c]);
 				}
+				$km = self::clave_materia($f['cod_carrera'], $f['cod_guarani'], $f['plan_guarani'], $f['version_guarani']);
+				$id = isset($indice[$km]) ? $indice[$km] : null;
+				$v[] = $id === null ? 'NULL' : (string) (int) $id;
 				$v[] = $q($usuario);
 				$valores[] = '(' . implode(', ', $v) . ')';
 				$dnis[$f['dni']] = true;
-				$materias[$f['cod_carrera'] . '|' . $f['cod_guarani'] . '|' . $f['materia']] = true;
+				$materias[$km . '|' . $f['materia']] = true;
+				if ($id === null) {
+					$sin_materia[$km . '|' . $f['materia']] = array('cod_carrera' => $f['cod_carrera'],
+						'cod_guarani' => $f['cod_guarani'], 'plan_guarani' => $f['plan_guarani'],
+						'version_guarani' => $f['version_guarani'], 'materia' => $f['materia']);
+				}
 			}
 			$db->ejecutar('INSERT INTO ' . self::TABLA . ' (ano_academico, envio, ' . implode(', ', $columnas)
-				. ', actualizado_por) VALUES ' . implode(', ', $valores));
+				. ', id_materia, actualizado_por) VALUES ' . implode(', ', $valores));
 		}
 		$obs = 'Inscriptos ' . $ano . ' envio ' . $envio . ': ' . count($dnis) . ' estudiantes en ' . count($materias)
-			. ' materias (' . count($filas) . ' filas; antes ' . (int) $antes['n'] . ')';
+			. ' materias, ' . count($sin_materia) . ' fuera del catalogo (' . count($filas) . ' filas; antes '
+			. (int) $antes['n'] . ')';
 		$db->ejecutar('INSERT INTO huayca.movimientos (nombre_tabla, id_tabla, fecha_movimiento, tipo_movimiento,
 			usuario_movimiento, observaciones, estado_mov) VALUES (' . $q('materias_inscripto') . ', ' . $ano
 			. ', now(), ' . $q('Inscriptos') . ', ' . $q($usuario) . ', ' . $q($obs) . ', NULL)');
 		return array('antes' => (int) $antes['n'], 'filas' => count($filas), 'estudiantes' => count($dnis),
-			'materias' => count($materias));
+			'materias' => count($materias), 'sin_materia' => array_values($sin_materia));
 	}
 
 	/** Reemplaza los del anio y envio en su transaccion; con $simular, lo deshace. */
@@ -132,7 +175,8 @@ class materias_inscripto
 
 	/**
 	 * Las filas de ese anio (y envio, si viene), en UTF-8, con las claves que
-	 * manda deptos mas ano_academico y envio.
+	 * manda deptos mas ano_academico, envio e id_materia (null si no esta en
+	 * el catalogo).
 	 */
 	static function filas($ano, $envio = null)
 	{
@@ -141,7 +185,8 @@ class materias_inscripto
 			. ' ORDER BY envio, cod_carrera, materia, dni');
 		$salida = array();
 		foreach ($filas as $f) {
-			$r = array('ano_academico' => (int) $f['ano_academico'], 'envio' => (int) $f['envio']);
+			$r = array('ano_academico' => (int) $f['ano_academico'], 'envio' => (int) $f['envio'],
+				'id_materia' => $f['id_materia'] === null ? null : (int) $f['id_materia']);
 			foreach (self::$COLUMNAS as $columna => $campo) {
 				$r[$campo] = mb_convert_encoding((string) $f[$columna], 'UTF-8', 'ISO-8859-1');
 			}

@@ -10,14 +10,17 @@ require_once dirname(__FILE__) . '/../informes/materias_inscripto.php';
  *
  * GET /rest/inscriptos?ano_academico=2027[&envio=1|2]
  *   Una fila por estudiante y materia: {ano_academico, envio, cod_carrera,
- *   cod_actividad, plan_siu, materia, dni}.
+ *   cod_actividad, plan_guarani, version_guarani, materia, dni, id_materia}.
+ *   id_materia es la materia del catalogo con la misma cod_carrera,
+ *   cod_guarani, plan_guarani y version_guarani (null si no hay).
  *
  * POST /rest/inscriptos
  *   {"simular": true|false, "quien": "Nombre en deptos", "ano_academico": "2027",
- *    "envio": 1, "inscriptos": [{"cod_carrera", "cod_actividad", "plan_siu",
- *                                "materia", "dni"}, ...]}
+ *    "envio": 1, "inscriptos": [{"cod_carrera", "cod_actividad", "plan_guarani",
+ *                                "version_guarani", "materia", "dni"}, ...]}
  *   Reemplaza los de ese anio y envio, en una transaccion. Devuelve {simulado,
- *   ano_academico, envio, antes, filas, estudiantes, materias}. Solo para el
+ *   ano_academico, envio, antes, filas, estudiantes, materias, sin_materia:
+ *   [{cod_carrera, cod_guarani, plan_guarani, version_guarani, materia}]}. Solo para el
  *   usuario de alta de deptos (como /rest/mocovi-anio).
  *
  * El envio 1 son las materias del 1.er cuatrimestre y las anuales; el 2, las
@@ -90,7 +93,14 @@ class recurso_inscriptos implements modelable
 		} catch (Exception $e) {
 			throw new rest_error(500, 'No se pudo ' . ($simular ? 'simular' : 'guardar') . ' y no se cambio nada.');
 		}
+		$sin = array();
+		foreach ($r['sin_materia'] as $m) {
+			$sin[] = array_map(function ($v) {
+				return mb_convert_encoding((string) $v, 'UTF-8', 'ISO-8859-1');
+			}, $m);
+		}
 		rest::response()->get(array('simulado' => $simular, 'ano_academico' => (int) $ano, 'envio' => $envio,
-			'antes' => $r['antes'], 'filas' => $r['filas'], 'estudiantes' => $r['estudiantes'], 'materias' => $r['materias']));
+			'antes' => $r['antes'], 'filas' => $r['filas'], 'estudiantes' => $r['estudiantes'], 'materias' => $r['materias'],
+			'sin_materia' => $sin));
 	}
 }
