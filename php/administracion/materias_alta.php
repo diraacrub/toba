@@ -34,7 +34,8 @@ class catedras_materias
 {
 	const TABLA = 'materias';
 
-	// Columna => largo maximo (null = text; 'int' = ano_plan).
+	// Columna => largo maximo (null = text; 'int' = ano_plan; 'num' = numeric).
+	// Las i_* son de las ingenierias (desde 2027, php/ingenierias/ingenierias.php).
 	static $COLUMNAS = array(
 		'nombre_carrera' => 150, 'nombre_materia' => null, 'ano_plan' => 'int',
 		'periodo_plan' => 50, 'horas_totales' => 50, 'horas_semanales' => 50,
@@ -44,6 +45,8 @@ class catedras_materias
 		'optativa' => 10, 'trayecto' => 150, 'cod_carrera' => 50, 'plan_guarani' => 50,
 		'version_guarani' => 50, 'plan_mocovi' => 50, 'plan_ordenanzas' => null,
 		'cod_guarani' => 50, 'observaciones' => null,
+		'i_bloque_curricular' => null, 'i_correlativas_anteriores' => null,
+		'i_correlativas_posteriores' => null, 'i_reconocimiento_t_f' => 'num',
 	);
 
 	static $CLAVE = array('cod_guarani', 'plan_guarani', 'version_guarani');
@@ -81,6 +84,13 @@ class catedras_materias
 						$r['avisos'][] = "$c: se guarda " . (int) $m[0] . " (decia \"$v\").";
 					}
 					$v = (int) $m[0];
+				} elseif ($largo === 'num') {
+					$n = str_replace(',', '.', $v);
+					if (!is_numeric($n)) {
+						$r['problemas'][] = "$c: \"$v\" no es un numero.";
+						continue;
+					}
+					$v = $n;
 				} elseif ($largo !== null && strlen($v) > $largo) {
 					$r['problemas'][] = "$c: tiene " . strlen($v) . " caracteres y entran $largo.";
 					continue;
@@ -187,6 +197,9 @@ class catedras_materias
 		}
 		if (self::$COLUMNAS[$columna] === 'int') {
 			return (int) $actual === (int) $nuevo;
+		}
+		if (self::$COLUMNAS[$columna] === 'num') {
+			return is_numeric($actual) && (float) $actual === (float) $nuevo;
 		}
 		return trim((string) $actual) === (string) $nuevo;
 	}

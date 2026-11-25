@@ -1,4 +1,5 @@
 <?php
+require_once 'ingenierias/ingenierias.php';
 class ci_sac_control_programas extends catedras_ci
 {
 
@@ -204,6 +205,11 @@ $salida->mensaje('<div class="print-container"><table>');
 		$salida->mensaje($abre_div_style_1 . '<strong>1. FUNDAMENTACIÓN:</strong> <br>' . $this->fundamentacion_selec . $cierra_div_style_1);
 		$salida->mensaje($abre_div_style_1 . '<strong>2. OJETIVOS:</strong> <br>' . $this->objetivos_selec . $cierra_div_style_1);
 		$salida->mensaje($abre_div_style_1 . '<strong>3. CONTENIDOS SEGÚN PLAN DE ESTUDIOS:</strong> <br>' . nl2br($this->contenidos_minimos_selec) . $cierra_div_style_1);
+		// Ingenierias desde 2027: sus campos propios.
+		$programa_ing = $this->dep('datos')->tabla('programas')->get_datos_programa($this->id_programa_seleccionado);
+		foreach (ingenierias::secciones_impresion($programa_ing) as $titulo_ing => $html_ing) {
+			$salida->mensaje($abre_div_style_1 . '<strong>' . $titulo_ing . ':</strong> <br>' . $html_ing . $cierra_div_style_1);
+		}
 		$salida->mensaje($abre_div_style_1 . '<strong>4. CONTENIDO PROGRAMA ANALÍTICO:</strong> <br>' . $this->programa_analitico_selec . $cierra_div_style_1);
 		$salida->mensaje($abre_div_style_1 . '<strong>5. BIBLIOGRAFÍA BÁSICA YA DE CONSULTA:</strong> <br>' . $this->bibliografia_selec . $cierra_div_style_1);
 		$salida->mensaje($abre_div_style_1 . '<strong>6. PROPUESTA METODOLÓGICA MODALIDAD PRESENCIAL:</strong> <br>' . $this->propuesta_metodologica_selec . $cierra_div_style_1);

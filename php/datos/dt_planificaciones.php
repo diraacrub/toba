@@ -1,6 +1,18 @@
 <?php
+require_once 'ingenierias/ingenierias.php';
 class dt_planificaciones extends catedras_datos_tabla
 {
+
+	/**
+	 * Planificaciones (por separado) es solo hasta el anio anterior a
+	 * ingenierias::DESDE: desde ese anio la planificacion se carga con su
+	 * programa en Programas y Planificaciones. Con $hasta_antes false, todos.
+	 */
+	function sql_hasta_antes_conjunta($hasta_antes)
+	{
+		return $hasta_antes ? ingenierias::sql_desde('t_p', false) : 'TRUE';
+	}
+
 
 	
 //----------------
@@ -146,7 +158,7 @@ class dt_planificaciones extends catedras_datos_tabla
 	}
 	
 //----------------
-	function get_listado_filtrado($usuario_id)
+	function get_listado_filtrado($usuario_id, $hasta_antes = false)
 	{
 		$sql = "SELECT
 			t_pl.*,
@@ -159,7 +171,8 @@ class dt_planificaciones extends catedras_datos_tabla
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			t_p.legajo_resp = " . quote($usuario_id) . " 
+			" . $this->sql_hasta_antes_conjunta($hasta_antes) . "
+			AND t_p.legajo_resp = " . quote($usuario_id) . " 
 			AND t_pl.estado_planificacion = 'docente'
 			AND t_p.publicado
 		ORDER BY legajo_resp";
@@ -414,7 +427,7 @@ class dt_planificaciones extends catedras_datos_tabla
 	
 //----------------
 	
-	function get_listado_estado_depto_aprobado()
+	function get_listado_estado_depto_aprobado($hasta_antes = false)
 	{
 			$sql =
 		"SELECT
@@ -428,14 +441,15 @@ class dt_planificaciones extends catedras_datos_tabla
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			t_pl.estado_planificacion IN ('depto','aprobado')
+			" . $this->sql_hasta_antes_conjunta($hasta_antes) . "
+			AND t_pl.estado_planificacion IN ('depto','aprobado')
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 	}
 	
 //----------------
 	
-	function get_listado_estado_docente()
+	function get_listado_estado_docente($hasta_antes = false)
 	{
 			$sql = 
 		"SELECT
@@ -449,7 +463,8 @@ class dt_planificaciones extends catedras_datos_tabla
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia
 		WHERE
-			t_pl.estado_planificacion IN ('docente')
+			" . $this->sql_hasta_antes_conjunta($hasta_antes) . "
+			AND t_pl.estado_planificacion IN ('docente')
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);
 	}
@@ -517,7 +532,7 @@ class dt_planificaciones extends catedras_datos_tabla
 	
 //----------------
 	
-	function get_listado_enviados($usuario_id)
+	function get_listado_enviados($usuario_id, $hasta_antes = false)
 	{
 		$sql = 
 		"SELECT
@@ -531,7 +546,8 @@ class dt_planificaciones extends catedras_datos_tabla
 		JOIN
 			materias AS t_m ON t_p.id_materia_prog = t_m.id_materia      
 		WHERE
-			t_p.legajo_resp = " . quote($usuario_id) . "
+			" . $this->sql_hasta_antes_conjunta($hasta_antes) . "
+			AND t_p.legajo_resp = " . quote($usuario_id) . "
 			AND t_pl.estado_planificacion IN ('depto', 'aprobado')
 		ORDER BY legajo_resp";
 		return toba::db('catedras')->consultar($sql);

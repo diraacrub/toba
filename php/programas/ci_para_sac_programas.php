@@ -1,5 +1,6 @@
 <?php
 require_once 'ci_base_operaciones.php';
+require_once 'ingenierias/ingenierias.php';
 class ci_para_sac_programas extends ci_base_operaciones
 {
 	//esto es de operaciones departamentos
@@ -205,6 +206,11 @@ $salida->mensaje('<div class="print-container"><table>');
 		$salida->mensaje($abre_div_style_1 . '<strong>1. FUNDAMENTACIÓN:</strong> <br>' . $this->fundamentacion_selec . $cierra_div_style_1);
 		$salida->mensaje($abre_div_style_1 . '<strong>2. OJETIVOS:</strong> <br>' . $this->objetivos_selec . $cierra_div_style_1);
 		$salida->mensaje($abre_div_style_1 . '<strong>3. CONTENIDOS SEGÚN PLAN DE ESTUDIOS:</strong> <br>' . nl2br($this->contenidos_minimos_selec) . $cierra_div_style_1);
+		// Ingenierias desde 2027: sus campos propios.
+		$programa_ing = $this->dep('datos')->tabla('programas')->get_datos_programa($this->id_programa_seleccionado);
+		foreach (ingenierias::secciones_impresion($programa_ing) as $titulo_ing => $html_ing) {
+			$salida->mensaje($abre_div_style_1 . '<strong>' . $titulo_ing . ':</strong> <br>' . $html_ing . $cierra_div_style_1);
+		}
 		$salida->mensaje($abre_div_style_1 . '<strong>4. CONTENIDO PROGRAMA ANALÍTICO:</strong> <br>' . $this->programa_analitico_selec . $cierra_div_style_1);
 		$salida->mensaje($abre_div_style_1 . '<strong>5. BIBLIOGRAFÍA BÁSICA YA DE CONSULTA:</strong> <br>' . $this->bibliografia_selec . $cierra_div_style_1);
 		$salida->mensaje($abre_div_style_1 . '<strong>6. PROPUESTA METODOLÓGICA MODALIDAD PRESENCIAL:</strong> <br>' . $this->propuesta_metodologica_selec . $cierra_div_style_1);
@@ -352,7 +358,8 @@ toba::memoria()->set_dato_operacion('firma_doc_selec', $this->firma_doc_selec);
 toba::memoria()->set_dato_operacion('firma_dto_selec', $this->firma_dto_selec);
 toba::memoria()->set_dato_operacion('firma_sac_selec', $this->firma_sac_selec);              
 			
-			// Establecer los datos en el formulario
+			// Establecer los datos en el formulario (ingenierias desde 2027: sus campos)
+			$datos_programa = ingenierias::conf_vista($form, $datos_programa);
 			$form->set_datos($datos_programa);
 
 			// Setear de solo lectura para 'contenidos_minimos'
@@ -430,6 +437,7 @@ function evt__formulario_con_todo__modificacion($datos) {
 	// *** Fin de la lógica para actualizar firma_dto y firma_sac ***
 
 	// Guardar los datos modificados en la tabla 'programas'
+	$datos = ingenierias::sin_campos($datos);
 	$this->dep('datos')->tabla('programas')->set($datos);
 
 	// Agregar una notificación para mostrar al guardar correctamente
@@ -495,6 +503,7 @@ function evt__formulario_con_todo__modificacion_original($datos) {
 	}
 
 	// Guardar los datos modificados en la tabla 'programas'
+	$datos = ingenierias::sin_campos($datos);
 	$this->dep('datos')->tabla('programas')->set($datos);
 
 	// Agregar una notificación para mostrar al guardar correctamente
