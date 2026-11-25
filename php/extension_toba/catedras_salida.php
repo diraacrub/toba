@@ -12,6 +12,8 @@
  *   desde css/toba.css, pero Toba enlaza ese archivo siempre con ?av=3.4.6 y el
  *   servidor no manda Cache-Control: el navegador seguia con el CSS viejo
  *   despues de un deploy. Asi cada cambio de huayca.css es una URL nueva.
+ *   El favicon (www/img/favicon.ico), igual: Toba lo enlaza con ?av=1.0.0 y los
+ *   navegadores guardan aparte el "no hay icono" de cuando no existia.
  * - PaginaNormal (las operaciones con menu): el pie, a continuacion del
  *   contenido (getPostContenido); el getFooterHtml() de Toba se imprime despues
  *   de </body>, fuera del documento.
@@ -38,6 +40,14 @@ class catedras_salida
 		$v = is_file($archivo) ? filemtime($archivo) : 0;
 		$url = toba::escaper()->escapeHtmlAttr(toba_recurso::url_proyecto() . "/css/huayca.css?v=$v");
 		return "<link rel='stylesheet' type='text/css' media='screen' href='$url'/>\n";
+	}
+
+	/** La URL del favicon, versionada por la fecha del archivo */
+	static function url_favicon()
+	{
+		$archivo = __DIR__ . '/../../www/img/favicon.ico';
+		$v = is_file($archivo) ? filemtime($archivo) : 0;
+		return toba_recurso::url_proyecto() . "/img/favicon.ico?v=$v";
 	}
 
 	/** El pie, tambien lo usa la pantalla de login */
@@ -87,10 +97,13 @@ class catedras_factory_salida implements IFactory
 
 class catedras_tp_basico_salida extends siu_tp_basico
 {
-	// Despues de los CSS de Toba y del proyecto (css/toba.css): el tema les gana
+	// Despues de los CSS de Toba y del proyecto (css/toba.css): el tema les gana.
+	// El favicon que enlaza Toba (?av=...) se cambia por el versionado.
 	public function getPlantillasCss()
 	{
-		return parent::getPlantillasCss() . catedras_salida::link_tema();
+		$favicon = toba::escaper()->escapeHtmlAttr(catedras_salida::url_favicon());
+		$salida = preg_replace('/href="[^"]*favicon\.ico[^"]*"/', 'href="' . $favicon . '"', parent::getPlantillasCss());
+		return $salida . catedras_salida::link_tema();
 	}
 }
 
