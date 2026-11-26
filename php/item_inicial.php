@@ -11,16 +11,15 @@
  * tema. Archivo en ASCII: los acentos van como entidades HTML.
  */
 
-$perfil_usuario = toba::usuario()->get_perfiles_funcionales();
+require_once __DIR__ . '/extension_toba/catedras_perfiles.php';
+
+$perfiles = catedras_perfiles::actual();
 $nombre_completo = texto_plano(toba::usuario()->get_nombre());
 
-$perfil_usuario_lower = array_map('strtolower', $perfil_usuario);
-$perfiles_deptos = array('biologiageneral','botanica','didactica','ecologia','educacionfisica','enfermeria','estadistica','explotacionderecursosacuaticos','fisica','geologiaypetroleo','idiomasextranjerosconpropositosespecificos','ingenieriacivil','matematica','politicaeducacional','psicologia','quimica','zoologia');
-
-$es_admin = in_array("admin", $perfil_usuario_lower);
-$es_docente = in_array("docente", $perfil_usuario_lower) || in_array("docentefadel", $perfil_usuario_lower);
-$es_depto = count(array_intersect($perfil_usuario_lower, $perfiles_deptos)) > 0;
-$es_sac = count(array_intersect($perfil_usuario_lower, array('sac', 'saccrub', 'sacfadel'))) > 0;
+$es_admin = $perfiles->es_admin();
+$es_docente = $perfiles->es_docente();
+$es_depto = $perfiles->es_depto();
+$es_sac = $perfiles->es_sac();
 $ve_obligaciones = $es_admin || $es_docente || $es_depto || $es_sac;
 
 // Guias de uso (www/ayuda/), segun el perfil
@@ -54,17 +53,23 @@ if ($guias) {
 	echo '</section>';
 }
 
-if ($es_admin || $es_depto || $es_sac) {
+if ($es_admin || $es_depto || $es_sac || $perfiles->es_docente_crub()) {
 	// --- Gestion Academica: la otra aplicacion de Huayca, con la misma cuenta.
 	// Un departamento tiene ahi redesignaciones, ayudantes estudiantes y
-	// licencias; Secretaria, su panel con todo lo pendiente.
-	$url_gestion = 'https://huayca.crub.uncoma.edu.ar/gestion-academica/';
+	// licencias; Secretaria, su panel con todo lo pendiente; un docente, Mis
+	// catedras. Secretaria, departamentos y docentes ya empiezan alla al entrar con la
+	// cuenta Huayca (catedras_perfiles): la tarjeta es para volver.
+	$url_gestion = catedras_perfiles::URL_GESTION;
 	if ($es_sac || $es_admin) {
 		$texto_gestion = 'El panel de Secretar&iacute;a: lo pendiente de redesignaciones, conjuntos de materias, ayudantes estudiantes y programas del a&ntilde;o.';
 		$boton_gestion = 'Panel de Secretar&iacute;a';
-	} else {
+	} elseif ($es_depto) {
 		$texto_gestion = 'Las redesignaciones, los ayudantes estudiantes y las licencias a renovar de tu departamento.';
 		$boton_gestion = 'Ir a Gesti&oacute;n Acad&eacute;mica';
+	} else {
+		$url_gestion .= 'mis-catedras';
+		$texto_gestion = 'Mis c&aacute;tedras: tus materias del a&ntilde;o, con sus documentos, las fechas de entrega y el equipo.';
+		$boton_gestion = 'Ir a Mis c&aacute;tedras';
 	}
 	echo '<section class="hy-tarjeta hy-instructivo">';
 	echo '<div>';

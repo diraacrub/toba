@@ -38,3 +38,9 @@ url_reset = "https://huayca.crub.uncoma.edu.ar/quintral/reset-password?app=cated
 ; el endpoint de activacion de Quintral, llamado desde el navegador. Vacio = el
 ; de este mismo dominio.
 ;url_api_activar = "/quintral/api/auth/password-reset"
+
+; Al entrar con la cuenta Huayca sin pedir una operacion, Secretaria,
+; departamentos y docentes (no admin) empiezan en Gestion Academica, si el
+; token trae alguno de estos roles (los de ROLES_AUTORIZADOS en el .env de
+; deptos). Separados por coma. Por omision, quintral-user.
+;roles_gestion = "quintral-user"

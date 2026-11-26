@@ -23,6 +23,8 @@
  * Academica) sin sesion abierta, se guarda ahi mismo ('destino'): Keycloak
  * vuelve a ?huayca=vuelta, sin el ai, y sin esto se caeria en el Inicio. Al
  * abrir la sesion se entra en esa operacion (ver recordar_destino y tomar_destino).
+ * Sin operacion pedida, Secretaria, un departamento o un docente empieza en Gestion
+ * Academica (ver empieza_en_gestion y catedras_perfiles); el resto, en el Inicio.
  *
  * El id_token se recibe directo del endpoint de tokens, por TLS y con el secreto
  * del cliente: alcanza con verificar iss, aud, nonce y vencimiento (OIDC Core
@@ -31,6 +33,7 @@
  * Archivo en ASCII: los acentos van como \xNN (latin1, como el resto de Toba).
  */
 require_once __DIR__ . '/catedras_usuarios.php';
+require_once __DIR__ . '/catedras_perfiles.php';
 
 class catedras_huayca_sso
 {
@@ -255,6 +258,13 @@ class catedras_huayca_sso
 			// El exito: entra en la operacion que habia pedido, si pidio una.
 			if ($destino !== null) {
 				$e->set_item($destino);
+			} elseif (self::empieza_en_gestion($tokens)) {
+				// Si no pidio ninguna, Secretaria, un departamento o un docente
+				// empieza en Gestion Academica (su panel, el escritorio de su
+				// departamento o Mis catedras). La sesion de Toba ya quedo abierta: redirigir()
+				// la guarda antes de salir.
+				toba::logger()->info("LOGIN HUAYCA: $legajo empieza en Gestion Academica");
+				self::redirigir(catedras_perfiles::URL_GESTION);
 			}
 			throw $e;
 		} catch (toba_error_autenticacion $e) {
@@ -263,6 +273,56 @@ class catedras_huayca_sso
 			// Usuario bloqueado, IP rechazada, etc. (toba_reset_nucleo, el exito, no es toba_error y sigue de largo)
 			self::$mensaje = $e->getMessage();
 		}
+	}
+
+	/**
+	 * true si quien acaba de entrar empieza en Gestion Academica: por sus
+	 * perfiles de catedras (catedras_perfiles) y porque Gestion Academica lo
+	 * deja entrar. Para eso tiene que tener uno de los roles de Keycloak de
+	 * roles_gestion (keycloak.ini; los de ROLES_AUTORIZADOS en el .env de
+	 * deptos). Quien no lo tiene se queda en catedras: alla veria "no
+	 * habilitado". Un director que entra a Gestion Academica por estar en
+	 * DNI_AUTORIZADOS sin el rol tambien se queda aca: no es un error.
+	 */
+	private static function empieza_en_gestion(array $tokens)
+	{
+		try {
+			if (! catedras_perfiles::actual()->empieza_en_gestion()) {
+				return false;
+			}
+		} catch (Exception $e) {
+			toba::logger()->error('LOGIN HUAYCA: no se pudieron leer los perfiles: ' . $e->getMessage());
+			return false;
+		}
+		$habilitantes = array_filter(array_map('trim', explode(',', (string) self::conf('roles_gestion', 'quintral-user'))));
+		return count(array_intersect(self::roles_del_token($tokens['access_token'] ?? ''), $habilitantes)) > 0;
+	}
+
+	/**
+	 * Los roles del access_token, del realm y de cada cliente (como
+	 * auth.roles_del_token en deptos). Sin verificar la firma: el token lo
+	 * acaba de entregar Keycloak por TLS, no viene del navegador.
+	 */
+	private static function roles_del_token($jwt)
+	{
+		$partes = explode('.', (string) $jwt);
+		$datos = count($partes) === 3 ? json_decode(self::b64url_decode($partes[1]), true) : null;
+		if (! is_array($datos)) {
+			return array();
+		}
+		$listas = array($datos['realm_access'] ?? null);
+		if (isset($datos['resource_access']) && is_array($datos['resource_access'])) {
+			$listas = array_merge($listas, array_values($datos['resource_access']));
+		}
+		$roles = array();
+		foreach ($listas as $acceso) {
+			if (is_array($acceso) && isset($acceso['roles']) && is_array($acceso['roles'])) {
+				foreach ($acceso['roles'] as $r) {
+					$roles[] = (string) $r;
+				}
+			}
+		}
+		return array_values(array_unique($roles));
 	}
 
 	private static function canjear_codigo($codigo, $verificador)

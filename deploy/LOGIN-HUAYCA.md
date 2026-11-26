@@ -50,6 +50,18 @@ Keycloak (así no se vuelve a entrar solo, ni acá ni en Quintral o deptos) y
 Keycloak devuelve a `?huayca=salio`. Las sesiones ya abiertas en Quintral y deptos
 siguen hasta que vencen. Si se entró con legajo y clave, se sale como siempre.
 
+**Dónde empieza cada uno.** Si se pidió una operación (un enlace con `?ai=`),
+entra en ella. Si no, Secretaría Académica (`sac`, `saccrub`), un departamento
+(su grupo) o un docente del CRUB (`docente`), que no sea admin, sale a Gestión
+Académica (`catedras_perfiles::URL_GESTION`), que lo manda a lo suyo:
+Secretaría a su panel, quien dirige un departamento al escritorio de su
+departamento, el docente a Mis cátedras (`perfiles.destino` en deptos). Solo si su token trae uno de los roles de
+`roles_gestion` (keycloak.ini, por omisión `quintral-user`: los de
+`ROLES_AUTORIZADOS` de deptos); si no, allá vería "no habilitado" y se queda
+en el Inicio de Cátedras. Quien entra con legajo y clave también se queda: no
+tiene sesión Huayca para entrar solo a Gestión Académica. El Inicio de Cátedras
+tiene la tarjeta para volver (Mis cátedras, para el docente).
+
 El estado del pedido (state, nonce, verificador PKCE) y el id_token viven en
 `$_SESSION['catedras_huayca']`, fuera de lo de Toba.
 
